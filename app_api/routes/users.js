@@ -12,6 +12,11 @@ router.route('/')
 	.get(urlencode, controller.listUsers)
 	.post(urlencode, controller.createUser);
 
+router.route('/:userid')
+	.get(urlencode, controller.getUser)
+	.put(urlencode, controller.updateUser)
+	.delete(urlencode, controller.deleteUser);
+
 
 
 

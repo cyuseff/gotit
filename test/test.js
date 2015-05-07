@@ -23,18 +23,25 @@ describe('Request to the root path', function(){
 
 describe('Create a new User', function(){
 
-  it('Returns a 201 status code', function(done){
+  it('Returns a 201 and _id:name:email', function(done){
 		request(app)
 			.post('/api/users')
 			.send('name=User001&email=user001@mail.com&password=1234')
-			.expect(201, done);
+			.expect(201)
+      .expect(/User001/)
+      .expect(/user001\@mail.com/)
+      .expect(/_id/, done);
 	});
 
-  it('Returns the User name and email', function(done){
+  it('do not return user passwords', function(done){
 		request(app)
 			.post('/api/users')
 			.send('name=User002&email=user002@mail.com&password=1234')
-			.expect(/User002[^u]*user002@mail.com/, done);
+      .expect(function(res){
+        //to pass test return falsy value
+        return /password/.test(JSON.stringify(res.body));
+      })
+      .end(done);
 	});
 
   it('Validate uniqueness of user name', function(done){
@@ -88,38 +95,19 @@ describe('List of Users', function(){
       .get('/api/users')
       .expect(function(res){
         //to pass test return falsy value
-        return /password/.test(res.body);
+        return /password/.test(JSON.stringify(res.body));
       })
       .end(done);
-  });
-
-});
-
-
-
-
-
-describe('Update a User', function(){
-
-  it('Update User001 email', function(done) {
-
-    request(app)
-      .get('/api/users/asd')
-      .expect(200, done);
-
   });
 
   after(function(done){
 
     var n = 0;
     function cb(err) {
-
       if(err) {
         console.log(err);
         return;
       }
-      console.log('User removed.')
-
       n++;
       if(n === 2) done();
     }
@@ -135,7 +123,93 @@ describe('Update a User', function(){
       .exec(function(err, user){
         cb(err);
       });
+
   });
 
+});
+
+
+
+
+var dummy;
+describe('Show one User', function(){
+
+  before(function(done){
+    User.create({
+  		name: 'Dummy',
+  	  email: 'dummy@email.com',
+  	  password: 'dummy123',
+  	}, function(err, user) {
+  		if (err) console.log(err);
+      dummy = user;
+      done();
+  	});
+  });
+
+  it('Return a 200, Json format', function(done) {
+
+    request(app)
+      .get('/api/users/'+dummy._id)
+      .expect(200)
+      .expect('Content-Type', /json/, done);
+
+  });
+
+
+  it('Return Dummy Users', function(done){
+		request(app)
+			.get('/api/users/'+dummy._id)
+			.expect(/Dummy/i, done);
+	});
+
+
+  it('do not return user passwords', function(done){
+    request(app)
+    .get('/api/users/'+dummy._id)
+      .expect(function(res){
+        //to pass test return falsy value
+        return /password/i.test(JSON.stringify(res.body));
+      })
+      .end(done);
+  });
+
+});
+
+
+
+
+
+describe('Update a User', function(){
+
+  it('Update Dummy user email', function(done) {
+
+    request(app)
+      .put('/api/users/'+dummy._id)
+      .send('email=new@email.com')
+      .expect(200)
+      .expect(function(res){
+        //to pass test return falsy value
+        return /password/.test(res.body);
+      })
+      .expect(/new\@email.com/, done);
+
+  });
+
+});
+
+
+
+
+describe('Delete a User', function(){
+
+  it('Returns a 204 status code', function(done){
+		request(app)
+      .delete('/api/users/'+dummy._id)
+			.expect(204)
+			.end(function(error){
+				if(error) throw error;
+				done();
+			});
+	});
 
 });
