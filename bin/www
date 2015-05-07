@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
-var app = require('./../app');
 
+"use strict";
+
+var app = require('./../app');
 var port = 5000;
 
 app.listen(port, function(){
