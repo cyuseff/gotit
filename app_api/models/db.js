@@ -40,4 +40,11 @@ process.on('SIGTERM', function(){
 	});
 });
 
-require('./user');
+
+/*****MODELS*****/
+require('./user')(mongoose);
+
+
+
+//If the DB is require in other file, export it
+//module.exports = mongoose;

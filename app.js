@@ -4,7 +4,8 @@ var express = require('express'),
   app = express();
 
 //Database connection
-require('./app_api/models/db.js');
+var db = require('./app_api/models/db.js');
+console.log(db);
 
 //Api Routes
 require('./app_api/routes')(app);
