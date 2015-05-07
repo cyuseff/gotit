@@ -1,7 +1,7 @@
 "use strict";
 
-var express = require('express');
-var app = express();
+var express = require('express'),
+  app = express();
 
 //Database connection
 require('./app_api/models/db.js');

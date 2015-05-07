@@ -2,6 +2,23 @@
   "name": "GotIt",
   "version": "1.0.0",
   "dependencies": {
+    "bcrypt": {
+      "version": "0.8.2",
+      "from": "bcrypt@0.8.2",
+      "resolved": "https://registry.npmjs.org/bcrypt/-/bcrypt-0.8.2.tgz",
+      "dependencies": {
+        "bindings": {
+          "version": "1.2.0",
+          "from": "bindings@1.2.0",
+          "resolved": "https://registry.npmjs.org/bindings/-/bindings-1.2.0.tgz"
+        },
+        "nan": {
+          "version": "1.7.0",
+          "from": "nan@1.7.0",
+          "resolved": "https://registry.npmjs.org/nan/-/nan-1.7.0.tgz"
+        }
+      }
+    },
     "body-parser": {
       "version": "1.12.3",
       "from": "body-parser@*",
@@ -1088,6 +1105,23 @@
           "version": "0.0.5",
           "from": "sliced@0.0.5",
           "resolved": "https://registry.npmjs.org/sliced/-/sliced-0.0.5.tgz"
+        }
+      }
+    },
+    "passport": {
+      "version": "0.2.1",
+      "from": "passport@*",
+      "resolved": "https://registry.npmjs.org/passport/-/passport-0.2.1.tgz",
+      "dependencies": {
+        "passport-strategy": {
+          "version": "1.0.0",
+          "from": "passport-strategy@>=1.0.0 <2.0.0",
+          "resolved": "https://registry.npmjs.org/passport-strategy/-/passport-strategy-1.0.0.tgz"
+        },
+        "pause": {
+          "version": "0.0.1",
+          "from": "pause@0.0.1",
+          "resolved": "https://registry.npmjs.org/pause/-/pause-0.0.1.tgz"
         }
       }
     }

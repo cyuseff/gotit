@@ -1,9 +1,9 @@
 "use strict";
 
-var request = require('supertest');
-var app = require('../app');
+var request = require('supertest'),
+  app = require('../app'),
+  mongoose = require('mongoose');
 
-var mongoose = require('mongoose');
 var User = mongoose.model('User');
 
 describe('Request to the root path', function(){
@@ -127,7 +127,6 @@ describe('List of Users', function(){
   });
 
 });
-
 
 
 

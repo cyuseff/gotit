@@ -1,9 +1,9 @@
 "use strict";
 
-var router = require('express').Router();
-var bodyParser = require('body-parser');
-var urlencode = bodyParser.urlencoded({extended:false});
-var controller = require('../controllers/users');
+var router = require('express').Router(),
+	bodyParser = require('body-parser'),
+	urlencode = bodyParser.urlencoded({extended:false}),
+	controller = require('../controllers/users');
 
 
 

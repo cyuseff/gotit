@@ -4,14 +4,17 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha test/test.js"
+    "users_test": "mocha test/users.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^0.8.2",
     "body-parser": "^1.12.3",
     "express": "^4.12.3",
-    "mongoose": "^4.0.2"
+    "mongoose": "^4.0.2",
+    "passport": "^0.2.1",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
     "mocha": "^2.2.4",
