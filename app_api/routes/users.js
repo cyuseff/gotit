@@ -6,7 +6,6 @@ var router = require('express').Router(),
 	controller = require('../controllers/users');
 
 
-
 //*** /users  ***//
 router.route('/')
 	.get(urlencode, controller.listUsers)

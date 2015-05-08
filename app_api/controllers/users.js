@@ -1,7 +1,6 @@
 "use strict";
 
-var mongoose = require('mongoose');
-var User = mongoose.model('User');
+var User = require('../models/user.js');
 
 //helper function
 function sendJsonResponse(res, status, content){

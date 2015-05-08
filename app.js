@@ -1,15 +1,22 @@
 "use strict";
 
 var express = require('express'),
-  app = express();
+  session = require('express-session');
+
+var app = express();
 
 //Database connection
-var db = require('./app_api/models/db.js');
-console.log(db);
+var db = require('./config/db.js');
 
 //Api Routes
 require('./app_api/routes')(app);
 
+
+
+
+
+
+/** Index **/
 app.get('/', function(req, res){
   res.send('OK');
 });
@@ -17,40 +24,24 @@ app.get('/', function(req, res){
 
 
 
-
-/** Handle Not Found Errors **/
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+/** LOGIN **/
+app.post('/login', function(req, res){
+  res.sendStatus(200);
 });
 
-// error handlers
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res
-      .status(err.status || 500)
-      .send({
-        message: err.message,
-        error: err
-      });
-  });
-}
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res
-    .status(err.status || 500)
-    .send({
-      message: err.message,
-      error: 'Something gones wrong D;'
-    });
-});
 
+
+
+
+
+
+
+
+
+
+
+app.get('*', function(req, res){ res.status(404).end(); });
 
 
 
