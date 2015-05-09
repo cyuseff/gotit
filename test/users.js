@@ -4,27 +4,24 @@ var request = require('supertest'),
   app = require('../app'),
   mongoose = require('mongoose');
 
-var User = mongoose.model('User');
-
-describe('Request to the root path', function(){
-
-  it('Return a 200 status code', function(done) {
-
-    request(app)
-      .get('/')
-      .expect(200, done);
-
-  });
-
-});
-
-
+var agent = request.agent(app),
+  User = mongoose.model('User');
 
 
 describe('Create a new User', function(){
 
+  //athenticate before exec test
+  before(function(done){
+    agent
+      .post('/login')
+      .send('username=Admin&password=admin123')
+      .expect(200, done);
+  });
+
+
+
   it('Returns a 201 and _id:name:email', function(done){
-		request(app)
+		agent
 			.post('/api/users')
 			.send('name=User001&email=user001@mail.com&password=1234')
 			.expect(201)
@@ -34,7 +31,7 @@ describe('Create a new User', function(){
 	});
 
   it('do not return user passwords', function(done){
-		request(app)
+		agent
 			.post('/api/users')
 			.send('name=User002&email=user002@mail.com&password=1234')
       .expect(function(res){
@@ -45,21 +42,21 @@ describe('Create a new User', function(){
 	});
 
   it('Validate uniqueness of user name', function(done){
-		request(app)
+		agent
 			.post('/api/users')
 			.send('name=User002&email=user003@mail.com&password=1234')
 			.expect(400, done);
 	});
 
   it('Validate uniqueness of user email', function(done){
-		request(app)
+		agent
 			.post('/api/users')
 			.send('name=User003&email=user002@mail.com&password=1234')
 			.expect(400, done);
 	});
 
 	it('Validate required (user, email and password)', function(done){
-		request(app)
+		agent
       .post('/api/users')
 			.send('name=&email=&password=')
 			.expect(400, done);
@@ -75,7 +72,7 @@ describe('List of Users', function(){
 
   it('Return a 200, Json format', function(done) {
 
-    request(app)
+    agent
       .get('/api/users')
       .expect(200)
       .expect('Content-Type', /json/, done);
@@ -84,14 +81,14 @@ describe('List of Users', function(){
 
 
   it('Return Test Users (Users001 & Users002)', function(done){
-		request(app)
+		agent
 			.get('/api/users')
 			.expect(/User001[^U]*User002/, done);
 	});
 
 
   it('do not return user passwords', function(done){
-    request(app)
+    agent
       .get('/api/users')
       .expect(function(res){
         //to pass test return falsy value
@@ -133,6 +130,7 @@ describe('List of Users', function(){
 var dummy;
 describe('Show one User', function(){
 
+  //create "Dummy" user
   before(function(done){
     User.create({
   		name: 'Dummy',
@@ -147,7 +145,7 @@ describe('Show one User', function(){
 
   it('Return a 200, Json format', function(done) {
 
-    request(app)
+    agent
       .get('/api/users/'+dummy._id)
       .expect(200)
       .expect('Content-Type', /json/, done);
@@ -156,14 +154,14 @@ describe('Show one User', function(){
 
 
   it('Return Dummy Users', function(done){
-		request(app)
+		agent
 			.get('/api/users/'+dummy._id)
 			.expect(/Dummy/i, done);
 	});
 
 
   it('do not return user passwords', function(done){
-    request(app)
+    agent
     .get('/api/users/'+dummy._id)
       .expect(function(res){
         //to pass test return falsy value
@@ -182,7 +180,7 @@ describe('Update a User', function(){
 
   it('Update Dummy user email', function(done) {
 
-    request(app)
+    agent
       .put('/api/users/'+dummy._id)
       .send('email=new@email.com')
       .expect(200)
@@ -202,7 +200,7 @@ describe('Update a User', function(){
 describe('Delete a User', function(){
 
   it('Returns a 204 status code', function(done){
-		request(app)
+		agent
       .delete('/api/users/'+dummy._id)
 			.expect(204)
 			.end(function(error){
@@ -210,5 +208,23 @@ describe('Delete a User', function(){
 				done();
 			});
 	});
+
+
+
+  //Logout user
+  after(function(done){
+    agent
+      .get('/logout')
+      .expect(200)
+      .expect(/bye/, done);
+
+    //delete "Dummy" user
+    User
+      .findOneAndRemove({name:'Dummy'})
+      .exec(function(err, user){
+        if(err) console.log(err);
+      });
+
+  });
 
 });

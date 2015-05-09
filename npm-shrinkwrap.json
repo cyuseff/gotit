@@ -104,6 +104,30 @@
         }
       }
     },
+    "connect-redis": {
+      "version": "2.3.0",
+      "from": "connect-redis@*",
+      "resolved": "https://registry.npmjs.org/connect-redis/-/connect-redis-2.3.0.tgz",
+      "dependencies": {
+        "debug": {
+          "version": "1.0.4",
+          "from": "debug@>=1.0.4 <2.0.0",
+          "resolved": "https://registry.npmjs.org/debug/-/debug-1.0.4.tgz",
+          "dependencies": {
+            "ms": {
+              "version": "0.6.2",
+              "from": "ms@0.6.2",
+              "resolved": "https://registry.npmjs.org/ms/-/ms-0.6.2.tgz"
+            }
+          }
+        },
+        "redis": {
+          "version": "0.12.1",
+          "from": "redis@>=0.12.1 <0.13.0",
+          "resolved": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz"
+        }
+      }
+    },
     "express": {
       "version": "4.12.3",
       "from": "express@*",
