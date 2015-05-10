@@ -11,19 +11,10 @@ passport.serializeUser(function(user, done) {
 
 passport.deserializeUser(function(uuid, done) {
 
-  //use find for performance
-  User
-    .find({uuid: uuid})
-    .limit(1)
-    .exec(function (err, user) {
-      done(err, user);
-    });
-
-
   //use uuid instead _id
-  /*User.findOne(uuid, function (err, user) {
+  User.findOne(uuid, function (err, user) {
     done(err, user);
-  });*/
+  });
 
 
   //Passport default
