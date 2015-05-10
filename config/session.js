@@ -1,6 +1,7 @@
 "use strict";
 
-var session = require('express-session');
+var session = require('express-session'),
+  cookieParser = require('cookie-parser');
 
 //store session on redis instead server RAM
 var RedisStore = require('connect-redis')(session);
@@ -34,10 +35,11 @@ var session_ops = {
   secret: SECRET,
   name: 'got-it',
   resave: false,
-  saveUninitialized:false,
+  saveUninitialized:true,
   store: new RedisStore(redis_opt)// if is not specify it will use server ram
 };
 
 module.exports = function(app) {
+  app.use(cookieParser(SECRET));
   app.use(session(session_ops));
 };

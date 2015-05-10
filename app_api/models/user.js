@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
 	bcrypt = require('bcrypt');
 
 var SALT_WORK_FACTOR = (process.env.NODE_ENV == 'production')? 10 :  1;
+console.log(SALT_WORK_FACTOR);
 
 var userSchema = new mongoose.Schema({
 	name: {type:String, required:true, unique: true},

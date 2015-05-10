@@ -3,8 +3,7 @@
 var express = require('express'),
   mongoose = require('./config/db'),
   passport = require('./config/pass'),
-  bodyParser = require('body-parser'),
-	urlencode = bodyParser.urlencoded({extended:false});
+  bodyParser = require('body-parser');
 
 
 
@@ -13,7 +12,7 @@ var express = require('express'),
 var app = express();
 
 //config app
-app.use(urlencode);
+app.use(bodyParser.urlencoded({extended:false}));
 require('./config/session')(app);
 
 //config passport
@@ -47,6 +46,7 @@ app.post('/login', function(req, res, next) {
     }
     req.logIn(user, function(err) {
       if (err) { return next(err); }
+      req.session.user = user;
       res.status(200).send(user);
       return;
     });
@@ -55,6 +55,8 @@ app.post('/login', function(req, res, next) {
 
 
 app.get('/private', ensureAuthenticated, function(req, res){
+  console.log("Cookies: ", req.cookies);
+  console.log(req.session.passport.user);
   res.sendStatus(200);
 });
 

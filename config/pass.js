@@ -4,9 +4,16 @@ var mongoose = require('mongoose'),
   User = require('../app_api/models/user');
 
 
+function formatUser(user) {
+	return {_id:user._id, name:user.name, email:user.email};
+}
+
 
 passport.serializeUser(function(user, done) {
-  done(null, user.id);
+
+  done(null, formatUser(user));
+  //Passport default
+  //done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
