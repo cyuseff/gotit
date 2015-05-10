@@ -20,9 +20,9 @@ describe('Create a new User', function(){
 
 
 
-  it('Returns a 201 and _id:name:email', function(done){
+  it('Returns a 201 and uuid:name:email', function(done){
 		agent
-			.post('/api/users')
+			.post('/signin')
 			.send('name=User001&email=user001@mail.com&password=1234')
 			.expect(201)
       .expect(/User001/)
@@ -32,7 +32,7 @@ describe('Create a new User', function(){
 
   it('do not return user passwords', function(done){
 		agent
-			.post('/api/users')
+			.post('/signin')
 			.send('name=User002&email=user002@mail.com&password=1234')
       .expect(function(res){
         //to pass test return falsy value
@@ -43,21 +43,21 @@ describe('Create a new User', function(){
 
   it('Validate uniqueness of user name', function(done){
 		agent
-			.post('/api/users')
+			.post('/signin')
 			.send('name=User002&email=user003@mail.com&password=1234')
 			.expect(400, done);
 	});
 
   it('Validate uniqueness of user email', function(done){
 		agent
-			.post('/api/users')
+			.post('/signin')
 			.send('name=User003&email=user002@mail.com&password=1234')
 			.expect(400, done);
 	});
 
 	it('Validate required (user, email and password)', function(done){
 		agent
-      .post('/api/users')
+      .post('/signin')
 			.send('name=&email=&password=')
 			.expect(400, done);
 	});
@@ -146,7 +146,7 @@ describe('Show one User', function(){
   it('Return a 200, Json format', function(done) {
 
     agent
-      .get('/api/users/'+dummy._id)
+      .get('/api/users/'+dummy.uuid)
       .expect(200)
       .expect('Content-Type', /json/, done);
 
@@ -155,14 +155,14 @@ describe('Show one User', function(){
 
   it('Return Dummy Users', function(done){
 		agent
-			.get('/api/users/'+dummy._id)
+			.get('/api/users/'+dummy.uuid)
 			.expect(/Dummy/i, done);
 	});
 
 
   it('do not return user passwords', function(done){
     agent
-    .get('/api/users/'+dummy._id)
+    .get('/api/users/'+dummy.uuid)
       .expect(function(res){
         //to pass test return falsy value
         return /password/i.test(JSON.stringify(res.body));
@@ -181,7 +181,7 @@ describe('Update a User', function(){
   it('Update Dummy user email', function(done) {
 
     agent
-      .put('/api/users/'+dummy._id)
+      .put('/api/users/'+dummy.uuid)
       .send('email=new@email.com')
       .expect(200)
       .expect(function(res){
@@ -201,7 +201,7 @@ describe('Delete a User', function(){
 
   it('Returns a 204 status code', function(done){
 		agent
-      .delete('/api/users/'+dummy._id)
+      .delete('/api/users/'+dummy.uuid)
 			.expect(204)
 			.end(function(error){
 				if(error) throw error;

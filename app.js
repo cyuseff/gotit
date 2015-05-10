@@ -36,62 +36,21 @@ app.get('/', function(req, res){
 
 
 
-/** LOGIN **/
-app.post('/login', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-    if (err) { return next(err) }
-    if (!user) {
-      console.log(info.message);
-      return res.status(401).send(info.message);
-    }
-    req.logIn(user, function(err) {
-      if (err) { return next(err); }
-      res.status(200).send(user);
-      return;
-    });
-  })(req, res, next);
-});
 
 
+/* Test for private route */
 app.get('/private', ensureAuthenticated, function(req, res){
-  /*console.log("Cookies: ", req.cookies);
-  console.log(req.session.passport.user);
-  console.log(req.user);
-  console.log(req.session.user);*/
-  res.sendStatus(200);
+  res.sendStatus(200)
 });
-
-app.get('/logout', function(req, res){
-  req.logout();
-  res.status(200).send('bye');
-});
-
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.sendStatus(401);
 }
 
-/*function alreadyAuthenticated(req, res, next){
-  if (req.user) {
-    res.status(200).send(req.user);
-  } else {
-    next();
-  }
-}*/
 
-
-
-
-
-
-
-
-
-
-app.get('*', function(req, res){ res.status(404).end(); });
-
-
+//Not found
+app.all('*', function(req, res){ res.status(404).send("404: Not found."); });
 
 
 module.exports = app;

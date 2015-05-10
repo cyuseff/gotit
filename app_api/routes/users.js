@@ -6,10 +6,9 @@ var router = require('express').Router(),
 
 //*** /users  ***//
 router.route('/')
-	.get(controller.listUsers)
-	.post(controller.createUser);
+	.get(controller.listUsers);
 
-router.route('/:userid')
+router.route('/:useruuid')
 	.get(controller.getUser)
 	.put(controller.updateUser)
 	.delete(controller.deleteUser);
