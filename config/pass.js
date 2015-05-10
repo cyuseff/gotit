@@ -11,6 +11,7 @@ function formatUser(user) {
 
 passport.serializeUser(function(user, done) {
 
+
   done(null, formatUser(user));
   //Passport default
   //done(null, user.id);
@@ -23,9 +24,10 @@ passport.deserializeUser(function(id, done) {
 });
 
 
-
-passport.use(new LocalStrategy(function(username, password, done) {
-  User.findOne({ name: username }, function(err, user) {
+passport.use(new LocalStrategy({
+    usernameField: 'email'
+  },function(username, password, done) {
+  User.findOne({ email: username }, function(err, user) {
     if (err) { return done(err); }
     if (!user) { return done(null, false, { message: 'Unknown user ' + username }); }
     user.comparePassword(password, function(err, isMatch) {

@@ -14,7 +14,7 @@ describe('Create a new User', function(){
   before(function(done){
     agent
       .post('/login')
-      .send('username=Admin&password=admin123')
+      .send('email=admin@email.com&password=admin123')
       .expect(200, done);
   });
 

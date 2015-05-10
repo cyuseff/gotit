@@ -13,7 +13,7 @@ describe('Login User', function(){
 
     agent
       .post('/login')
-      .send('username=Admin&password=admin123')
+      .send('email=admin@email.com&password=admin123')
       .expect(200)
       .expect('set-cookie', /got-it/)
       .expect(/admin/i,done);
@@ -43,7 +43,7 @@ describe('Login User', function(){
 
     request(app)
       .post('/login')
-      .send('username=Admin&password=admin')
+      .send('email=admin@email.com&password=admin')
       .expect(401)
       .expect(/invalid\spassword/i,done);
 
