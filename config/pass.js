@@ -4,23 +4,32 @@ var mongoose = require('mongoose'),
   User = require('../app_api/models/user');
 
 
-function formatUser(user) {
-	return {_id:user._id, name:user.name, email:user.email};
-}
-
-
 passport.serializeUser(function(user, done) {
-
-
-  done(null, formatUser(user));
-  //Passport default
-  //done(null, user.id);
+  //use UUID instead user._id
+  done(null, user.uuid);
 });
 
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function (err, user) {
+passport.deserializeUser(function(uuid, done) {
+
+  //use find for performance
+  User
+    .find({uuid: uuid})
+    .limit(1)
+    .exec(function (err, user) {
+      done(err, user);
+    });
+
+
+  //use uuid instead _id
+  /*User.findOne(uuid, function (err, user) {
     done(err, user);
-  });
+  });*/
+
+
+  //Passport default
+  /*User.findById(id, function (err, user) {
+    done(err, user);
+  });*/
 });
 
 

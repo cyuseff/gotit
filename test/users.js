@@ -27,7 +27,7 @@ describe('Create a new User', function(){
 			.expect(201)
       .expect(/User001/)
       .expect(/user001\@mail.com/)
-      .expect(/_id/, done);
+      .expect(/uuid/, done);
 	});
 
   it('do not return user passwords', function(done){

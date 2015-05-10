@@ -14,7 +14,7 @@ function formatList(name, content) {
 }
 
 function formatUser(user) {
-	return {_id:user._id, name:user.name, email:user.email};
+	return {uuid:user.uuid, name:user.name, email:user.email};
 }
 
 
@@ -39,7 +39,7 @@ module.exports.createUser = function(req, res) {
 module.exports.listUsers = function(req, res) {
 
 	User
-		.find({}, {name:1, email:1})
+		.find({}, {name:1, email:1, uuid:1, _id:0})
 		.exec(function(err, users){
 			if (err) {
 				sendJsonResponse(res, 400, err);

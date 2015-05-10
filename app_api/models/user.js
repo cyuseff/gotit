@@ -1,12 +1,14 @@
 "use strict";
 
 var mongoose = require('mongoose'),
-	bcrypt = require('bcrypt');
+	bcrypt = require('bcrypt'),
+	uuid = require('node-uuid');
 
 var SALT_WORK_FACTOR = (process.env.NODE_ENV == 'production')? 10 :  1;
 
 var userSchema = new mongoose.Schema({
-	name: {type:String, required:true, unique: true},
+	uuid: {type:String, unique:true},
+	name: {type:String, required:true},
 	email: {type:String, required:true, unique: true},
 	password: {type:String, required:true},
 	admin: {type: Boolean, default:false}
@@ -15,6 +17,9 @@ var userSchema = new mongoose.Schema({
 //Encript the user password before save
 userSchema.pre('save', function(next){
 	var user = this;
+
+	//create the unique user uuid
+	if(!user.uuid) user.uuid = uuid.v4();
 
 	if(!user.isModified('password')) return next();
 

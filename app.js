@@ -46,7 +46,6 @@ app.post('/login', function(req, res, next) {
     }
     req.logIn(user, function(err) {
       if (err) { return next(err); }
-      req.session.user = user;
       res.status(200).send(user);
       return;
     });
@@ -55,8 +54,10 @@ app.post('/login', function(req, res, next) {
 
 
 app.get('/private', ensureAuthenticated, function(req, res){
-  console.log("Cookies: ", req.cookies);
+  /*console.log("Cookies: ", req.cookies);
   console.log(req.session.passport.user);
+  console.log(req.user);
+  console.log(req.session.user);*/
   res.sendStatus(200);
 });
 
