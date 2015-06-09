@@ -1,76 +1,113 @@
 "use strict";
 
-var mongoose = require('mongoose'),
-	bcrypt = require('bcrypt'),
-	uuid = require('node-uuid');
+var mongoose = require('mongoose')
+  , bcrypt = require('bcrypt')
+  , jwt = require('jsonwebtoken')
+  , SALT_WORK_FACTOR = 2 // 8 => 12, been 12 the recommended factor
+  , SECRET = 'my-cool-secret';
 
-var SALT_WORK_FACTOR = (process.env.NODE_ENV == 'production')? 10 :  1;
 
-var userSchema = new mongoose.Schema({
-	uuid: {type:String, unique:true},
-	name: {type:String, required:true},
-	email: {type:String, required:true, unique: true},
-	password: {type:String, required:true},
-	admin: {type: Boolean, default:false}
+var userSchema = mongoose.Schema({
+
+  token:      { type: String, unique: true },
+
+  email:      { type: String }, // primary email, indexed
+  emails:     Array,            // all accounts emails
+  accounts:   Array,            // merged accounts ids
+
+  //account properties
+  admin:      { type: Boolean, default: false },
+  active:     { type: Boolean, default: true },
+  createdAt:  { type: String, default: Date.now },
+
+  //user properties
+  fullName:   String,
+  firstName:  String,
+  lastName:   String,
+  birthAt:    String,
+  sex:        String,
+  phone:      Number,
+
+  //additional info
+  address:    String,
+  commune:    String,
+  city:       String,
+
+  //authenticated with
+  local: {
+    email:        String,
+    password:     String
+  },
+
+  facebook: {
+    id:           String,
+    token:        String,
+    email:        String,
+    name:         String
+  },
+
+  twitter: {
+    id:           String,
+    token:        String,
+    displayName:  String,
+    username:     String
+  },
+
+  google: {
+    id:           String,
+    token:        String,
+    email:        String,
+    name:         String
+  }
+
 });
 
-//Encript the user password before save
-userSchema.pre('save', function(next){
-	var user = this;
+// Password setter
+userSchema.methods.generateHash = function(password, callback) {
+  bcrypt.hash(password, SALT_WORK_FACTOR, function(err, hash) {
+    if(err) return callback(err);
+    callback(null, hash);
+  });
 
-	//create the unique user uuid
-	if(!user.uuid) user.uuid = uuid.v4();
+};
 
-	if(!user.isModified('password')) return next();
-
-	bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt){
-		if(err) return next(err);
-
-		bcrypt.hash(user.password, salt, function(err, hash){
-			if(err) return next(err);
-			user.password = hash;
-			next();
-		});
-
-	});
-
-});
 
 // Password verification
-userSchema.methods.comparePassword = function(candidatePassword, cb) {
-	bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-		if(err) return cb(err);
-		cb(null, isMatch);
+userSchema.methods.comparePassword = function(candidatePassword, callback) {
+	bcrypt.compare(candidatePassword, this.local.password, function(err, isMatch) {
+		if(err) return callback(err);
+		callback(null, isMatch);
 	});
 };
 
-var User = mongoose.model('User', userSchema);
-module.exports = User;
+userSchema.methods.getPublicUser = function(){
+  var publicUser = {
+    //
+    _id: this._id,
+    email: this.email,
+    accounts: this.accounts,
 
+    //account properties
+    isAdmin: this.admin,
+    active: this.active,
+    createdAt: this.createdAt,
 
+    //user properties
+    fullName: this.fullName
+  };
 
-/* Create a dummy user */
-/*var User = mongoose.model('User', userSchema);
+  //add auth
+  if(this.local.email) publicUser.local = this.local.email;
+  if(this.facebook.id) publicUser.facebook = this.facebook.id;
+  if(this.twitter.id) publicUser.twitter = this.twitter.id;
+  if(this.google.id) publicUser.google = this.google.id;
 
-User.create({
-	name: 'Admin',
-	email: 'admin@email.com',
-	password: 'admin123',
-}, function(err, user) {
-	if (err) {
-		console.log(err);
-		return;
-	}
+  return publicUser;
+};
 
-	console.log('user created');
+userSchema.methods.generateToken = function(callback) {
+  this.token = jwt.sign(this.getPublicUser(), SECRET, {});
+  callback(this.token);
+};
 
-	user.comparePassword('aers', function(){
-		console.log('aers');
-		console.log(arguments);
-	});
-	user.comparePassword('admin123', function(){
-		console.log('admin123');
-		console.log(arguments);
-	});
-
-});*/
+module.exports = mongoose.model('User', userSchema);

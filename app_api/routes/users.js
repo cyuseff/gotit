@@ -1,17 +1,17 @@
 "use strict";
 
-var router = require('express').Router(),
-	controller = require('../controllers/users');
+var router = require('express').Router()
+  , ctrl = require('../controllers/users');
 
 
 //*** /users  ***//
 router.route('/')
-	.get(controller.listUsers);
+	.get(ctrl.listUsers);
 
-router.route('/:useruuid')
-	.get(controller.getUser)
-	.put(controller.updateUser)
-	.delete(controller.deleteUser);
+/*router.route('/:useruuid')
+	.get(ctrl.getUser)
+	.put(ctrl.updateUser)
+	.delete(ctrl.deleteUser);*/
 
 
 

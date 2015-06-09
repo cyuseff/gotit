@@ -3,9 +3,9 @@
 
 "use strict";
 
-var app = require('./../app');
-var port = 5000;
+var app = require('./../app')
+  , port = 5000;
 
 app.listen(port, function(){
-  console.log('Listening on port: '+port);
+  console.log('Magic on port: '+port);
 });
