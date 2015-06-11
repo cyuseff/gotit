@@ -1,30 +1,6 @@
 "use strict";
 
-var jwt = require('jsonwebtoken')
-  , SECRET = 'my-cool-secret';
-
-var authToken = function(req, res, next) {
-  var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
-  if(token) {
-    jwt.verify(token, SECRET, function(err, decoded){
-      if(err) {
-        console.log(err);
-        return res.json({ success: false, message: 'Failed to authenticate token.' });
-      } else {
-        console.log(decoded);
-        req.decoded = decoded;
-        req.user = decoded;
-        next();
-      }
-    });
-  } else {
-    return res.status(403).json({
-      success:false,
-      message: 'No token provided'
-    });
-  }
-};
+var hh = require('../helpers/helpers');
 
 
 module.exports = function(app) {
@@ -44,7 +20,7 @@ module.exports = function(app) {
     res.render('login.ejs');
   });
 
-  app.get('/profile', authToken, function(req, res){
+  app.get('/profile', hh.authToken, function(req, res){
     res.render('profile.ejs', {user: req.user});
   });
 

@@ -11,9 +11,10 @@ describe('Signin FacebookStrategy', function() {
   it('Return 200 with a new User', function(done) {
 
     agent
-      .get('/api/auth/facebook')
-      .redirects(20)
+      .get('/auth/facebook')
+      .redirects(100)
       .end(function(err, res){
+        console.log(res.status);
         console.log(res);
         done();
       });

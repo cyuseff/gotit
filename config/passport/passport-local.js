@@ -1,6 +1,7 @@
 "use strict";
 
-var LocalStrategy = require('passport-local').Strategy;
+var LocalStrategy = require('passport-local').Strategy
+  , validator = require('validator');
 
 module.exports = function(passport, User){
 
@@ -16,79 +17,84 @@ module.exports = function(passport, User){
 
       process.nextTick(function(){
 
-        if(email && password) {
-      		if(password === req.body.confirm_password) {
+        //Check email
+        if(!validator.isEmail(email, {allow_utf8_local_part:false})) return done(null, false, {message: 'Invalid email address', status: 400});
 
-      			User
-      				.findOne({'local.email': req.body.email })
-      				//.findOne({ emails:{ $in: [email] } })
-      				.exec(function(err, user) {
+        //Check password
+        if(!validator.isAlphanumeric(password)) return done(null, false, {message: 'Password can only have alpha numerical characters', status: 400});
 
+        //Check password length
+        if(password.length < 6) return done(null, false, {message: 'Password must have at least 6 characthers length', status: 400});
+
+        //Check password and confirmation
+    		if(password !== req.body.confirm_password) return done(null, false, { message:'Passwords don\'t match.', status: 400 });
+
+  			User
+  				.findOne({'local.email': email })
+  				//.findOne({ emails:{ $in: [email] } })
+  				.exec(function(err, user) {
+
+            if(err) return done(null, false, err);
+
+  					if(user) {
+  						if(user.local.email === email) {
+  							//Email is used on local strategy
+                return done(null, false, { message: 'User already exits.', status: 409 });
+  						} else {
+                //Old account user, merge path
+                var info = {
+                  message: 'Email is asociated in other account',
+                  status: 409,
+                  user: user
+                };
+                return done(null, false, info);
+  						}
+  					}
+
+  					//Create a new User
+  					var user = new User();
+  					user.generateHash(password, function(err, hash) {
+
+              if(err) return done(null, false, err);
+
+  						//user's primary email, add to account emails list
+  						user.email = email;
+  						user.emails.push(email);
+
+  						//add general properties
+  						user.firstName = req.body.first_name;
+  						user.lastName = req.body.last_name;
+  						user.fullName = req.body.first_name + ' ' + req.body.last_name;
+
+  						//add strategy properties
+  						user.local.email = email;
+  						user.local.password = hash;
+
+  						//save user before serialize into his token
+  						user.save(function(err){
                 if(err) return done(null, false, err);
 
-      					if(user) {
-      						if(user.local.email === req.body.email) {
-      							//Email is used on local strategy
-                    return done(null, false, { message: 'User already exits.', status: 409 });
-      						} else {
-                    //Old account user, merge path
-                    var info = {
-                      message: 'Email is asociated in other account',
-                      status: 409,
-                      user: user
-                    };
-                    return done(null, false, info);
-      						}
-      					}
+  							//create a session token
+  							user.generateToken(function(token){
 
-      					//Create a new User
-      					var user = new User();
-      					user.generateHash(password, function(err, hash) {
-
-                  if(err) return done(null, false, err);
-
-      						//user's primary email, add to account emails list
-      						user.email = email;
-      						user.emails.push(email);
-
-      						//add general properties
-      						user.firstName = req.body.first_name;
-      						user.lastName = req.body.last_name;
-      						user.fullName = req.body.first_name + ' ' + req.body.last_name;
-
-      						//add strategy properties
-      						user.local.email = email;
-      						user.local.password = hash;
-
-      						//save user before serialize into his token
-      						user.save(function(err){
+  								//save user token
+  								user.save(function(err){
                     if(err) return done(null, false, err);
 
-      							//create a session token
-      							user.generateToken(function(token){
+  									//return the new user
+                    return done(null, user);
 
-      								//save user token
-      								user.save(function(err){
-                        if(err) return done(null, false, err);
+  								});
 
-      									//return the new user
-                        return done(null, user);
+  							});
 
-      								});
+  						});
 
-      							});
+  					});
 
-      						});
+  				});
 
-      					});
 
-      				});
-
-      		} else {
-            return done(null, false, { message:'Passwords don\'t match.', status: 400 });
-      		}
-
-      	}
 
       });
     }
@@ -104,11 +110,18 @@ module.exports = function(passport, User){
       passReqToCallback: true
     },
     function(req, email, password, done) {
+
+      //Check email
+      if(!validator.isEmail(email, {allow_utf8_local_part:false})) return done(null, false, {message: 'Invalid email address', status: 400});
+
+      //Check password
+      if(!validator.isAlphanumeric(password)) return done(null, false, {message: 'Password can only have alpha numerical characters', status: 400});
+
       User.findOne({'local.email':email}, function(err, user){
         if(err) return done(err);
 
         //No user
-        if(!user) return done(null, false, { message:'No user found.', status: 403 });
+        if(!user) return done(null, false, { message:'User not found.', status: 403 });
 
         //Check password
         user.comparePassword(password, function(err, isMatch) {

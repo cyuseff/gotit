@@ -86,6 +86,7 @@
         method: 'POST',
         success: function(data) {
           console.log(data);
+          window.location.href = '/profile?token='+data.token;
         },
         error: function(jqXHR, textStatus, err){
           console.log(jqXHR.responseJSON);

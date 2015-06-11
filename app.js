@@ -13,16 +13,20 @@ var app = express();
 app.set('view engine', 'ejs');
 
 //middlewares
-app.use(morgan('dev'));
+//app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
+  console.log(req.headers['user-agent']);
+  next();
+});
+/*app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
   next();
-});
+});*/
 
 app.use(passport.initialize());
 app.use(passport.session());
