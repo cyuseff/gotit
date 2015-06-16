@@ -18,12 +18,12 @@ describe('Login user', function() {
     , token;
 
   before(function(done) {
-    console.log('/***Create dummy user***/');
+
     agent
       .post('/api/v1/auth/local')
       .send('email='+email+'&password='+password+'&confirm_password='+password+'&first_name='+firstName+'&last_name='+lastName)
       .end(function(){
-        console.log('/***Dummy user created***/');
+
         done();
       });
   });
@@ -116,7 +116,7 @@ describe('Login user', function() {
 
 
   after(function(done){
-    User.findOneAndRemove({email:email}, function(err){
+    User.findOneAndRemove({'local.email':email}, function(err){
       console.log('User removed');
       done();
     });

@@ -11,6 +11,9 @@ module.exports.localSignin = function(req, res){
   var email = req.body.email
     , password = req.body.password;
 
+  console.log(email);
+  console.log('---------------');
+
   if(!email || !password) return hh.sendJsonResponse(res, 400, {error: 'Missing credentials'});
 
   //Check email

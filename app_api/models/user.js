@@ -88,7 +88,7 @@ userSchema.methods.getPublicUser = function(){
   var publicUser = {
     //
     _id: this._id,
-    email: this.email,
+    emails: this.emails,
     accounts: this.accounts,
 
     //account properties
