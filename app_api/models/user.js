@@ -1,24 +1,21 @@
 "use strict";
 
-var mongoose = require('mongoose')
+var mongoose = require('../../config/mongoose')
   , bcrypt = require('bcrypt')
-  , jwt = require('jsonwebtoken')
-  , SALT_WORK_FACTOR = 2 // 8 => 12, been 12 the recommended factor
-  , SECRET = 'my-cool-secret';
+  , SALT_WORK_FACTOR = 2; // 8 => 12, been 12 the recommended factor
 
 
 var userSchema = mongoose.Schema({
 
-  token:      { type: String, unique: true },
-
-  email:      { type: String }, // primary email, indexed
+  //email:      { type: String, unique: true, sparse: true }, // primary email, indexed { unique: true, sparse: true }
   emails:     Array,            // all accounts emails
   accounts:   Array,            // merged accounts ids
 
   //account properties
   admin:      { type: Boolean, default: false },
-  active:     { type: Boolean, default: true },
   createdAt:  { type: String, default: Date.now },
+  active:     { type: Boolean, default: true },
+  verify:     { type: Boolean, default: false },
 
   //user properties
   fullName:   String,
@@ -35,32 +32,39 @@ var userSchema = mongoose.Schema({
 
   //authenticated with
   local: {
-    email:        String,
+    email:        { type: String, unique: true, sparse: true },
     password:     String
   },
 
   facebook: {
-    id:           String,
+    id:           { type: String, unique: true, sparse: true },
     token:        String,
     email:        String,
     name:         String
   },
 
   twitter: {
-    id:           String,
+    id:           { type: String, unique: true, sparse: true },
     token:        String,
     displayName:  String,
     username:     String
   },
 
   google: {
-    id:           String,
+    id:           { type: String, unique: true, sparse: true },
     token:        String,
     email:        String,
     name:         String
   }
 
 });
+
+
+// Create Index
+userSchema.index({ emails: 1 });
+// Don't create index in producction (performance)
+if(process.ENV === 'production') userSchema.set('autoIndex', false);
+
 
 // Password setter
 userSchema.methods.generateHash = function(password, callback) {
@@ -96,18 +100,13 @@ userSchema.methods.getPublicUser = function(){
     fullName: this.fullName
   };
 
-  //add auth
-  if(this.local.email) publicUser.local = this.local.email;
-  if(this.facebook.id) publicUser.facebook = this.facebook.id;
-  if(this.twitter.id) publicUser.twitter = this.twitter.id;
-  if(this.google.id) publicUser.google = this.google.id;
+  //Auth mehotds
+  publicUser.local = (this.local.email)? true : false;
+  publicUser.facebook = (this.facebook.id)? true : false;
+  publicUser.twitter = (this.twitter.id)? true : false;
+  publicUser.google = (this.google.id)? true : false;
 
   return publicUser;
-};
-
-userSchema.methods.generateToken = function(callback) {
-  this.token = jwt.sign(this.getPublicUser(), SECRET, {});
-  callback(this.token);
 };
 
 module.exports = mongoose.model('User', userSchema);

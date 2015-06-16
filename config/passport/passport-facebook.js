@@ -1,7 +1,8 @@
 "use strict";
 
 var FacebookStrategy = require('passport-facebook').Strategy
-  , auth = require('./auth.js');
+  , auth = require('./auth.js')
+  , redis = require('../redis');
 
 module.exports = function(passport, User){
 
@@ -27,19 +28,14 @@ module.exports = function(passport, User){
             if(err) return done(err);
 
             if(user) {
-              if(user.facebook.id === profile.id) {
-                //Email is used on facebook strategy, send token
-                return done(null, user);
-              } else {
-                //Old account user, merge path
-                var info = {
-                  error: 'Email is asociated in other account',
-                  user: user,
-                  profile: profile
-                };
-                return done(null, false, info);
-              }
+              //Login User
+              redis.setUserToken(user, function(err, token){
 
+                if(err) return done(err);
+
+                //return the new user with token
+                return done(null, user, {token:token});
+              });
             } else {
 
               //Create a new User
@@ -64,19 +60,15 @@ module.exports = function(passport, User){
   						user.save(function(err){
   							if(err) return done(err);
 
-  							//create a session token
-  							user.generateToken(function(token){
+                //create session token
+                redis.setUserToken(user, function(err, token){
 
-  								//save user token
-  								user.save(function(err){
-                    if(err) return done(err);
+                  //The user was created so send it back anyway even if token creation or redis fails
+                  if(err) console.log(err);
 
-  									//return the new user
-                    return done(null, user);
-
-  								});
-
-  							});
+                  //return the new user with token
+                  return done(null, user, {token:token||'001'});
+                });
 
   						});
 

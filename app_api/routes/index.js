@@ -1,27 +1,12 @@
 "use strict";
 
-var hh = require('../helpers/helpers');
-
+var hh = require('../../helpers');
 
 module.exports = function(app) {
   require('./auth')(app);
-  //require('./users')(app);
 
-  //home
-  app.get('/', function(req, res){
-    res.render('index.ejs');
+  app.get('/private', hh.authToken, function(req, res){
+    hh.sendJsonResponse(res, 200, {message: 'This content is private!', user: req.user})
   });
 
-  //
-  app.get('/signup', function(req, res){
-    res.render('signup.ejs');
-  });
-  app.get('/login', function(req, res){
-    res.render('login.ejs');
-  });
-
-  app.get('/profile', hh.authToken, function(req, res){
-    res.render('profile.ejs', {user: req.user});
-  });
-
-};
+}

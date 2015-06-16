@@ -1,7 +1,8 @@
 "use strict";
 
 var LocalStrategy = require('passport-local').Strategy
-  , validator = require('validator');
+  , validator = require('validator')
+  , redis = require('../redis');
 
 module.exports = function(passport, User){
 
@@ -72,21 +73,18 @@ module.exports = function(passport, User){
 
   						//save user before serialize into his token
   						user.save(function(err){
-                if(err) return done(null, false, err);
 
-  							//create a session token
-  							user.generateToken(function(token){
+                if(err) return done(err);
 
-  								//save user token
-  								user.save(function(err){
-                    if(err) return done(null, false, err);
+                //create session token
+                redis.setUserToken(user, function(err, token){
 
-  									//return the new user
-                    return done(null, user);
+                  //The user was created so send it back anyway even if token creation or redis fails
+                  if(err) console.log(err);
 
-  								});
-
-  							});
+                  //return the new user with token
+                  return done(null, user, {token:token||'001'});
+                });
 
   						});
 
@@ -111,28 +109,40 @@ module.exports = function(passport, User){
     },
     function(req, email, password, done) {
 
-      //Check email
-      if(!validator.isEmail(email, {allow_utf8_local_part:false})) return done(null, false, {message: 'Invalid email address', status: 400});
+      process.nextTick(function(){
 
-      //Check password
-      if(!validator.isAlphanumeric(password)) return done(null, false, {message: 'Password can only have alpha numerical characters', status: 400});
-
-      User.findOne({'local.email':email}, function(err, user){
-        if(err) return done(err);
-
-        //No user
-        if(!user) return done(null, false, { message:'User not found.', status: 403 });
+        //Check email
+        if(!validator.isEmail(email, {allow_utf8_local_part:false})) return done(null, false, {message: 'Invalid email address', status: 400});
 
         //Check password
-        user.comparePassword(password, function(err, isMatch) {
-          if (err) return done(err);
-          if(isMatch) {
-            return done(null, user);
-          } else {
-            return done(null, false, { message:'Oops! Wrong password..', status: 403 });
-          }
-        });
+        if(!validator.isAlphanumeric(password)) return done(null, false, {message: 'Password can only have alpha numerical characters', status: 400});
 
+        User.findOne({'local.email':email}, function(err, user){
+          if(err) return done(err);
+
+          //No user
+          if(!user) return done(null, false, { message:'User not found.', status: 403 });
+
+          //Check password
+          user.comparePassword(password, function(err, isMatch) {
+            if (err) return done(err);
+            if(isMatch) {
+
+              //create session token
+              redis.setUserToken(user, function(err, token){
+                if(err) return done(null, false, err);
+
+                //return the new user with token
+                return done(null, user, {token:token});
+              });
+
+            } else {
+              return done(null, false, { message:'Oops! Wrong password..', status: 403 });
+            }
+          });
+
+
+        });
 
       });
     }

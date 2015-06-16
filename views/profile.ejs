@@ -39,7 +39,7 @@
                 <h3><span class="fa fa-user"></span> Local</h3>
 
                 <% if (user.local) { %>
-                    <p><strong>email</strong>: <%= user.local %></p>
+                    <p><strong>email</strong>: <%= user.local.email %></p>
                 <% } else { %>
                     <a href="/connect/local" class="btn btn-default">Connect Local</a>
                 <% } %>

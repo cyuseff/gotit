@@ -1,14 +1,14 @@
 "use strict";
 
-var mongoose = require('mongoose');
-var dbURI = 'mongodb://localhost/got-it';
+var mongoose = require('mongoose')
+	, dbURI = 'mongodb://localhost/got-it';
+
 //if(process.env.NODE_ENV == 'production') dbURI = process.env.MONGOLAB_URI;
-mongoose.connect(dbURI);
 
 /** Events **/
 mongoose.connection
 	.on('connected', function(){
-		//console.log('Mongoose connected to: '+dbURI);
+		console.log('Mongoose connected to: '+dbURI);
 	})
 	.on('error', function(err){
 		console.log('Mongoose connected error: '+err);
@@ -37,5 +37,8 @@ process
 			process.exit(0);
 		});
 	});
+
+
+mongoose.connect(dbURI);
 
 module.exports = mongoose;

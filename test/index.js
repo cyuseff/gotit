@@ -1,3 +1,4 @@
-require('./local-signup');
-require('./local-login');
-//require('./facebook-signup');
+"use strict";
+
+require('./auth/local-signin');
+require('./auth/local-login');

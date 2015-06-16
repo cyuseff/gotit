@@ -1,36 +1,18 @@
 "use strict";
 
 var router = require('express').Router()
-  , ctrl = require('../controllers/auth')
+  , localCtrl = require('../controllers/auth/local')
+  , facebookCtrl = require('../controllers/auth/facebook')
   , passport = require('passport');
 
 
-//*** local-strategy  ***//
-router.route('/local')
-  .post(ctrl.localSignup);
+router.route('/local').post(localCtrl.localSignin);
+router.route('/local/login').post(localCtrl.localLogin);
 
-router.route('/local-login')
-  .post(ctrl.localLogin);
-
-//*** facebook-strategy  ***//
-router.route('/facebook')
-  .get(passport.authenticate('facebook', { scope: 'email', session: false }));
-
-router.route('/facebook/callback')
-  .get(ctrl.facebookStrategy);
-
-//*** google-strategy  ***//
-router.route('/google')
-  .get(passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
-
-router.route('/google/callback')
-  .get(ctrl.googleStrategy);
-
-
-
-
+router.route('/facebook').post(facebookCtrl.facebookSignin);
+router.route('/facebook/login').post(facebookCtrl.facebookLogin);
 
 
 module.exports = function(app) {
-  app.use('/auth', router);
+  app.use('/api/v1/auth', router);
 };
