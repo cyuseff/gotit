@@ -102,34 +102,83 @@ the FB.login() function when clicked.
 <div id="status">
 </div>
 
-<button id="createUser">Create User</button>
+<button id="createUser">Signin</button>
+<button id="loginUser">Login</button>
+-
+<button id="token">Get private with Token</button>
+<button id="noToken">Get private without Token</button>
+
+<textarea id="text" rows="12" style="width: 100%;"></textarea>
+
 <script>
+var TOKEN;
 $('#createUser').on('click', function(){
 
-  FB.api('/me', function(response) {
-    var data = {
-      profile: response,
-      token: FB.getAuthResponse().accessToken
-    };
+  var data = {
+    id: FB.getUserID(),
+    token: FB.getAuthResponse().accessToken
+  };
 
-    console.log(data);
+  console.log(data);
 
-    $.ajax({
-      url:'http://localhost:5000/api/v1/auth/facebook',
-      data: data,
-      method:'POST',
-      success: function(data){
-        console.log(data);
-      },
-      error: function(jqXHR, textStatus, err){
-        console.log(jqXHR.responseJSON);
-      }
-    });
+  $.ajax({
+    url:'http://localhost:5000/api/v1/auth/facebook',
+    data: data,
+    method:'POST',
+    success: function(data){
+      console.log(data);
+      TOKEN = data.token;
+      $('#text').append('\n'+JSON.stringify(data));
+    },
+    error: function(jqXHR, textStatus, err){
+      console.log(jqXHR.responseJSON);
+      $('#text').append('\n'+JSON.stringify(jqXHR.responseJSON));
+    }
   });
+
 
 
   return false;
 });
+
+$('#loginUser').on('click', function(){
+  var data = {
+    id: FB.getUserID(),
+    token: FB.getAuthResponse().accessToken
+  };
+
+  $.ajax({
+    url:'http://localhost:5000/api/v1/auth/facebook/login',
+    data: data,
+    method:'POST',
+    success: function(data){
+      console.log(data);
+      TOKEN = data.token;
+      $('#text').append('\n'+JSON.stringify(data));
+    },
+    error: function(jqXHR, textStatus, err){
+      console.log(jqXHR.responseJSON);
+      $('#text').append('\n'+JSON.stringify(jqXHR.responseJSON));
+    }
+  });
+
+  return false;
+});
+
+$('#token').on('click', function(){
+  if(TOKEN) {
+    window.location.href = '/private?token='+TOKEN;
+  } else {
+    $('#text').append('\nPlease, sigin or login first');
+  }
+  return false;
+});
+
+$('#noToken').on('click', function(){
+  window.location.href = '/private';
+  return false;
+});
+
 </script>
 
 </body>
