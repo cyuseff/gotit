@@ -22,7 +22,7 @@ module.exports.authToken = function(req, res, next) {
       } else {
 
         //check if token exist
-        redis.getUserToken(decoded.key, decoded.id, function(err, user){
+        redis.getUserToken(decoded.id, decoded.key, function(err, user){
           if(err) return sendJsonResponse(res, 403, {message: err});
 
           //Token exist on redis

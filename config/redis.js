@@ -55,7 +55,7 @@ module.exports.setUserToken = function(user, callback) {
     var token = generateToken({id:user._id, key:buff});
 
     //Generate redis key
-    var key = generateRedisKey(buff, user._id);
+    var key = generateRedisKey(user._id, buff);
 
     client.set(key, JSON.stringify(user), function(err, reply){
       if(err) return callback(err);
@@ -72,9 +72,9 @@ module.exports.setUserToken = function(user, callback) {
   });
 };
 
-module.exports.getUserToken = function(token, userId, callback){
+module.exports.getUserToken = function(userId, token, callback){
 
-  var key = generateRedisKey(token, userId);
+  var key = generateRedisKey(userId, token);
 
   client.get(key, function(err, reply){
     if(err) return callback(err);
