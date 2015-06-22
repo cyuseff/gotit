@@ -105,10 +105,9 @@ module.exports.revokeUserToken = function(userId, token, callback){
   });
 };
 
-function getAllKeys(userId, callback) {
+function getAllKeys(pattern, callback) {
 
-  var array = []
-    , pattern = PREFIX+':'+userId+':*';
+  var array = [];
 
   function cb(err, reply) {
     if(err) callback(err);
@@ -131,7 +130,7 @@ function getAllKeys(userId, callback) {
 }
 module.exports.revokeAllUserTokens = function(userId, callback){
 
-  getAllKeys(userId, function(err, keys){
+  getAllKeys(PREFIX+':'+userId+':*', function(err, keys){
     if(err) callback(err);
     console.log(keys);
 
