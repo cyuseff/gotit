@@ -4,18 +4,17 @@ var request = require('supertest')
   , app = require('../../app')
   , agent = request.agent(app)
   , User = require('../../app_api/models/user')
-  , url = '/api/v1/auth/local/login';
+  , url = '/api/v1/auth/local';
+
+//Create User
+var email = 'user001@test.com'
+  , password = '123456'
+  , firstName = 'User001'
+  , lastName = 'Testo'
+  , token;
 
 
 describe('Login user', function() {
-
-
-  //Create User
-  var email = 'user001@test.com'
-    , password = '123456'
-    , firstName = 'User001'
-    , lastName = 'Testo'
-    , token;
 
   before(function(done) {
 
@@ -23,7 +22,6 @@ describe('Login user', function() {
       .post('/api/v1/auth/local')
       .send('email='+email+'&password='+password+'&confirm_password='+password+'&first_name='+firstName+'&last_name='+lastName)
       .end(function(){
-
         done();
       });
   });
@@ -113,17 +111,31 @@ describe('Login user', function() {
       .expect(/content\sis\sprivate/i, done);
   });
 
+});
 
+
+describe('Logout user', function() {
+
+  it('Return a 400 error, No token provided', function(done) {
+    agent
+      .get('/api/v1/auth/logout')
+      .expect(400)
+      .expect(/no\stoken/i, done);
+  });
+
+  it('Return a 200, Token revoked', function(done) {
+    agent
+      .get('/api/v1/auth/logout')
+      .set('x-access-token', token)
+      .expect(200)
+      .expect(/token\srevoked/i, done);
+  });
 
   after(function(done){
     User.findOneAndRemove({'local.email':email}, function(err){
-      console.log('User removed');
+      if(err) console.log(err);
       done();
     });
   });
-
-
-
-
 
 });

@@ -4,7 +4,8 @@ var request = require('supertest')
   , app = require('../../app')
   , agent = request.agent(app)
   , User = require('../../app_api/models/user')
-  , url = '/api/v1/auth/local';
+  , url = '/api/v1/auth/local'
+  , token;
 
 describe('Signin LocalStrategy', function() {
 
@@ -71,7 +72,14 @@ describe('Signin LocalStrategy', function() {
       .expect(201)
       .expect('Content-Type', /json/)
       .expect(/admin\@email\.com/i)
-      .expect(/token/i, done)
+      .expect(function(res){
+        if(res.body.token) {
+          token = res.body.token;
+        } else {
+          throw new Error("No token!");
+        }
+      })
+      .end(done);
 
   });
 
@@ -84,6 +92,14 @@ describe('Signin LocalStrategy', function() {
       .expect('Content-Type', /json/)
       .expect(/user\salready\sexits/i, done)
 
+  });
+
+  it('Return a 200, Token revoked', function(done) {
+    agent
+      .get('/api/v1/auth/logout')
+      .set('x-access-token', token)
+      .expect(200)
+      .expect(/token\srevoked/i, done);
   });
 
 

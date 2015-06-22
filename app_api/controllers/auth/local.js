@@ -6,28 +6,10 @@ var User = require('../../models/user')
 	, hh = require('../../../helpers');
 
 
-module.exports.localSignin = function(req, res){
-
-  var email = req.body.email
-    , password = req.body.password;
-
-  console.log(email);
-  console.log('---------------');
-
-  if(!email || !password) return hh.sendJsonResponse(res, 400, {error: 'Missing credentials'});
-
-  //Check email
-  if(!validator.isEmail(email, {allow_utf8_local_part:false})) return hh.sendJsonResponse(res, 400, {error: 'Invalid email address'});
-
-  //Check password
-  if(!validator.isAlphanumeric(password)) return hh.sendJsonResponse(res, 400, {error: 'Password can only have alpha numerical characters'});
-
-  //Check password length
-  if(password.length < 6) return hh.sendJsonResponse(res, 400, {error: 'Password must have at least 6 characthers length'});
+function localSignin(req, res, email, password, confirm_password) {
 
   //Check password and confirmation
   if(password !== req.body.confirm_password) return hh.sendJsonResponse(res, 400, {error: 'Passwords don\'t match'});
-
 
   User
     .findOne({'local.email': email })
@@ -76,21 +58,10 @@ module.exports.localSignin = function(req, res){
 
     });
 
-};
+}
 
 
-module.exports.localLogin = function(req, res){
-
-  var email = req.body.email
-    , password = req.body.password;
-
-  if(!email || !password) return hh.sendJsonResponse(res, 400, {error: 'Missing credentials'});
-
-  //Check email
-  if(!validator.isEmail(email, {allow_utf8_local_part:false})) return hh.sendJsonResponse(res, 400, {error: 'Invalid email address'});
-
-  //Check password
-  if(!validator.isAlphanumeric(password)) return hh.sendJsonResponse(res, 400, {error: 'Password can only have alpha numerical characters'});
+function localLogin(req, res, email, password) {
 
   User.findOne({'local.email':email}, function(err, user){
 
@@ -117,5 +88,32 @@ module.exports.localLogin = function(req, res){
 
 
   });
+
+}
+
+module.exports.localStrategy = function(req, res) {
+  var email = req.body.email
+    , password = req.body.password
+    , confirm_password = req.body.confirm_password;
+
+    if(!email || !password) return hh.sendJsonResponse(res, 400, {error: 'Missing credentials'});
+
+    //Check email
+    if(!validator.isEmail(email, {allow_utf8_local_part:false})) return hh.sendJsonResponse(res, 400, {error: 'Invalid email address'});
+
+    //Check password
+    if(!validator.isAlphanumeric(password)) return hh.sendJsonResponse(res, 400, {error: 'Password can only have alpha numerical characters'});
+
+    //Check password length
+    if(password.length < 6) return hh.sendJsonResponse(res, 400, {error: 'Password must have at least 6 characthers length'});
+
+
+    if(!confirm_password) {
+      //Old user, start login flow
+      localLogin(req, res, email, password);
+    } else {
+      //New user, start signin flow
+      localSignin(req, res, email, password, confirm_password);
+    }
 
 };

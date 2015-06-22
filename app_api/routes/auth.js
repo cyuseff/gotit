@@ -3,15 +3,13 @@
 var router = require('express').Router()
   , localCtrl = require('../controllers/auth/local')
   , facebookCtrl = require('../controllers/auth/facebook')
-  , passport = require('passport');
+  , logoutCtrl = require('../controllers/auth/logout')
+  , hh = require('../../helpers');
 
-
-router.route('/local').post(localCtrl.localSignin);
-router.route('/local/login').post(localCtrl.localLogin);
-
-router.route('/facebook').post(facebookCtrl.facebookSignin);
-router.route('/facebook/login').post(facebookCtrl.facebookLogin);
-
+router.route('/local').post(localCtrl.localStrategy);
+router.route('/facebook').post(facebookCtrl.facebookStrategy);
+router.route('/logout').get(logoutCtrl.revokeToken);
+router.route('/logoutAll').get(hh.authToken, logoutCtrl.revokeAllTokens);
 
 module.exports = function(app) {
   app.use('/api/v1/auth', router);

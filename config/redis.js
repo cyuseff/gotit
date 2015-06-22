@@ -22,28 +22,28 @@ client.on('connect', function () {
 
 module.exports.client = client;
 
-var generateBuffer = function(callback){
+function generateBuffer(callback) {
   crypto.randomBytes(TOKEN_LENGTH, function(ex, buf) {
-    if (ex) callback(ex);
+    if (ex) return callback(ex);
 
     if (buf) {
       callback(null, buf.toString('hex'));
     } else {
-      callback(new Error('Problem when generating buf'));
+      callback({error:'Problem generating buf'});
     }
   });
-};
+}
 
-var generateToken = function(data) {
+function generateToken(data) {
   data.timeStamp = Date.now();
   return jwt.sign(data, SECRET, {});
-};
+}
 
-var generateRedisKey = function(primaryKey, secondaryKey) {
+function generateRedisKey(primaryKey, secondaryKey) {
   var key = PREFIX + ':' + primaryKey;
   if(secondaryKey) key += ':'+secondaryKey;
   return key;
-};
+}
 
 module.exports.setUserToken = function(user, callback) {
 
@@ -79,7 +79,7 @@ module.exports.getUserToken = function(userId, token, callback){
   client.get(key, function(err, reply){
     if(err) return callback(err);
     if(!reply) {
-      return callback({message:'Token not found!'});
+      return callback({error:'Token not found!'});
     } else {
       //Touch the token TTL
       client.expire(key, TTL, function(err, rr){
@@ -90,16 +90,59 @@ module.exports.getUserToken = function(userId, token, callback){
   });
 };
 
-module.exports.revokeUserToken = function(token, userId, callback){
-  var key = generateRedisKey(token, userId);
+module.exports.revokeUserToken = function(userId, token, callback){
+
+  var key = generateRedisKey(userId, token);
 
   client.del(key, function(err, reply){
     if(err) return callback(err);
     if(reply) {
       return callback(null, {message:'Token revoked.'});
     } else {
-      return callback(null, {message:'Token not found.'});
+      return callback({error:'Token not found.'});
     }
 
   });
+};
+
+function getAllKeys(userId, callback) {
+
+  var array = []
+    , pattern = PREFIX+':'+userId+':*';
+
+  function cb(err, reply) {
+    if(err) callback(err);
+
+    console.log('************');
+    console.log(reply);
+    console.log('-------------');
+
+    if(reply[1].length > 0) array.push.apply(array, reply[1]);
+
+    var idx = parseFloat(reply[0]);
+    if(idx !== 0) {
+      client.scan(idx, 'match', pattern, cb);
+    } else {
+      callback(null, array);
+    }
+  }
+
+  client.scan(0, 'match', pattern, cb);
+}
+module.exports.revokeAllUserTokens = function(userId, callback){
+
+  getAllKeys(userId, function(err, keys){
+    if(err) callback(err);
+    console.log(keys);
+
+    client.del(keys, function(err, reply){
+      if(err) return callback(err);
+      console.log(reply);
+      return callback(null, {message:'All tokens revoked.'});
+
+    });
+
+    //callback({error:'No token removed.'});
+  });
+
 };
