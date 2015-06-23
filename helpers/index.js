@@ -3,10 +3,11 @@
 var User = require('../app_api/models/user')
   , redis = require('../config/redis')
   , jwt = require('jsonwebtoken')
+  , validator = require('validator')
   , SECRET = 'my-cool-secret';
 
 function sendJsonResponse(res, status, content) {
-  //console.log(content);
+  console.log(content);
   res.status(status).json(content);
 }
 module.exports.sendJsonResponse = sendJsonResponse;
@@ -40,4 +41,49 @@ module.exports.authToken = function(req, res, next) {
   } else {
     sendJsonResponse(res, 403, {error: 'No token provided.'});
   }
+};
+
+
+function queryToInt(query, defVal) {
+  if(!query) return defVal;
+  var int = parseInt(query);
+  return (!isNaN(int) && int >= 1)? int : defVal;
+}
+module.exports.paginateModel = function(query, Model, filters, callback) {
+
+  filters = filters || {};
+
+  console.log(query);
+  var PER_PAGE = 15
+    , PAGE = 1
+    , per_page = queryToInt(query.per_page, PER_PAGE)
+    , page = queryToInt(query.page, PAGE);
+
+  Model.count(filters, function(err, count) {
+    if(err) return callback(err);
+
+    var pages = Math.ceil(count / per_page);
+    if(page > pages) page = pages;
+
+    var meta = {
+      per_page: per_page,
+      page: page,
+      total_pages: pages,
+      total_entries: count
+    };
+
+    var skip = (page - 1) * per_page;
+
+    callback(null, meta, skip);
+  });
+};
+
+module.exports.getValidFiltersFromRequest = function(query, filters) {
+  var ff = {};
+  for(var i=0, l=filters.length; i<l; i++) {
+    var filter = query[filters[i]];
+    if(!filter) continue;
+    if(validator.isAlphanumeric(filter)) ff[filters[i]] = filter;
+  }
+  return ff;
 };
