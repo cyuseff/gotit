@@ -44,7 +44,7 @@ module.exports.authToken = function(req, res, next) {
 };
 
 
-function queryToInt(query, defVal) {
+function strToInt(query, defVal) {
   if(!query) return defVal;
   var int = parseInt(query);
   return (!isNaN(int) && int >= 1)? int : defVal;
@@ -56,8 +56,8 @@ module.exports.paginateModel = function(query, Model, filters, callback) {
   console.log(query);
   var PER_PAGE = 15
     , PAGE = 1
-    , per_page = queryToInt(query.per_page, PER_PAGE)
-    , page = queryToInt(query.page, PAGE);
+    , per_page = strToInt(query.per_page, PER_PAGE)
+    , page = strToInt(query.page, PAGE);
 
   Model.count(filters, function(err, count) {
     if(err) return callback(err);

@@ -1,14 +1,7 @@
 "use strict";
 
 var User = require('../models/user')
-  , hh = require('../../helpers')
-  , validator = require('validator');
-
-function formatUserList(array) {
-  var a = [];
-  for(var i=0, l=array.length; i<l; i++) a.push( array[i].getPublicUser() );
-  return a;
-}
+  , hh = require('../../helpers');
 
 module.exports.listUsers = function(req, res) {
 
