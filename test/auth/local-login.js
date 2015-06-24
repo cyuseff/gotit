@@ -17,7 +17,6 @@ var email = 'user001@test.com'
 describe('Login user', function() {
 
   before(function(done) {
-
     agent
       .post('/api/v1/auth/local')
       .send('email='+email+'&password='+password+'&confirm_password='+password+'&first_name='+firstName+'&last_name='+lastName)

@@ -5,7 +5,10 @@ var router = require('express').Router()
   , hh = require('../../helpers');
 
 router.route('/')
-  .get(usersCtrl.listUsers);
+  .get(hh.authToken, usersCtrl.listUsers);
+
+router.route('/:userid')
+  .get(hh.authToken, usersCtrl.showUser);
 
 module.exports = function(app) {
   app.use('/api/v1/users', router);

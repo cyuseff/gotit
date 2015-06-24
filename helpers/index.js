@@ -7,7 +7,7 @@ var User = require('../app_api/models/user')
   , SECRET = 'my-cool-secret';
 
 function sendJsonResponse(res, status, content) {
-  console.log(content);
+  //console.log(content);
   res.status(status).json(content);
 }
 module.exports.sendJsonResponse = sendJsonResponse;

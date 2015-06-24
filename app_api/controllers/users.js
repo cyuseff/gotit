@@ -28,5 +28,13 @@ module.exports.listUsers = function(req, res) {
       });
   });
 
+};
 
+module.exports.showUser = function(req, res) {
+  User
+    .findById(req.params['userid'])
+    .exec(function(err, user) {
+      if(err) return hh.sendJsonResponse(res, 400, {error:err});
+      return hh.sendJsonResponse(res, 200, { user: user.getPublicUser() });
+    });
 };
