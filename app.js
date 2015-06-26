@@ -14,7 +14,7 @@ var app = express();
 app.set('view engine', 'ejs');
 
 //middlewares
-app.use(morgan('dev'));
+//app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 

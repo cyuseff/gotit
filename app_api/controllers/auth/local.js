@@ -16,14 +16,14 @@ function localSignin(req, res, email, password, confirm_password) {
     //.findOne({ emails:{ $in: [email] } })
     .exec(function(err, user) {
 
-      if(err) return hh.sendJsonResponse(res, 400, err);
+      if(err) return hh.sendJsonResponse(res, 500, err);
       if(user) return hh.sendJsonResponse(res, 409, { error: 'User already exits.' });
 
       //Create a new User
       var user = new User();
       user.generateHash(password, function(err, hash) {
 
-        if(err) return hh.sendJsonResponse(res, 400, err);
+        if(err) return hh.sendJsonResponse(res, 500, err);
 
         //Push to users emails array
         user.emails.push(email);
@@ -39,7 +39,7 @@ function localSignin(req, res, email, password, confirm_password) {
 
         //save user before serialize into his token
         user.save(function(err){
-          if(err) return hh.sendJsonResponse(res, 400, err);
+          if(err) return hh.sendJsonResponse(res, 500, err);
 
           //create session token
           redis.setUserToken(user, function(err, token){
@@ -65,17 +65,17 @@ function localLogin(req, res, email, password) {
 
   User.findOne({'local.email':email}, function(err, user){
 
-    if(err) return hh.sendJsonResponse(res, 400, err);
+    if(err) return hh.sendJsonResponse(res, 500, err);
     if(!user) return hh.sendJsonResponse(res, 403, {error:'User not found.'});
 
     //Check password
     user.comparePassword(password, function(err, isMatch) {
-      if (err) return done(err);
+      if(err) return hh.sendJsonResponse(res, 500, err);
       if(isMatch) {
 
         //create session token
         redis.setUserToken(user, function(err, token){
-          if(err) return hh.sendJsonResponse(res, 400, err);
+          if(err) return hh.sendJsonResponse(res, 500, err);
 
           //return the new user with token
           return hh.sendJsonResponse(res, 200, { user: user.getPublicUser(), token: token });

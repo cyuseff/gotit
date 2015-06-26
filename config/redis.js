@@ -96,12 +96,7 @@ module.exports.revokeUserToken = function(userId, token, callback){
 
   client.del(key, function(err, reply){
     if(err) return callback(err);
-    if(reply) {
-      return callback(null, {message:'Token revoked.'});
-    } else {
-      return callback({error:'Token not found.'});
-    }
-
+    return callback(null, {message:'Token revoked.'});
   });
 };
 
@@ -134,12 +129,15 @@ module.exports.revokeAllUserTokens = function(userId, callback){
     if(err) callback(err);
     console.log(keys);
 
-    client.del(keys, function(err, reply){
-      if(err) return callback(err);
-      console.log(reply);
+    if(keys.length > 0) {
+      client.del(keys, function(err, reply){
+        if(err) return callback(err);
+        console.log(reply);
+        return callback(null, {message:'All tokens revoked.'});
+      });
+    } else {
       return callback(null, {message:'All tokens revoked.'});
-
-    });
+    }
 
     //callback({error:'No token removed.'});
   });

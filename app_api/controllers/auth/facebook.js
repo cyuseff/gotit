@@ -36,7 +36,7 @@ function facebookSignin(req, res, token) {
 
     //save user before serialize into his token
     user.save(function(err){
-      if(err) return hh.sendJsonResponse(res, 400, err);
+      if(err) return hh.sendJsonResponse(res, 500, err);
 
       //create session token
       redis.setUserToken(user, function(err, token){
@@ -61,7 +61,7 @@ function facebookLogin(req, res, user, token) {
 
     //create session token
     redis.setUserToken(user, function(err, token){
-      if(err) return hh.sendJsonResponse(res, 400, err);
+      if(err) return hh.sendJsonResponse(res, 500, err);
 
       //return the new user with token
       return hh.sendJsonResponse(res, 200, { user: user.getPublicUser(), token: token });
@@ -74,13 +74,13 @@ function facebookLogin(req, res, user, token) {
     //Update Facebook Token
     user.facebook.token = token;
     user.save(function(err){
-      if(err) return hh.sendJsonResponse(res, 400, err);
+      if(err) return hh.sendJsonResponse(res, 500, err);
 
       //create session token
       redis.setUserToken(user, function(err, token){
 
         //Its necesary send back a valid token
-        if(err || !token) return hh.sendJsonResponse(res, 400, {error:'Opps something goes wrong. Try again.'});
+        if(err) return hh.sendJsonResponse(res, 500, err);
 
         //return the user with the new token
         return hh.sendJsonResponse(res, 200, { user: user.getPublicUser(), token: token });
@@ -117,7 +117,7 @@ module.exports.facebookStrategy = function(req, res){
       .findOne({ 'facebook.id': userId })
       .exec(function(err, user){
 
-        if(err) return hh.sendJsonResponse(res, 400, err);
+        if(err) return hh.sendJsonResponse(res, 500, err);
 
         if(user) {
           //Old user, start login flow

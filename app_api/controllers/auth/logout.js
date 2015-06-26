@@ -11,10 +11,10 @@ module.exports.revokeToken = function(req, res){
   if(token) {
     jwt.verify(token, SECRET, function(err, decoded){
       if(err) {
-        return hh.sendJsonResponse(res, 400, err);
+        return hh.sendJsonResponse(res, 500, err);
       } else {
         redis.revokeUserToken(decoded.id, decoded.key, function(err, message){
-          if(err) return hh.sendJsonResponse(res, 400, err);
+          if(err) return hh.sendJsonResponse(res, 500, err);
           //Token revoked
           return hh.sendJsonResponse(res, 200, message);
         });
@@ -27,7 +27,7 @@ module.exports.revokeToken = function(req, res){
 
 module.exports.revokeAllTokens = function(req, res){
 	redis.revokeAllUserTokens(req.user._id, function(err, message){
-		if(err) return hh.sendJsonResponse(res, 400, err);
+		if(err) return hh.sendJsonResponse(res, 500, err);
 		//Token revoked
 		return hh.sendJsonResponse(res, 200, message);
 	});

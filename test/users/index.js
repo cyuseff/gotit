@@ -46,8 +46,37 @@ describe('Users', function() {
       .expect(200)
       .expect('Content-Type', /json/)
       .expect(function(res){
-        if(res.body.user._id !== userid) throw new Error("No ID!");
+        if(res.body.error) throw new Error(res.body.error);
+        if(res.body.user) {
+          if(res.body.user._id !== userid) throw new Error("ID don't match!");
+        } else {
+          throw new Error("No user!");
+        }
+
       })
+      .end(done);
+
+  });
+
+  it('Return a 400 with a no User found error', function(done) {
+
+    agent
+      .get(url+'/55860c3dfed88414e05a69c1')
+      .set('x-access-token', token)
+      .expect(400)
+      .expect('Content-Type', /json/)
+      .expect(/no\suser\sfound/i)
+      .end(done);
+
+  });
+
+  it('Return a 500, with a ObjectID not valid', function(done) {
+
+    agent
+      .get(url+'/1234')
+      .set('x-access-token', token)
+      .expect(500)
+      .expect('Content-Type', /json/)
       .end(done);
 
   });
