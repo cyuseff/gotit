@@ -57,7 +57,7 @@ module.exports.setUserToken = function(user, callback) {
     //Generate redis key
     var key = generateRedisKey(user._id, buff);
 
-    client.set(key, JSON.stringify(user), function(err, reply){
+    /*client.set(key, JSON.stringify(user), function(err, reply){
       if(err) return callback(err);
 
       if(reply) {
@@ -66,7 +66,12 @@ module.exports.setUserToken = function(user, callback) {
           callback(null, token);
         });
       }
+    });*/
 
+    //set key with TTL
+    client.SETEX(key, TTL, JSON.stringify(user), function(err, reply){
+      if(err) return callback(err);
+      callback(null, token);
     });
 
   });
@@ -76,7 +81,22 @@ module.exports.getUserToken = function(userId, token, callback){
 
   var key = generateRedisKey(userId, token);
 
-  client.get(key, function(err, reply){
+  //Single call
+  client.multi()
+    .get(key)
+    .expire(key, TTL)
+    .exec(function(errs, replies){
+
+      if(errs) return callback(errs);
+
+      if(replies && replies[0]) {
+        return callback(null, JSON.parse(replies[0]));
+      } else {
+        return callback({error:'Token not found!'});
+      }
+    });
+
+  /*client.get(key, function(err, reply){
     if(err) return callback(err);
     if(!reply) {
       return callback({error:'Token not found!'});
@@ -87,7 +107,7 @@ module.exports.getUserToken = function(userId, token, callback){
         callback(null, JSON.parse(reply));
       });
     }
-  });
+  });*/
 };
 
 module.exports.revokeUserToken = function(userId, token, callback){

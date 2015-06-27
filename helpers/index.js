@@ -24,7 +24,13 @@ module.exports.authToken = function(req, res, next) {
 
         //check if token exist
         redis.getUserToken(decoded.id, decoded.key, function(err, user){
-          if(err) return sendJsonResponse(res, 403, err);
+          if(err) {
+            if(err.error) {
+              return sendJsonResponse(res, 403, err);
+            } else {
+              return sendJsonResponse(res, 500, err);
+            }
+          }
 
           //Token exist on redis
           if(user._id === decoded.id) {
@@ -74,7 +80,7 @@ module.exports.paginateModel = function(query, Model, filters, callback) {
 
     var skip = (page - 1) * per_page;
 
-    callback(null, meta, skip);
+    return callback(null, meta, skip);
   });
 };
 
