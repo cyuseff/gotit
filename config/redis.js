@@ -45,85 +45,14 @@ function generateRedisKey(primaryKey, secondaryKey) {
   return key;
 }
 
-module.exports.setUserToken = function(user, callback) {
 
-  generateBuffer(function(err, buff){
-
-    if(err) return callback(err);
-
-    //Generate user token
-    var token = generateToken({id:user._id, key:buff});
-
-    //Generate redis key
-    var key = generateRedisKey(user._id, buff);
-
-    /*client.set(key, JSON.stringify(user), function(err, reply){
-      if(err) return callback(err);
-
-      if(reply) {
-        client.expire(key, TTL, function(err, reply){
-          if(err) return callback(err);
-          callback(null, token);
-        });
-      }
-    });*/
-
-    //set key with TTL
-    client.SETEX(key, TTL, JSON.stringify(user), function(err, reply){
-      if(err) return callback(err);
-      callback(null, token);
-    });
-
-  });
-};
-
-module.exports.getUserToken = function(userId, token, callback){
-
-  var key = generateRedisKey(userId, token);
-
-  //Single call
-  client.multi()
-    .get(key)
-    .expire(key, TTL)
-    .exec(function(errs, replies){
-
-      if(errs) return callback(errs);
-
-      if(replies && replies[0]) {
-        return callback(null, JSON.parse(replies[0]));
-      } else {
-        return callback({error:'Token not found!'});
-      }
-    });
-
-  /*client.get(key, function(err, reply){
-    if(err) return callback(err);
-    if(!reply) {
-      return callback({error:'Token not found!'});
-    } else {
-      //Touch the token TTL
-      client.expire(key, TTL, function(err, rr){
-        if(err) return callback(err);
-        callback(null, JSON.parse(reply));
-      });
-    }
-  });*/
-};
-
-module.exports.revokeUserToken = function(userId, token, callback){
-
-  var key = generateRedisKey(userId, token);
-
-  client.del(key, function(err, reply){
-    if(err) return callback(err);
-    return callback(null, {message:'Token revoked.'});
-  });
-};
-
+/*
+  Use Scan to get all keys with a pettern.
+  TODO: uniqness of keys in the array is not sure.
+*/
 function getAllKeys(pattern, callback) {
 
   var array = [];
-
   function cb(err, reply) {
     if(err) callback(err);
 
@@ -135,31 +64,84 @@ function getAllKeys(pattern, callback) {
 
     var idx = parseFloat(reply[0]);
     if(idx !== 0) {
-      client.scan(idx, 'match', pattern, cb);
+      client.SCAN(idx, 'match', pattern, cb);
     } else {
       callback(null, array);
     }
   }
 
-  client.scan(0, 'match', pattern, cb);
+  client.SCAN(0, 'match', pattern, cb);
 }
+/**/
+
+module.exports.setUserToken = function(user, callback) {
+
+  generateBuffer(function(err, buff){
+
+    if(err) return callback(err);
+
+    //Generate user token
+    var token = generateToken({id:user._id, key:buff});
+
+    //Generate redis key
+    var key = generateRedisKey(user._id, buff);
+    var setKey = generateRedisKey('all', user._id);
+
+    //set key with TTL
+    client.multi()
+      .SETEX(key, TTL, JSON.stringify(user))
+      .SADD(setKey, key)
+      .exec(function(err, reply) {
+        if(err) return callback(err);
+        return callback(null, token);
+      });
+  });
+};
+
+module.exports.getUserToken = function(userId, token, callback){
+
+  var key = generateRedisKey(userId, token);
+
+  //Single call
+  client.multi()
+    .GET(key)
+    .EXPIRE(key, TTL)
+    .exec(function(errs, reply){
+      if(errs) return callback(errs);
+
+      if(reply && reply[0]) {
+        return callback(null, JSON.parse(reply[0]));
+      } else {
+        return callback({error:'Token not found!'});
+      }
+    });
+};
+
+module.exports.revokeUserToken = function(userId, token, callback){
+
+  var key = generateRedisKey(userId, token);
+  var setKey = generateRedisKey('all', userId);
+
+  client.multi()
+    .DEL(key)
+    .SREM(setKey, key)
+    .exec(function(err, reply) {
+      if(err) return callback(err);
+      return callback(null, {message:'Token revoked.'});
+    });
+};
+
 module.exports.revokeAllUserTokens = function(userId, callback){
 
-  getAllKeys(PREFIX+':'+userId+':*', function(err, keys){
-    if(err) callback(err);
-    console.log(keys);
+  var setKey = generateRedisKey('all', userId);
 
-    if(keys.length > 0) {
-      client.del(keys, function(err, reply){
-        if(err) return callback(err);
-        console.log(reply);
-        return callback(null, {message:'All tokens revoked.'});
-      });
-    } else {
+  client.SMEMBERS(setKey, function(err, keys) {
+    keys.push(setKey);
+
+    client.DEL(keys, function(err, reply){
+      if(err) return callback(err);
       return callback(null, {message:'All tokens revoked.'});
-    }
-
-    //callback({error:'No token removed.'});
+    })
   });
 
 };

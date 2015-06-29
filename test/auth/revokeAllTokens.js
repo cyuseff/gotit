@@ -15,39 +15,38 @@ var email = 'user002@test.com'
   , lastName = 'Testo2'
   , token;
 
-
-function generateRedisKey(id, cb) {
-  var rand = Math.round(Math.random() * 10000000000);
-  client.set('token:'+id+':'+rand, JSON.stringify({user:id}), function(err, reply){
-    console.log(reply);
-    cb();
-  });
-}
-
 describe('Revoke all User Tokens', function() {
 
   before(function(done) {
     agent
       .post('/api/v1/auth/local')
       .send('email='+email+'&password='+password+'&confirm_password='+password+'&first_name='+firstName+'&last_name='+lastName)
-      .expect(function(res){
+      .end(function(err, res){
         token = res.body.token;
 
         var ctrl = 0
-          , max = 4
+          , max = 100
           , id = res.body.user._id;
 
-        var cb = function() {
-          ctrl++;
-          if(ctrl >= max) {
+        console.log('Creating '+max+' Dummy tokens');
 
-          } else {
-            generateRedisKey(id, cb);
-          }
+        var keys = [];
+        var ss = [];
+        for(var i=0; i<max; i++) {
+          var rand = Math.round(Math.random() * 10000000000);
+          keys.push('token:'+id+':'+rand);
+          keys.push(JSON.stringify({user:id}));
+          ss.push('token:'+id+':'+rand);
         }
-        generateRedisKey(id, cb);
-      })
-      .end(done);
+
+        client.multi()
+          .mset(keys)
+          .sadd('token:all:'+id, ss)
+          .exec(function(err, reply){
+            done();
+          });
+
+      });
 
   });
 
