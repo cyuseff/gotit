@@ -1,6 +1,6 @@
 "use strict";
 
-var redis = require('../../../config/redis')
+var tokenCtrl = require('../token')
 	, hh = require('../../../helpers')
   , jwt = require('jsonwebtoken')
   , SECRET = 'my-cool-secret';
@@ -13,7 +13,7 @@ module.exports.revokeToken = function(req, res){
       if(err) {
         return hh.sendJsonResponse(res, 500, err);
       } else {
-        redis.revokeUserToken(decoded.id, decoded.key, function(err, message){
+        tokenCtrl.revokeUserToken(decoded.id, decoded.key, function(err, message){
           if(err) return hh.sendJsonResponse(res, 500, err);
           //Token revoked
           return hh.sendJsonResponse(res, 200, message);
@@ -26,7 +26,7 @@ module.exports.revokeToken = function(req, res){
 };
 
 module.exports.revokeAllTokens = function(req, res){
-	redis.revokeAllUserTokens(req.user._id, function(err, message){
+	tokenCtrl.revokeAllUserTokens(req.user._id, function(err, message){
 		if(err) return hh.sendJsonResponse(res, 500, err);
 		//Token revoked
 		return hh.sendJsonResponse(res, 200, message);

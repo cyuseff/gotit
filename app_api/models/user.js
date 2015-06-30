@@ -1,7 +1,7 @@
 "use strict";
 
 var mongoose = require('../../config/mongoose')
-  , redis = require('../../config/redis')
+  , tokenCtrl = require('../controllers/token')
   , bcrypt = require('bcrypt')
   , SALT_WORK_FACTOR = 2; // 8 => 12, been 12 the recommended factor
 
@@ -69,7 +69,7 @@ if(process.ENV === 'production') userSchema.set('autoIndex', false);
 
 // Hooks
 userSchema.pre('remove', function(next) {
-  redis.revokeAllUserTokens(this._id, function(err, message) {
+  tokenCtrl.revokeAllUserTokens(this._id, function(err, message) {
     console.log(err, message);
     next();
   })

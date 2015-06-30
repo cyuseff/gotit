@@ -1,27 +1,14 @@
 "use strict";
 
-var redis = require('redis')
+var redis = require('../../config/redis')
   , crypto = require('crypto')
   , jwt = require('jsonwebtoken')
-  , client = redis.createClient()
   , SECRET = 'my-cool-secret'
   , PREFIX = 'token'
   , TTL = 360
   , TOKEN_LENGTH = 32;
 
-
-/* Conection Events */
-client.on('error', function (err) {
-  console.log('Error ' + err);
-});
-
-client.on('connect', function () {
-  console.log('Redis is ready');
-});
-
-module.exports = client;
-
-/*function generateBuffer(callback) {
+function generateBuffer(callback) {
   crypto.randomBytes(TOKEN_LENGTH, function(ex, buf) {
     if (ex) return callback(ex);
 
@@ -44,36 +31,7 @@ function generateRedisKey(primaryKey, secondaryKey) {
   return key;
 }
 
-
-/*
-  Use Scan to get all keys with a pettern.
-  TODO: uniqness of keys in the array is not sure.
-*/
-/*function getAllKeys(pattern, callback) {
-
-  var array = [];
-  function cb(err, reply) {
-    if(err) callback(err);
-
-    console.log('************');
-    console.log(reply);
-    console.log('-------------');
-
-    if(reply[1].length > 0) array.push.apply(array, reply[1]);
-
-    var idx = parseFloat(reply[0]);
-    if(idx !== 0) {
-      client.SCAN(idx, 'match', pattern, cb);
-    } else {
-      callback(null, array);
-    }
-  }
-
-  client.SCAN(0, 'match', pattern, cb);
-}
-/**/
-
-/*module.exports.setUserToken = function(user, callback) {
+module.exports.setUserToken = function(user, callback) {
 
   generateBuffer(function(err, buff){
 
@@ -87,7 +45,7 @@ function generateRedisKey(primaryKey, secondaryKey) {
     var setKey = generateRedisKey('all', user._id);
 
     //set key with TTL
-    client.multi()
+    redis.multi()
       .SETEX(key, TTL, JSON.stringify(user))
       .SADD(setKey, key)
       .exec(function(err, reply) {
@@ -97,12 +55,12 @@ function generateRedisKey(primaryKey, secondaryKey) {
   });
 };
 
-module.exports.getUserToken = function(userId, token, callback){
+function getUserToken(userId, token, callback) {
 
   var key = generateRedisKey(userId, token);
 
   //Single call
-  client.multi()
+  redis.multi()
     .GET(key)
     .EXPIRE(key, TTL)
     .exec(function(errs, reply){
@@ -113,22 +71,22 @@ module.exports.getUserToken = function(userId, token, callback){
       } else {
         callback({error:'Token not found!'});
 
-        // DEL token from set
+        // We asume that Token has expire, so DEL token from SET
         var setKey = generateRedisKey('all', userId);
-        client.SREM(setKey, key, function(err, reply){
-          if(err) return console.log(err);
-          console.log(reply);
+        redis.SREM(setKey, key, function(err, reply){
+          console.log(err, reply);
         });
       }
     });
-};
+}
+module.exports.getUserToken = getUserToken;
 
 module.exports.revokeUserToken = function(userId, token, callback){
 
   var key = generateRedisKey(userId, token);
   var setKey = generateRedisKey('all', userId);
 
-  client.multi()
+  redis.multi()
     .DEL(key)
     .SREM(setKey, key)
     .exec(function(err, reply) {
@@ -141,13 +99,40 @@ module.exports.revokeAllUserTokens = function(userId, callback){
 
   var setKey = generateRedisKey('all', userId);
 
-  client.SMEMBERS(setKey, function(err, keys) {
+  redis.SMEMBERS(setKey, function(err, keys) {
     keys.push(setKey);
 
-    client.DEL(keys, function(err, reply){
+    redis.DEL(keys, function(err, reply){
       if(err) return callback(err);
       return callback(null, {message:'All tokens revoked.'});
     })
   });
 
-};*/
+};
+
+module.exports.validateToken = function(token, callback) {
+  jwt.verify(token, SECRET, function(err, decoded){
+    if(err) {
+      console.log(err);
+      return callback({error: 'Token is not valid.'});
+    } else {
+
+      //check if token exist
+      getUserToken(decoded.id, decoded.key, function(err, user){
+        if(err) return callback(err);
+
+        //Token exist on redis
+        if(user._id === decoded.id) {
+          //req.user = user;
+          //next();
+          return callback(null, user);
+        } else {
+          //return sendJsonResponse(res, 400, {error: 'Bad token.'});
+          return callback({error: 'Bad token.'});
+        }
+
+      });
+
+    }
+  });
+};
