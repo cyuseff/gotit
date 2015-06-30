@@ -56,10 +56,7 @@ module.exports.setUserToken = function(user, callback) {
 };
 
 function getUserToken(userId, token, callback) {
-
   var key = generateRedisKey(userId, token);
-
-  //Single call
   redis.multi()
     .GET(key)
     .EXPIRE(key, TTL)
@@ -71,6 +68,7 @@ function getUserToken(userId, token, callback) {
       } else {
         callback({error:'Token not found!'});
 
+        //TODO: create check all Keys method to remove all deleted keys from SET
         // We asume that Token has expire, so DEL token from SET
         var setKey = generateRedisKey('all', userId);
         redis.SREM(setKey, key, function(err, reply){
