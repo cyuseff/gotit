@@ -1,6 +1,7 @@
 "use strict";
 
 var mongoose = require('../../config/mongoose')
+  , redis = require('../../config/redis')
   , bcrypt = require('bcrypt')
   , SALT_WORK_FACTOR = 2; // 8 => 12, been 12 the recommended factor
 
@@ -64,6 +65,15 @@ var userSchema = mongoose.Schema({
 userSchema.index({ emails: 1 });
 // Don't create index in producction (performance)
 if(process.ENV === 'production') userSchema.set('autoIndex', false);
+
+
+// Hooks
+userSchema.pre('remove', function(next) {
+  redis.revokeAllUserTokens(this._id, function(err, message) {
+    console.log(err, message);
+    next();
+  })
+});
 
 
 // Password setter

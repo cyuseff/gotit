@@ -105,10 +105,11 @@ describe('Signin LocalStrategy', function() {
 
   //Delete User
   after(function(done) {
-    User.findOneAndRemove({'local.email':'admin@email.com'})
-    .exec(function(err) {
+    User.findOne({'local.email':'admin@email.com'}, function(err, user){
       if(err) console.log(err);
-      done();
+      user.remove(function(err) {
+        done();
+      });
     });
   });
 

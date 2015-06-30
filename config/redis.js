@@ -112,7 +112,14 @@ module.exports.getUserToken = function(userId, token, callback){
       if(reply && reply[0]) {
         return callback(null, JSON.parse(reply[0]));
       } else {
-        return callback({error:'Token not found!'});
+        callback({error:'Token not found!'});
+
+        /*DEL token from set*/
+        var setKey = generateRedisKey('all', userId);
+        client.SREM(setKey, key, function(err, reply){
+          if(err) return console.log(err);
+          console.log(reply);
+        });
       }
     });
 };

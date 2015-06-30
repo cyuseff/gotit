@@ -131,9 +131,11 @@ describe('Logout user', function() {
   });
 
   after(function(done){
-    User.findOneAndRemove({'local.email':email}, function(err){
+    User.findOne({'local.email':email}, function(err, user){
       if(err) console.log(err);
-      done();
+      user.remove(function(err) {
+        done();
+      });
     });
   });
 

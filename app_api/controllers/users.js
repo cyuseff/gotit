@@ -20,7 +20,7 @@ module.exports.listUsers = function(req, res) {
     if(err) return hh.sendJsonResponse(res, 500, err);
     User
       .find(filters, proyection, { skip:skip, limit:meta.per_page })
-      .sort( { createdAt: -1 } )
+      .sort({createdAt: -1})
       .exec(function(err, users) {
         if(err) return hh.sendJsonResponse(res, 500, err);
         return hh.sendJsonResponse(res, 200, {users: users, meta:meta});

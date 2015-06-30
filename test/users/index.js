@@ -30,7 +30,7 @@ describe('Users', function() {
   it('Return a 200 with a list of Users', function(done) {
 
     agent
-      .get(url+'?page=1&per_page=1&fullName=yu&lastName=yu')
+      .get(url+'?page=1&per_page=15')
       .set('x-access-token', token)
       .expect(200)
       .expect('Content-Type', /json/)
@@ -82,9 +82,11 @@ describe('Users', function() {
   });
 
   after(function(done){
-    User.findOneAndRemove({'local.email':email}, function(err){
+    User.findOne({'local.email':email}, function(err, user){
       if(err) console.log(err);
-      done();
+      user.remove(function(err) {
+        done();
+      });
     });
   });
 
