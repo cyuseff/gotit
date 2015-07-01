@@ -82,8 +82,8 @@ function getUserToken(userId, token, callback) {
   redis.multi()
     .GET(key)
     .EXPIRE(key, TTL)
-    .exec(function(errs, reply){
-      if(errs) return callback(errs);
+    .exec(function(err, reply){
+      if(err) return callback(err);
 
       if(reply && reply[0]) {
         return callback(null, JSON.parse(reply[0]));
@@ -115,7 +115,7 @@ module.exports.revokeUserToken = function(token, callback){
         if(err) return callback(err);
         return callback(null, {message:'Token revoked.'});
       });
-        
+
   });
 };
 
@@ -140,13 +140,12 @@ module.exports.validateToken = function(token, callback) {
       console.log(err);
       return callback({error: 'Token is not valid.'});
     } else {
-
       //check if token exist
       getUserToken(decoded.id, decoded.key, function(err, user){
         if(err) return callback(err);
 
         //Token exist on redis
-        if(user._id === decoded.id) {
+        if(user && user._id === decoded.id) {
           return callback(null, user);
         } else {
           return callback({error: 'Bad token.'});

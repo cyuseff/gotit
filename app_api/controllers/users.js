@@ -5,7 +5,7 @@ var User = require('../models/user')
 
 module.exports.listUsers = function(req, res) {
 
-  var ff = hh.getValidFiltersFromRequest(req.query, ['fullName', 'createdAt']);
+  var ff = hh.getValidFiltersFromRequest(req.query, ['full_name', 'order_by']);
   console.log(ff);
 
   var filters = {};

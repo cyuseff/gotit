@@ -30,7 +30,7 @@ describe('Users', function() {
   it('Return a 200 with a list of Users', function(done) {
 
     agent
-      .get(url+'?page=1&per_page=15')
+      .get(url+'?page=1&per_page=15&full_name=yu&order_by=test')
       .set('x-access-token', token)
       .expect(200)
       .expect('Content-Type', /json/)

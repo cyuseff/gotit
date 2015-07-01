@@ -21,7 +21,6 @@ module.exports.authToken = function(req, res, next) {
           return sendJsonResponse(res, 500, err);
         }
       }
-
       //user exist
       req.user = user;
       next();
@@ -67,11 +66,20 @@ module.exports.paginateModel = function(query, Model, filters, callback) {
 };
 
 module.exports.getValidFiltersFromRequest = function(query, filters) {
-  var ff = {};
+  var ff = {}
+    , reg = /^[0-9A-Z_-]+$/i
+    , reg2 = /_[A-Z]/ig
+    , filter
+    , key;
+
   for(var i=0, l=filters.length; i<l; i++) {
-    var filter = query[filters[i]];
+    filter = query[filters[i]];
     if(!filter) continue;
-    if(validator.isAlphanumeric(filter)) ff[filters[i]] = filter;
+
+    if(reg.test(filter)) {
+      key = filters[i].replace(reg2, function(a){ return a[1].toUpperCase(); });
+      ff[key] = filter;
+    }
   }
   return ff;
 };
