@@ -13,7 +13,8 @@ var email = 'user002@test.com'
   , password = '123456'
   , firstName = 'User002'
   , lastName = 'Testo2'
-  , token;
+  , token
+  , max = 100;
 
 describe('Revoke all User Tokens', function() {
 
@@ -25,7 +26,6 @@ describe('Revoke all User Tokens', function() {
         token = res.body.token;
 
         var ctrl = 0
-          , max = 100
           , id = res.body.user._id;
 
         console.log('Creating '+max+' Dummy tokens');
@@ -34,14 +34,14 @@ describe('Revoke all User Tokens', function() {
         var ss = [];
         for(var i=0; i<max; i++) {
           var rand = Math.round(Math.random() * 10000000000);
-          keys.push('token:'+id+':'+rand);
+          keys.push('got-it:token:'+id+':'+rand);
           keys.push(JSON.stringify({user:id}));
-          ss.push('token:'+id+':'+rand);
+          ss.push('got-it:token:'+id+':'+rand);
         }
 
         client.multi()
           .mset(keys)
-          .sadd('token:all:'+id, ss)
+          .sadd('got-it:token:user-set:'+id, ss)
           .exec(function(err, reply){
             done();
           });
@@ -57,7 +57,12 @@ describe('Revoke all User Tokens', function() {
       .get(url)
       .set('x-access-token', token)
       .expect(200)
-      .expect(/all\stokens\srevoked/i, done);
+      .expect(new RegExp(max+2))
+      .expect(/all\stokens\srevoked/i)
+      .end(function(err, res) {
+        //console.log(res.body);
+        done();
+      });
   });
 
 

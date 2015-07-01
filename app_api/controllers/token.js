@@ -4,7 +4,9 @@ var redis = require('../../config/redis')
   , crypto = require('crypto')
   , jwt = require('jsonwebtoken')
   , SECRET = 'my-cool-secret'
+  , NAME_SPACE = 'got-it'
   , PREFIX = 'token'
+  , SET_PREFIX = 'user-set'
   , TTL = 360
   , TOKEN_LENGTH = 32;
 
@@ -26,7 +28,7 @@ function generateToken(data) {
 }
 
 function generateRedisKey(primaryKey, secondaryKey) {
-  var key = PREFIX + ':' + primaryKey;
+  var key = NAME_SPACE + ':' + PREFIX + ':' + primaryKey;
   if(secondaryKey) key += ':'+secondaryKey;
   return key;
 }
@@ -42,7 +44,7 @@ module.exports.setUserToken = function(user, callback) {
 
     //Generate redis key
     var key = generateRedisKey(user._id, buff);
-    var setKey = generateRedisKey('all', user._id);
+    var setKey = generateRedisKey(SET_PREFIX, user._id);
 
     //set key with TTL
     redis.multi()
@@ -54,6 +56,26 @@ module.exports.setUserToken = function(user, callback) {
       });
   });
 };
+
+function checkTokensInSet(userId) {
+  var setKey = generateRedisKey(SET_PREFIX, userId)
+    , tmp = [];
+
+  redis.SMEMBERS(setKey, function(err, keys) {
+    if(err) return console.log(err);
+    if(!keys) return console.log('Set not exist');
+
+    var multi = redis.multi();
+    for(var i=0, l=keys.length; i<l; i++) multi.EXISTS(keys[i]);
+
+    multi.exec(function(err, reply) {
+      if(err) return console.log(err);
+
+      for(i=0; i<l; i++) if(reply[i] === 0) tmp.push(keys[i]);
+      if(tmp.length > 0) redis.SREM(setKey, tmp);
+    });
+  });
+}
 
 function getUserToken(userId, token, callback) {
   var key = generateRedisKey(userId, token);
@@ -68,41 +90,45 @@ function getUserToken(userId, token, callback) {
       } else {
         callback({error:'Token not found!'});
 
-        //TODO: create check all Keys method to remove all deleted keys from SET
         // We asume that Token has expire, so DEL token from SET
-        var setKey = generateRedisKey('all', userId);
+        /*var setKey = generateRedisKey('all', userId);
         redis.SREM(setKey, key, function(err, reply){
           console.log(err, reply);
-        });
+        });*/
+        checkTokensInSet(userId);
       }
     });
 }
-module.exports.getUserToken = getUserToken;
 
-module.exports.revokeUserToken = function(userId, token, callback){
+module.exports.revokeUserToken = function(token, callback){
 
-  var key = generateRedisKey(userId, token);
-  var setKey = generateRedisKey('all', userId);
+  jwt.verify(token, SECRET, function(err, decoded){
+    if(err) return callback(err);
 
-  redis.multi()
-    .DEL(key)
-    .SREM(setKey, key)
-    .exec(function(err, reply) {
-      if(err) return callback(err);
-      return callback(null, {message:'Token revoked.'});
-    });
+    var key = generateRedisKey(decoded.id, decoded.key);
+    var setKey = generateRedisKey(SET_PREFIX, decoded.id);
+
+    redis.multi()
+      .DEL(key)
+      .SREM(setKey, key)
+      .exec(function(err, reply) {
+        if(err) return callback(err);
+        return callback(null, {message:'Token revoked.'});
+      });
+        
+  });
 };
 
 module.exports.revokeAllUserTokens = function(userId, callback){
 
-  var setKey = generateRedisKey('all', userId);
+  var setKey = generateRedisKey(SET_PREFIX, userId);
 
   redis.SMEMBERS(setKey, function(err, keys) {
     keys.push(setKey);
 
     redis.DEL(keys, function(err, reply){
       if(err) return callback(err);
-      return callback(null, {message:'All tokens revoked.'});
+      return callback(null, {message: 'All tokens revoked.', info: reply});
     })
   });
 
@@ -121,11 +147,8 @@ module.exports.validateToken = function(token, callback) {
 
         //Token exist on redis
         if(user._id === decoded.id) {
-          //req.user = user;
-          //next();
           return callback(null, user);
         } else {
-          //return sendJsonResponse(res, 400, {error: 'Bad token.'});
           return callback({error: 'Bad token.'});
         }
 

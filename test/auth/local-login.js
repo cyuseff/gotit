@@ -130,6 +130,14 @@ describe('Logout user', function() {
       .expect(/token\srevoked/i, done);
   });
 
+  it('Denied private with a 403, Token not found', function(done) {
+    agent
+      .get('/private')
+      .set('x-access-token', token)
+      .expect(403)
+      .expect(/token\snot\sfound/i, done);
+  });
+
   after(function(done){
     User.findOne({'local.email':email}, function(err, user){
       if(err) console.log(err);
