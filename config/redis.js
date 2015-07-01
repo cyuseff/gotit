@@ -1,13 +1,7 @@
 "use strict";
 
 var redis = require('redis')
-  , crypto = require('crypto')
-  , jwt = require('jsonwebtoken')
-  , client = redis.createClient()
-  , SECRET = 'my-cool-secret'
-  , PREFIX = 'token'
-  , TTL = 360
-  , TOKEN_LENGTH = 32;
+  , client = redis.createClient();
 
 
 /* Conection Events */
