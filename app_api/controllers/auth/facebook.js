@@ -55,7 +55,6 @@ function facebookSignin(req, res, token) {
 function facebookLogin(req, res, user, token) {
   //Check token
   if(user.facebook.token === token) {
-
     console.log('Token Match!');
 
     //create session token
@@ -67,7 +66,6 @@ function facebookLogin(req, res, user, token) {
     });
 
   } else {
-
     console.log('New Token!');
 
     //Update Facebook Token
@@ -125,7 +123,6 @@ module.exports.facebookStrategy = function(req, res){
           //New user, start signin flow
           facebookSignin(req, res, token);
         }
-
 
       });
 

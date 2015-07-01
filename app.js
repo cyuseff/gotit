@@ -4,8 +4,7 @@ var express = require('express')
   , mongoose = require('./config/mongoose')
   , redis = require('./config/redis')
   , morgan = require('morgan')
-  , bodyParser = require('body-parser')
-  , passport = require('./config/passport');
+  , bodyParser = require('body-parser');
 
 //create app
 var app = express();
@@ -25,9 +24,6 @@ app.use(bodyParser.json());
   next();
 });*/
 
-app.use(passport.initialize());
-app.use(passport.session());
-
 //Api routes
 require('./app_api/routes')(app);
 
@@ -35,6 +31,8 @@ require('./app_api/routes')(app);
 require('./app_site/routes')(app);
 
 //Not found
-app.use(function(req, res){ res.status(404).send("404: Not found."); });
+app.use(function(req, res){
+  res.status(404).json({error: 'Not found.'});
+});
 
 module.exports = app;

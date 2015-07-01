@@ -102,8 +102,7 @@ the FB.login() function when clicked.
 <div id="status">
 </div>
 
-<button id="createUser">Signin</button>
-<button id="loginUser">Login</button>
+<button id="createUser">Signin/Login User</button>
 -
 <button id="token">Get private with Token</button>
 <button id="noToken">Get private without Token</button>
@@ -135,33 +134,7 @@ $('#createUser').on('click', function(){
       $('#text').append('\n'+JSON.stringify(jqXHR.responseJSON));
     }
   });
-
-
-
-  return false;
-});
-
-$('#loginUser').on('click', function(){
-  var data = {
-    id: FB.getUserID(),
-    token: FB.getAuthResponse().accessToken
-  };
-
-  $.ajax({
-    url:'http://localhost:5000/api/v1/auth/facebook/login',
-    data: data,
-    method:'POST',
-    success: function(data){
-      console.log(data);
-      TOKEN = data.token;
-      $('#text').append('\n'+JSON.stringify(data));
-    },
-    error: function(jqXHR, textStatus, err){
-      console.log(jqXHR.responseJSON);
-      $('#text').append('\n'+JSON.stringify(jqXHR.responseJSON));
-    }
-  });
-
+  
   return false;
 });
 
