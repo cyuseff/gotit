@@ -31,55 +31,54 @@ module.exports.authToken = function(req, res, next) {
 };
 
 
-function strToInt(query, defVal) {
-  if(!query) return defVal;
-  var int = parseInt(query);
-  return (!isNaN(int) && int >= 1)? int : defVal;
+function strToInt(str, defVal) {
+  defVal = defVal || 0;
+  if(!str) return defVal;
+  var int = parseInt(str);
+  return (!isNaN(int) && int >= defVal)? int : defVal;
 }
 module.exports.paginateModel = function(query, Model, filters, callback) {
-
   filters = filters || {};
 
-  console.log(query);
+  //console.log(query);
   var PER_PAGE = 15
     , PAGE = 1
     , per_page = strToInt(query.per_page, PER_PAGE)
-    , page = strToInt(query.page, PAGE);
+    , page = strToInt(query.page, PAGE)
+    , pages;
 
   Model.count(filters, function(err, count) {
     if(err) return callback(err);
 
-    var pages = Math.ceil(count / per_page);
+    pages = Math.ceil(count / per_page);
     if(page > pages) page = pages;
 
-    var meta = {
+    //callback(err, meta)
+    return callback(null, {
       per_page: per_page,
       page: page,
       total_pages: pages,
-      total_entries: count
-    };
-
-    var skip = (page - 1) * per_page;
-
-    return callback(null, meta, skip);
+      total_entries: count,
+      skip: (page > 0)? (page - 1) * per_page : 0
+    });
   });
 };
 
-module.exports.getValidFiltersFromRequest = function(query, filters) {
+function escapeRegExp(s) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+module.exports.addTextCriterias = function(query, filters) {
   var ff = {}
-    , reg = /^[0-9A-Z_-]+$/i
-    , reg2 = /_[A-Z]/ig
-    , filter
+    , reg = /_[A-Z]/ig
+    , val
     , key;
 
   for(var i=0, l=filters.length; i<l; i++) {
-    filter = query[filters[i]];
-    if(!filter) continue;
+    val = query[filters[i]];
+    if(!val) continue;
 
-    if(reg.test(filter)) {
-      key = filters[i].replace(reg2, function(a){ return a[1].toUpperCase(); });
-      ff[key] = filter;
-    }
+    key = filters[i].replace(reg, function(a){ return a[1].toUpperCase(); });
+    ff[key] = escapeRegExp(val);
   }
   return ff;
 };

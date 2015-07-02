@@ -5,21 +5,28 @@ var User = require('../models/user')
 
 module.exports.listUsers = function(req, res) {
 
-  var ff = hh.getValidFiltersFromRequest(req.query, ['full_name', 'order_by']);
+  var ff = hh.addTextCriterias(req.query, ['full_name', 'order_by']);
   console.log(ff);
+  console.log('ff*******');
 
-  var filters = {};
-  if(ff.fullName) filters.fullName = new RegExp(ff.fullName, 'i');
+  var criteria = {};
+  if(ff.fullName) criteria.fullName = new RegExp(ff.fullName, 'i');
+  console.log(criteria);
+  console.log('criteria*******');
 
   var proyection = {
     emails: 1,
     fullName: 1
   };
 
-  hh.paginateModel(req.query, User, filters, function(err, meta, skip) {
+  hh.paginateModel(req.query, User, criteria, function(err, meta) {
     if(err) return hh.sendJsonResponse(res, 500, err);
+
+    console.log(meta);
+    console.log('meta*******');
+
     User
-      .find(filters, proyection, { skip:skip, limit:meta.per_page })
+      .find(criteria, proyection, { skip:meta.skip, limit:meta.per_page })
       .sort({createdAt: -1})
       .exec(function(err, users) {
         if(err) return hh.sendJsonResponse(res, 500, err);
