@@ -9,7 +9,7 @@ var User = require('../../models/user')
 function localSignin(req, res, email, password, confirm_password) {
 
   //Check password and confirmation
-  if(password !== req.body.confirm_password) return hh.sendJsonResponse(res, 400, {error: 'Passwords don\'t match'});
+  if(password !== confirm_password) return hh.sendJsonResponse(res, 400, {error: 'Passwords don\'t match'});
 
   User
     .findOne({'local.email': email })
