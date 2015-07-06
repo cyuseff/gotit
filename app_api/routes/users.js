@@ -4,7 +4,8 @@ var router = require('express').Router()
   , usersCtrl = require('../controllers/users')
   , hh = require('../../helpers');
 
-/*function checkRole(role) {
+/* OMG
+function checkRole(role) {
   return function(req, res, next) {
 
     console.log('role: '+role);
