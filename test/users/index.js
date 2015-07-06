@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var request = require('supertest')
   , app = require('../../app')
@@ -6,7 +6,7 @@ var request = require('supertest')
   , User = require('../../app_api/models/user')
   , url = '/api/v1/users';
 
-//Create User
+// Create User
 var email = 'user001@test.com'
   , password = '123456'
   , firstName = 'User001'
@@ -20,7 +20,7 @@ describe('Users', function() {
     agent
       .post('/api/v1/auth/local')
       .send('email='+email+'&password='+password+'&confirm_password='+password+'&first_name='+firstName+'&last_name='+lastName)
-      .expect(function(res){
+      .expect(function(res) {
         userid = res.body.user._id;
         token = res.body.token;
       })

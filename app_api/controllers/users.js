@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var User = require('../models/user')
   , hh = require('../../helpers');
@@ -26,11 +26,11 @@ module.exports.listUsers = function(req, res) {
     console.log('meta*******');
 
     User
-      .find(criteria, proyection, { skip:meta.skip, limit:meta.per_page })
+      .find(criteria, proyection, { skip: meta.skip, limit: meta.per_page })
       .sort({createdAt: -1})
       .exec(function(err, users) {
         if(err) return hh.sendJsonResponse(res, 500, err);
-        return hh.sendJsonResponse(res, 200, {users: users, meta:meta});
+        return hh.sendJsonResponse(res, 200, {users: users, meta: meta});
       });
   });
 
@@ -41,7 +41,7 @@ module.exports.showUser = function(req, res) {
     .findById(req.params['userid'])
     .exec(function(err, user) {
       if(err) return hh.sendJsonResponse(res, 500, err);
-      if(!user) return hh.sendJsonResponse(res, 400, {error:'No user found'});
+      if(!user) return hh.sendJsonResponse(res, 400, {error: 'No user found'});
       return hh.sendJsonResponse(res, 200, { user: user.getPublicUser() });
     });
 };

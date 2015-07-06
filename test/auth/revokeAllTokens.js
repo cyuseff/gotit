@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var request = require('supertest')
   , app = require('../../app')

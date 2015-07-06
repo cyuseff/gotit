@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var mongoose = require('../../config/mongoose')
   , tokenCtrl = require('../controllers/token')
@@ -8,17 +8,16 @@ var mongoose = require('../../config/mongoose')
 
 var userSchema = mongoose.Schema({
 
-  //email:      { type: String, unique: true, sparse: true }, // primary email, indexed { unique: true, sparse: true }
   emails:     Array,            // all accounts emails
   accounts:   Array,            // merged accounts ids
 
-  //account properties
+  // account properties
   admin:      { type: Boolean, default: false },
   createdAt:  { type: String, default: Date.now },
   active:     { type: Boolean, default: true },
   verify:     { type: Boolean, default: false },
 
-  //user properties
+  // user properties
   fullName:   String,
   firstName:  String,
   lastName:   String,
@@ -26,12 +25,12 @@ var userSchema = mongoose.Schema({
   sex:        String,
   phone:      Number,
 
-  //additional info
+  // additional info
   address:    String,
   commune:    String,
   city:       String,
 
-  //authenticated with
+  // authenticated with
   local: {
     email:        { type: String, unique: true, sparse: true },
     password:     String
@@ -70,7 +69,7 @@ if(process.ENV === 'production') userSchema.set('autoIndex', false);
 // Hooks
 userSchema.pre('remove', function(next) {
   tokenCtrl.revokeAllUserTokens(this._id, function(err, message) {
-    //console.log(err, message);
+    // console.log(err, message);
     next();
   })
 });
@@ -94,23 +93,23 @@ userSchema.methods.comparePassword = function(candidatePassword, callback) {
 	});
 };
 
-userSchema.methods.getPublicUser = function(){
+userSchema.methods.getPublicUser = function() {
   var publicUser = {
     //
     _id: this._id,
     emails: this.emails,
     accounts: this.accounts,
 
-    //account properties
+    // account properties
     isAdmin: this.admin,
     active: this.active,
     createdAt: this.createdAt,
 
-    //user properties
+    // user properties
     fullName: this.fullName
   };
 
-  //Auth mehotds
+  // Auth mehotds
   publicUser.local = (this.local.email)? true : false;
   publicUser.facebook = (this.facebook.id)? true : false;
   publicUser.twitter = (this.twitter.id)? true : false;

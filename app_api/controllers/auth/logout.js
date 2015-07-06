@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 var tokenCtrl = require('../token')
 	, hh = require('../../../helpers');
 
-module.exports.revokeToken = function(req, res){
+module.exports.revokeToken = function(req, res) {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
   if(token) {
@@ -16,10 +16,10 @@ module.exports.revokeToken = function(req, res){
   }
 };
 
-module.exports.revokeAllTokens = function(req, res){
-	tokenCtrl.revokeAllUserTokens(req.user._id, function(err, message){
+module.exports.revokeAllTokens = function(req, res) {
+	tokenCtrl.revokeAllUserTokens(req.user._id, function(err, message) {
 		if(err) return hh.sendJsonResponse(res, 500, err);
-		//Token revoked
+		// Token revoked
 		return hh.sendJsonResponse(res, 200, message);
 	});
 };

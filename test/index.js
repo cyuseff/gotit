@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 //Auth test
 require('./auth/local-signin');

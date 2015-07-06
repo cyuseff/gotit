@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var User = require('../app_api/models/user')
   , tokenCtrl = require('../app_api/controllers/token')
@@ -21,7 +21,7 @@ module.exports.authToken = function(req, res, next) {
           return sendJsonResponse(res, 500, err);
         }
       }
-      //user exist
+      // User exist
       req.user = user;
       next();
     });
@@ -40,7 +40,7 @@ function strToInt(str, defVal) {
 module.exports.paginateModel = function(query, Model, filters, callback) {
   filters = filters || {};
 
-  //console.log(query);
+  // console.log(query);
   var PER_PAGE = 15
     , PAGE = 1
     , per_page = strToInt(query.per_page, PER_PAGE)
@@ -53,7 +53,7 @@ module.exports.paginateModel = function(query, Model, filters, callback) {
     pages = Math.ceil(count / per_page);
     if(page > pages) page = pages;
 
-    //callback(err, meta)
+    // callback(err, meta)
     return callback(null, {
       per_page: per_page,
       page: page,
@@ -77,7 +77,7 @@ module.exports.addTextCriterias = function(query, filters) {
     val = query[filters[i]];
     if(!val) continue;
 
-    key = filters[i].replace(reg, function(a){ return a[1].toUpperCase(); });
+    key = filters[i].replace(reg, function(a) { return a[1].toUpperCase(); });
     ff[key] = escapeRegExp(val);
   }
   return ff;
