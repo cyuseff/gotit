@@ -38,7 +38,7 @@ module.exports.listUsers = function(req, res) {
 
 module.exports.showUser = function(req, res) {
   User
-    .findById(req.params['userid'])
+    .findById(req.params.userid)
     .exec(function(err, user) {
       if(err) return hh.sendJsonResponse(res, 500, err);
       if(!user) return hh.sendJsonResponse(res, 400, {error: 'No user found'});

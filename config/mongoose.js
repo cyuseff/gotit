@@ -23,7 +23,7 @@ function gracefulShutdown(msg, callback) {
 		console.log('Mongoose disconnected through ' + msg);
 		callback();
 	});
-};
+}
 
 /*Close mongodb connection*/
 process

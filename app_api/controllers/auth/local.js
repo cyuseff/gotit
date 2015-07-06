@@ -14,10 +14,10 @@ function localSignin(req, res, email, password, confirmPassword) {
   User
     .findOne({'local.email': email })
     // .findOne({ emails:{ $in: [email] } })
-    .exec(function(err, user) {
+    .exec(function(err, usr) {
 
       if(err) return hh.sendJsonResponse(res, 500, err);
-      if(user) return hh.sendJsonResponse(res, 409, { error: 'User already exits.' });
+      if(usr) return hh.sendJsonResponse(res, 409, { error: 'User already exits.' });
 
       // Create a new User
       var user = new User();

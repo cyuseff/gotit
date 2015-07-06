@@ -71,7 +71,7 @@ userSchema.pre('remove', function(next) {
   tokenCtrl.revokeAllUserTokens(this._id, function(err, message) {
     // console.log(err, message);
     next();
-  })
+  });
 });
 
 

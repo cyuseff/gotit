@@ -90,7 +90,7 @@ describe('Signin LocalStrategy', function() {
       .send('email=admin@email.com&password=admin123&confirm_password=admin123')
       .expect(409)
       .expect('Content-Type', /json/)
-      .expect(/user\salready\sexits/i, done)
+      .expect(/user\salready\sexits/i, done);
 
   });
 
@@ -103,9 +103,9 @@ describe('Signin LocalStrategy', function() {
   });
 
 
-  //Delete User
+  // Delete User
   after(function(done) {
-    User.findOne({'local.email':'admin@email.com'}, function(err, user){
+    User.findOne({'local.email': 'admin@email.com'}, function(err, user) {
       if(err) console.log(err);
       user.remove(function(err) {
         done();

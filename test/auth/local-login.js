@@ -6,7 +6,7 @@ var request = require('supertest')
   , User = require('../../app_api/models/user')
   , url = '/api/v1/auth/local';
 
-//Create User
+// Create User
 var email = 'user001@test.com'
   , password = '123456'
   , firstName = 'User001'
@@ -20,7 +20,7 @@ describe('Login user', function() {
     agent
       .post('/api/v1/auth/local')
       .send('email='+email+'&password='+password+'&confirm_password='+password+'&first_name='+firstName+'&last_name='+lastName)
-      .end(function(){
+      .end(function() {
         done();
       });
   });
@@ -138,8 +138,8 @@ describe('Logout user', function() {
       .expect(/token\snot\sfound/i, done);
   });
 
-  after(function(done){
-    User.findOne({'local.email':email}, function(err, user){
+  after(function(done) {
+    User.findOne({'local.email': email}, function(err, user) {
       if(err) console.log(err);
       user.remove(function(err) {
         done();

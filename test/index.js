@@ -1,9 +1,9 @@
 'use strict';
 
-//Auth test
+// Auth test
 require('./auth/local-signin');
 require('./auth/local-login');
 require('./auth/revokeAllTokens');
 
-//Users test
+// Users test
 require('./users');

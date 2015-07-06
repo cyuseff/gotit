@@ -45,12 +45,12 @@ describe('Users', function() {
       .set('x-access-token', token)
       .expect(200)
       .expect('Content-Type', /json/)
-      .expect(function(res){
+      .expect(function(res) {
         if(res.body.error) throw new Error(res.body.error);
         if(res.body.user) {
-          if(res.body.user._id !== userid) throw new Error("ID don't match!");
+          if(res.body.user._id !== userid) throw new Error('ID don\'t match!');
         } else {
-          throw new Error("No user!");
+          throw new Error('No user!');
         }
 
       })
@@ -81,8 +81,8 @@ describe('Users', function() {
 
   });
 
-  after(function(done){
-    User.findOne({'local.email':email}, function(err, user){
+  after(function(done) {
+    User.findOne({'local.email': email}, function(err, user) {
       if(err) console.log(err);
       user.remove(function(err) {
         done();
