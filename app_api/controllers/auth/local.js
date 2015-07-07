@@ -1,7 +1,7 @@
 'use strict';
 
 var User = require('../../models/user')
-  , tokenCtrl = require('../token')
+  , Token = require('../../models/token')
   , validator = require('validator')
 	, hh = require('../../../helpers');
 
@@ -42,7 +42,7 @@ function localSignin(req, res, email, password, confirmPassword) {
           if(err) return hh.sendJsonResponse(res, 500, err);
 
           // create session token
-          tokenCtrl.setUserToken(user, function(err, token) {
+          Token.setUserToken(user, function(err, token) {
 
             // The user was created so send it back anyway even if token creation or redis fails
             if(err) console.log(err);
@@ -74,7 +74,7 @@ function localLogin(req, res, email, password) {
       if(isMatch) {
 
         // create session token
-        tokenCtrl.setUserToken(user, function(err, token) {
+        Token.setUserToken(user, function(err, token) {
           if(err) return hh.sendJsonResponse(res, 500, err);
 
           // return the new user with token

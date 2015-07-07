@@ -1,7 +1,7 @@
 'use strict';
 
 var User = require('../app_api/models/user')
-  , tokenCtrl = require('../app_api/controllers/token')
+  , Token = require('../app_api/models/token')
   , validator = require('validator');
 
 function sendJsonResponse(res, status, content) {
@@ -13,7 +13,7 @@ module.exports.sendJsonResponse = sendJsonResponse;
 module.exports.authToken = function(req, res, next) {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
   if(token) {
-    tokenCtrl.validateToken(token, function(err, user) {
+    Token.validateToken(token, function(err, user) {
       if(err) {
         if(err.error) {
           return sendJsonResponse(res, 403, err);

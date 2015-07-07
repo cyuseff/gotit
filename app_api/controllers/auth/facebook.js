@@ -1,7 +1,7 @@
 'use strict';
 
 var User = require('../../models/user')
-  , tokenCtrl = require('../token')
+  , Token = require('../../models/token')
   , request = require('request')
   , hh = require('../../../helpers');
 
@@ -38,9 +38,9 @@ function facebookSignin(req, res, token) {
       if(err) return hh.sendJsonResponse(res, 500, err);
 
       // create session token
-      tokenCtrl.setUserToken(user, function(err, token) {
+      Token.setUserToken(user, function(err, token) {
 
-        // The user was created so send it back anyway even if token creation or tokenCtrl fails
+        // The user was created so send it back anyway even if token creation or Token fails
         if(err) console.log(err);
 
         // return the new user with token
@@ -58,7 +58,7 @@ function facebookLogin(req, res, user, token) {
     console.log('Token Match!');
 
     // create session token
-    tokenCtrl.setUserToken(user, function(err, token) {
+    Token.setUserToken(user, function(err, token) {
       if(err) return hh.sendJsonResponse(res, 500, err);
 
       // return the new user with token
@@ -74,7 +74,7 @@ function facebookLogin(req, res, user, token) {
       if(err) return hh.sendJsonResponse(res, 500, err);
 
       // create session token
-      tokenCtrl.setUserToken(user, function(err, token) {
+      Token.setUserToken(user, function(err, token) {
 
         // Its necesary send back a valid token
         if(err) return hh.sendJsonResponse(res, 500, err);
