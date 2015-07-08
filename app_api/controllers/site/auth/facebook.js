@@ -3,7 +3,9 @@
 var User = require('../../../models/user')
   , Token = require('../../../models/token')
   , request = require('request')
-  , hh = require('../../../helpers');
+  , hh = require('../../../helpers')
+  , ID = '909396282439703'
+  , SECRET = 'd7062dfb81a1574860aff74f1a7cfcad';
 
 
 function facebookSignin(req, res, token) {
@@ -87,10 +89,6 @@ function facebookLogin(req, res, user, token) {
   }
 }
 
-
-var _ID = '909396282439703'
-  , _SECRET = 'd7062dfb81a1574860aff74f1a7cfcad';
-
 module.exports.facebookStrategy = function(req, res) {
   var userId = req.body.id
     , token = req.body.token;
@@ -99,14 +97,14 @@ module.exports.facebookStrategy = function(req, res) {
 
   // Check if FbToken is valid for GotIt app
   var fbOpts = {
-    url: 'https://graph.facebook.com/debug_token?input_token='+token+'&access_token=' + _ID + '|' + _SECRET,
+    url: 'https://graph.facebook.com/debug_token?input_token='+token+'&access_token=' + ID + '|' + SECRET,
     method: 'GET'
   };
   request(fbOpts, function(err, facebookResponse, body) {
     var json = JSON.parse(body);
 
     // Check if info is correct
-    if(!json.data || !json.data.is_valid || !json.data.app_id === _ID || !json.data.user_id === userId) {
+    if(!json.data || !json.data.is_valid || !json.data.app_id === ID || !json.data.user_id === userId) {
       return hh.sendJsonResponse(res, 403, {error: 'Facebook token error'});
     }
 

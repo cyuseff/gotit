@@ -91,11 +91,11 @@ describe('Login user', function() {
       .expect(200)
       .expect('Content-Type', /json/)
       .expect(/user001\@test\.com/i)
-      .expect(function(res){
+      .expect(function(res) {
         if(res.body.token) {
           token = res.body.token;
         } else {
-          throw new Error("No token!");
+          throw new Error('No token!');
         }
       })
       .end(done);

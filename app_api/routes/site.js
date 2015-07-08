@@ -24,6 +24,9 @@ module.exports = function(app) {
 
   // Private test Route
   app.get('/private', hh.authToken, function(req, res) {
-    hh.sendJsonResponse(res, 200, {message: 'This content is private!', user: req.user});
+    hh.sendJsonResponse(res, 200, {message: 'This content is private!', user: {
+      id: req.user._id,
+      name: req.user.fullName
+    }});
   });
 };
