@@ -1,9 +1,9 @@
 'use strict';
 
-var User = require('../../models/user')
-  , Token = require('../../models/token')
+var User = require('../../../models/user')
+  , Token = require('../../../models/token')
   , validator = require('validator')
-	, hh = require('../../../helpers');
+	, hh = require('../../../../helpers');
 
 
 function localSignin(req, res, email, password, confirmPassword) {

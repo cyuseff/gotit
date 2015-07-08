@@ -1,7 +1,7 @@
 'use strict';
 
-var Token = require('../../models/token')
-	, hh = require('../../../helpers');
+var Token = require('../../../models/token')
+	, hh = require('../../../../helpers');
 
 module.exports.revokeToken = function(req, res) {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];

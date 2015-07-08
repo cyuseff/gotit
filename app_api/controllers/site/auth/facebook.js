@@ -1,9 +1,9 @@
 'use strict';
 
-var User = require('../../models/user')
-  , Token = require('../../models/token')
+var User = require('../../../models/user')
+  , Token = require('../../../models/token')
   , request = require('request')
-  , hh = require('../../../helpers');
+  , hh = require('../../../../helpers');
 
 
 function facebookSignin(req, res, token) {

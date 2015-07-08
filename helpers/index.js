@@ -5,7 +5,7 @@ var User = require('../app_api/models/user')
   , validator = require('validator');
 
 function sendJsonResponse(res, status, content) {
-  //console.log(content);
+  // console.log(content);
   res.status(status).json(content);
 }
 module.exports.sendJsonResponse = sendJsonResponse;
@@ -43,23 +43,23 @@ module.exports.paginateModel = function(query, Model, filters, callback) {
   // console.log(query);
   var PER_PAGE = 15
     , PAGE = 1
-    , per_page = strToInt(query.per_page, PER_PAGE)
+    , perPage = strToInt(query.per_page, PER_PAGE)
     , page = strToInt(query.page, PAGE)
     , pages;
 
   Model.count(filters, function(err, count) {
     if(err) return callback(err);
 
-    pages = Math.ceil(count / per_page);
+    pages = Math.ceil(count / perPage);
     if(page > pages) page = pages;
 
     // callback(err, meta)
     return callback(null, {
-      per_page: per_page,
+      per_page: perPage,
       page: page,
       total_pages: pages,
       total_entries: count,
-      skip: (page > 0)? (page - 1) * per_page : 0
+      skip: (page > 0)? (page - 1) * perPage : 0
     });
   });
 };
@@ -82,3 +82,21 @@ module.exports.addTextCriterias = function(query, filters) {
   }
   return ff;
 };
+
+/* OMG
+function checkRole(role) {
+  return function(req, res, next) {
+
+    console.log('role: '+role);
+    switch (role) {
+      case 'owner':
+        if(req.user._id === req.params.userid) {
+          console.log('Is Owner!');
+          next();
+        } else {
+          hh.sendJsonResponse(res, 403, {error: 'Roles don\'t match!'});
+        }
+        break;
+    }
+  };
+}*/

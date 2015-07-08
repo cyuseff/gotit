@@ -26,8 +26,11 @@ app.use(function(req, res, next) {
 });
 */
 
-// Api routes
-require('./app_api/routes')(app);
+// Api Site routes
+require('./app_api/routes/site')(app);
+
+// Api Admin routes
+require('./app_api/routes/admin')(app);
 
 // Site routes
 require('./app_site/routes')(app);

@@ -55,7 +55,9 @@ var userSchema = mongoose.Schema({
     token:        String,
     email:        String,
     name:         String
-  }
+  },
+
+  roles: Array
 
 });
 
@@ -87,10 +89,10 @@ userSchema.methods.generateHash = function(password, callback) {
 
 // Password verification
 userSchema.methods.comparePassword = function(candidatePassword, callback) {
-	bcrypt.compare(candidatePassword, this.local.password, function(err, isMatch) {
-		if(err) return callback(err);
-		callback(null, isMatch);
-	});
+  bcrypt.compare(candidatePassword, this.local.password, function(err, isMatch) {
+    if(err) return callback(err);
+    callback(null, isMatch);
+  });
 };
 
 userSchema.methods.getPublicUser = function() {
