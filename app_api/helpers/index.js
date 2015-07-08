@@ -1,7 +1,7 @@
 'use strict';
 
-var User = require('../app_api/models/user')
-  , Token = require('../app_api/models/token')
+var User = require('../models/user')
+  , Token = require('../models/token')
   , validator = require('validator');
 
 function sendJsonResponse(res, status, content) {

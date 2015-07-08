@@ -5,7 +5,7 @@ var router = require('express').Router()
   , facebookCtrl = require('../controllers/site/auth/facebook')
   , logoutCtrl = require('../controllers/site/auth/logout')
   , usersCtrl = require('../controllers/site/users')
-  , hh = require('../../helpers');
+  , hh = require('../helpers');
 
 // Auth routes
 router.route('/auth/local').post(localCtrl.localStrategy);

@@ -1,7 +1,7 @@
 'use strict';
 
 var User = require('../../models/user')
-  , hh = require('../../../helpers');
+  , hh = require('../../helpers');
 
 module.exports.listUsers = function(req, res) {
 

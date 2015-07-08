@@ -1,7 +1,7 @@
 'use strict';
 
 var router = require('express').Router()
-  , hh = require('../../helpers');
+  , hh = require('../helpers');
 
 // Test route
 router.route('/').get(function(req, res) {
