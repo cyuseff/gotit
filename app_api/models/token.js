@@ -7,7 +7,7 @@ var redis = require('../../config/redis')
   , NAME_SPACE = 'got-it'
   , PREFIX = 'token'
   , SET_PREFIX = 'user-set'
-  , TTL = 360
+  , TTL = 3600// 360
   , TOKEN_LENGTH = 32;
 
 function generateBuffer(callback) {

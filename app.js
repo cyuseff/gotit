@@ -11,6 +11,7 @@ var app = express();
 
 // Config app
 app.set('view engine', 'ejs');
+require('./config/admin');
 
 // Middlewares
 // app.use(morgan('dev'));

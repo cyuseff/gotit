@@ -1692,6 +1692,11 @@
         }
       }
     },
+    "uuid": {
+      "version": "2.0.1",
+      "from": "uuid@*",
+      "resolved": "https://registry.npmjs.org/uuid/-/uuid-2.0.1.tgz"
+    },
     "validator": {
       "version": "3.40.0",
       "from": "validator@*",
