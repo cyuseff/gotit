@@ -24,7 +24,9 @@ function generateRedisKey(primaryKey, secondaryKey) {
 
     -routes:        (array <Object>) Ex:
                         -url: (string) Ex: '/provider/:scope/some-nested-route'
-                        -methods: (string, array) Support for "*", "GET", "POST", "PUT", "DELETE"
+                        -methods: (string, array) Support for "*", "GET", "POST", "PUT" and "DELETE".
+                        -scope: (string) Local scope. Default: Rol scope.
+                        -accessLevel: (string) Local accessLevel. Default: Rol accessLevel.
                         -recursive: (boolean). Default false. If true, allow user any route under.
 */
 function Rol(opts) {
