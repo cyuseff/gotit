@@ -21,6 +21,11 @@ function generateRedisKey(primaryKey, secondaryKey) {
         route.url:  '/provider/:scope/some-nested-route' => '/provider/my-url/some-nested-route'
 
     -accessLevel:   (int)     used to filter the data in a endpoint. 0 is the highest access level.
+
+    -routes:        (array <Object>) Ex:
+                        -url: (string) Ex: '/provider/:scope/some-nested-route'
+                        -methods: (string, array) Support for "*", "GET", "POST", "PUT", "DELETE"
+                        -recursive: (boolean). Default false. If true, allow user any route under.
 */
 function Rol(opts) {
   this.id = opts.id || uuid.v1();
