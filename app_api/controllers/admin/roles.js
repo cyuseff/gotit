@@ -7,7 +7,10 @@ module.exports.newRol = function(req, res) {
 
   var routes = req.routes;
 
-  var rol = new Rol(null, 'superAdmin', 1);
+  var rol = new Rol({
+    name: 'superadmin'
+  });
+
   rol.addRoute('*', '*', true);
   rol.save(function(err, reply) {
     if(err) return hh.sendJsonResponse(res, 500, err);
@@ -34,16 +37,11 @@ module.exports.showRol = function(req, res) {
 };
 
 function updateRol(rol, vars) {
-  if(vars.routes === 'routes') {
-    var routes = JSON.parse(vars.routes)
-      , tmp = [];
-
-    for(var i=0, l=routes.length; i<l; i++) tmp.push(routes[i]);
-    rol.routes = tmp;
-  }
-
-  if(vars.access_level) rol.accessLevel = vars.access_level;
-  if(vars.name) rol.name = vars.name;
+  rol.name = vars.name || rol.name;
+  rol.scope = vars.scope || rol.scope;
+  rol.accessLevel = vars.accessLevel || rol.accessLevel;
+  rol.routes = vars.routes || rol.routes;
+  return rol;
 }
 module.exports.updateRol = function(req, res) {
   if(!req.params.rolId) return hh.sendJsonResponse(res, 400, {error: 'No id supplied.'});
@@ -52,7 +50,7 @@ module.exports.updateRol = function(req, res) {
     if(err) return hh.sendJsonResponse(res, 500, err);
     if(!rol) return hh.sendJsonResponse(res, 404, {error: 'Rol not found'});
 
-    updateRol(rol, req.body);
+    rol = updateRol(rol, req.body);
 
     rol.save(function(err, reply) {
       if(err) return hh.sendJsonResponse(res, 500, err);
