@@ -16,6 +16,9 @@ function checkRoute(route, scope, reqUrl, reqMethod, prefixUrl) {
   var url
     , regEx
     , match;
+
+  reqUrl = reqUrl.replace(/\/$/, '');
+
   console.log(route);
   console.log('scope: '+scope);
   console.log('reqUrl: '+reqUrl);
@@ -23,7 +26,7 @@ function checkRoute(route, scope, reqUrl, reqMethod, prefixUrl) {
   console.log('prefixUrl: '+prefixUrl);
 
   if(scope === '*') scope = '\\w*';
-  if(route.recursive) scope += '(\/\\w*)*';
+  if(route.recursive) scope += '(\/\\w+)*';
 
   url = (prefixUrl + route.url.replace(':scope', scope)).replace(/\//g, '\\/');
   regEx = new RegExp('^' + url + '$');
