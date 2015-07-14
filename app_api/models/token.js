@@ -135,7 +135,8 @@ module.exports.revokeAllUserTokens = function(userId, callback) {
 };
 
 module.exports.updateAllUserTokens = function(userId, user, callback) {
-  var setKey = generateRedisKey(SET_PREFIX, userId);
+  var setKey = generateRedisKey(SET_PREFIX, userId)
+    , tmp = [];
 
   user = JSON.stringify(user);
 
@@ -147,8 +148,20 @@ module.exports.updateAllUserTokens = function(userId, user, callback) {
     for(var i=0, l=keys.length; i<l; i++) multi.SET(keys[i], user, 'XX');
 
     multi.exec(function(err, reply) {
+
       if(err) return callback(err);
-      return callback(null, reply);
+
+      // check if any key has expire
+      for(i=0; i<l; i++) if(!reply[i]) tmp.push(keys[i]);
+      if(tmp.length) {
+        redis.SREM(setKey, tmp, function(err) {
+          console.log('Set updated!');
+          return callback(null, reply);
+        });
+      } else {
+        return callback(null, reply);
+      }
+
     });
 
   });

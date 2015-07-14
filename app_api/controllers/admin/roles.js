@@ -82,11 +82,13 @@ module.exports.assignRol = function(req, res) {
       if(err) return hh.sendJsonResponse(res, 500, err);
       if(!user) return hh.sendJsonResponse(res, 400, {error: 'No user found'});
 
+      var rand = Math.round(Math.random() * 2) + 1;
+
       user.admin = true;
-      user.roles.push({
+      user.roles = [{
         id: req.params.rolId,
-        scope: '3'
-      });
+        scope: rand.toString()
+      }];
 
       user.save(function(err) {
         if(err) return hh.sendJsonResponse(res, 500, err);
