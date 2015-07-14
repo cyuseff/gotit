@@ -109,14 +109,14 @@ User
       user.local.email = P_EMAIL;
       user.local.password = hash;
 
-      // set as Admin
+      /*// set as Admin
       user.admin = true;
 
       // Assign SuperAdmin Rol
       user.roles.push({
         id: rol2.id,
         scope: '3'
-      });
+      });*/
 
       // save user before serialize into his token
       user.save(function(err) {

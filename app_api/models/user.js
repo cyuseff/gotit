@@ -13,7 +13,7 @@ var userSchema = mongoose.Schema({
 
   // account properties
   admin:      { type: Boolean, default: false },
-  createdAt:  { type: String, default: Date.now },
+  createdAt:  { type: Date, default: Date.now },
   active:     { type: Boolean, default: true },
   verify:     { type: Boolean, default: false },
 
@@ -73,6 +73,15 @@ userSchema.pre('remove', function(next) {
   Token.revokeAllUserTokens(this._id, function(err, message) {
     // console.log(err, message);
     next();
+  });
+});
+
+userSchema.post('save', function(user) {
+  var me = this;
+  Token.updateAllUserTokens(me._id, me, function(err, reply) {
+    if(err) return console.log(err);
+    if(!reply) return console.log('Nothing to update');
+    return console.log('User token updated.', reply);
   });
 });
 

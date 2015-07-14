@@ -66,7 +66,7 @@ function checkTokensInSet(userId) {
     if(!keys) return console.log('Set not exist');
 
     var multi = redis.multi();
-    for(var i = 0, l = keys.length; i < l; i ++) multi.EXISTS(keys[i]);
+    for(var i=0, l=keys.length; i<l; i++) multi.EXISTS(keys[i]);
 
     multi.exec(function(err, reply) {
       if(err) return console.log(err);
@@ -132,6 +132,26 @@ module.exports.revokeAllUserTokens = function(userId, callback) {
     });
   });
 
+};
+
+module.exports.updateAllUserTokens = function(userId, user, callback) {
+  var setKey = generateRedisKey(SET_PREFIX, userId);
+
+  user = JSON.stringify(user);
+
+  redis.SMEMBERS(setKey, function(err, keys) {
+    if(err) return callback(err);
+    if(!keys || !keys.length) return callback(null, null);
+
+    var multi = redis.multi();
+    for(var i=0, l=keys.length; i<l; i++) multi.SET(keys[i], user, 'XX');
+
+    multi.exec(function(err, reply) {
+      if(err) return callback(err);
+      return callback(null, reply);
+    });
+
+  });
 };
 
 module.exports.validateToken = function(token, callback) {

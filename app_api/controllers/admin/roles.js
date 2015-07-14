@@ -1,6 +1,7 @@
 'use strict';
 
 var Rol = require('../../models/rol')
+  , User = require('../../models/user')
   , hh = require('../../helpers');
 
 module.exports.newRol = function(req, res) {
@@ -68,4 +69,28 @@ module.exports.removeRol = function(req, res) {
     if(err) return hh.sendJsonResponse(res, 500, err);
     return hh.sendJsonResponse(res, 200, message);
   });
+};
+
+module.exports.assignRol = function(req, res) {
+  if(!req.body.userId) return hh.sendJsonResponse(res, 400, {error: 'User id is required.'});
+
+  console.log(req.params.rolId, req.body.userId);
+
+  User
+    .findById(req.body.userId)
+    .exec(function(err, user) {
+      if(err) return hh.sendJsonResponse(res, 500, err);
+      if(!user) return hh.sendJsonResponse(res, 400, {error: 'No user found'});
+
+      user.admin = true;
+      user.roles.push({
+        id: req.params.rolId,
+        scope: '3'
+      });
+
+      user.save(function(err) {
+        if(err) return hh.sendJsonResponse(res, 500, err);
+        return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});
+      });
+    });
 };
