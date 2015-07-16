@@ -6,5 +6,6 @@
     "before": true,
     "it": true,
     "after": true
-  }
+  },
+  "multistr": true
 }

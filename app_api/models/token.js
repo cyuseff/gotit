@@ -101,7 +101,6 @@ function getUserToken(userId, token, callback) {
 }
 
 module.exports.revokeUserToken = function(token, callback) {
-
   jwt.verify(token, SECRET, function(err, decoded) {
     if(err) return callback(err);
 
@@ -120,7 +119,6 @@ module.exports.revokeUserToken = function(token, callback) {
 };
 
 module.exports.revokeAllUserTokens = function(userId, callback) {
-
   var setKey = generateRedisKey(SET_PREFIX, userId);
 
   redis.SMEMBERS(setKey, function(err, keys) {
@@ -136,19 +134,33 @@ module.exports.revokeAllUserTokens = function(userId, callback) {
 
 module.exports.updateAllUserTokens = function(userId, user, callback) {
   var setKey = generateRedisKey(SET_PREFIX, userId)
-    , tmp = [];
+    , tmp = []
+    , script;
 
   user = JSON.stringify(user);
 
-  redis.SMEMBERS(setKey, function(err, keys) {
+  script = "\
+    local reply \
+    local keys = redis.call('smembers', KEYS[1]) \
+    for i, k in ipairs(keys) do \
+      reply = redis.call('set', k, ARGV[1], 'xx') \
+      if reply==false then redis.call('srem', KEYS[1], k) end \
+    end \
+    return redis.call('smembers', KEYS[1])";
+
+  redis.EVAL(script, 1, setKey, user, function(err, reply) {
     if(err) return callback(err);
-    if(!keys || !keys.length) return callback(null, null);
+    return callback(null, reply);
+  });
+
+  /*redis.SMEMBERS(setKey, function(err, keys) {
+    if(err) return callback(err);
+    if(!keys) return callback(null, null);
 
     var multi = redis.multi();
     for(var i=0, l=keys.length; i<l; i++) multi.SET(keys[i], user, 'XX');
 
     multi.exec(function(err, reply) {
-
       if(err) return callback(err);
 
       // check if any key has expire
@@ -161,10 +173,9 @@ module.exports.updateAllUserTokens = function(userId, user, callback) {
       } else {
         return callback(null, reply);
       }
-
     });
 
-  });
+  });*/
 };
 
 module.exports.validateToken = function(token, callback) {

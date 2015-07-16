@@ -46,9 +46,20 @@ Rol.findOneById = function(id, callback) {
 
 Rol.findAll = function(callback) {
   var setKey = generateRedisKey(SET_PREFIX)
-    , roles = [];
+    , roles = []
+    , script;
 
-  redis.SMEMBERS(setKey, function(err, keys) {
+  script = 'return redis.call("MGET", unpack(redis.call("SMEMBERS", KEYS[1])))';
+
+  redis.EVAL(script, 1, setKey, function(err, reply) {
+    if(err) return callback(err);
+    if(!reply.length) return callback(null, roles);
+    // convert to objects
+    for(var i=0, l=reply.length; i<l; i++) roles.push(JSON.parse(reply[i]));
+    return callback(null, roles);
+  });
+
+  /*redis.SMEMBERS(setKey, function(err, keys) {
     if(err) return callback(err);
     if(!keys.length) return callback(null, roles);
 
@@ -58,7 +69,7 @@ Rol.findAll = function(callback) {
       for(var i=0, l=reply.length; i<l; i++) roles.push(JSON.parse(reply[i]));
       return callback(null, roles);
     });
-  });
+  });*/
 };
 
 Rol.remove = function(id, callback) {

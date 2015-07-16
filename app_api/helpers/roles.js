@@ -3,10 +3,6 @@
 var Rol = require('../models/rol')
   , hh = require('./index');
 
-function isAdmin(req, res, next) {
-  if(req.user && req.user.admin) return next();
-  return hh.sendJsonResponse(res, 403, {message: 'You don\'t have admin privilege!'});
-}
 function checkRoute(route, scope, reqUrl, reqMethod, prefixUrl) {
   var url = route.url
     , regEx;
@@ -21,7 +17,7 @@ function checkRoute(route, scope, reqUrl, reqMethod, prefixUrl) {
   // add pattern if is flagged as recursive
   if(route.recursive) url += '([\/\\w-]+)*';
 
-  // scape url to create the regExp
+  // escape url to create the regExp
   url.replace(/\//g, '\\/');
 
   // create the regExp matching the beginning and the end
@@ -46,23 +42,23 @@ function checkRoute(route, scope, reqUrl, reqMethod, prefixUrl) {
 module.exports.isAllowed = function(req, res, next) {
 
   var reqUrl = req.originalUrl.split('?')[0]
-    , prefixUrl = '/api/v1/admin/'
-    , url;
+    , prefixUrl = '/api/v1/admin/';
 
-  isAdmin(req, res, function() {
-    if(!req.user.roles) return hh.sendJsonResponse(res, 403, {error: 'You don\'t have roles.'});
+  // check if user is admin
+  if(!req.user || !req.user.admin) return hh.sendJsonResponse(res, 403, {message: 'You don\'t have admin privilege!'});
+  // check if user has roles
+  if(!req.user.roles) return hh.sendJsonResponse(res, 403, {error: 'You don\'t have roles.'});
 
-    Rol.findOneById(req.user.roles[0].id, function(err, rol) {
-      for(var i=0, l=rol.routes.length; i<l; i++) {
-        var isAllowed = checkRoute(rol.routes[i], req.user.roles[0].scope, reqUrl, req.method, prefixUrl);
-        if(isAllowed) {
-          req.rol = isAllowed;
-          req.rol.name = rol.name;
-          req.rol.accessLevel = req.rol.accessLevel || rol.accessLevel;
-          return next();
-        }
+  Rol.findOneById(req.user.roles[0].id, function(err, rol) {
+    for(var i=0, l=rol.routes.length; i<l; i++) {
+      var isAllowed = checkRoute(rol.routes[i], req.user.roles[0].scope, reqUrl, req.method, prefixUrl);
+      if(isAllowed) {
+        req.rol = isAllowed;
+        req.rol.name = rol.name;
+        req.rol.accessLevel = req.rol.accessLevel || rol.accessLevel;
+        return next();
       }
-      return hh.sendJsonResponse(res, 403, {message: 'You don\'t have the required privilege!'});
-    });
+    }
+    return hh.sendJsonResponse(res, 403, {message: 'You don\'t have the required privilege!'});
   });
 };
