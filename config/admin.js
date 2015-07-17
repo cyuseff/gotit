@@ -13,7 +13,7 @@ var User = require('../app_api/models/user')
 var rol, rol2;
 
 Rol.findAll(function(err, roles) {
-  if(!roles.length) {
+  if(!roles || !roles.length) {
     rol = new Rol({
       name: 'superAdmin',
       accessLevel: 1,
@@ -73,6 +73,11 @@ User
       user.roles.push({
         id: rol.id,
         scope: '*'
+      });
+      // Assign ProviderAdmin Rol
+      user.roles.push({
+        id: rol2.id,
+        scope: '3'
       });
 
       // save user before serialize into his token

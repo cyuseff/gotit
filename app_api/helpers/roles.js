@@ -31,34 +31,73 @@ function checkRoute(route, scope, reqUrl, reqMethod, prefixUrl) {
       if(route.methods.indexOf(reqMethod) !== -1) {
         return {url: route.url, method: reqMethod, accessLevel: route.accessLevel};
       } else {
-        return false;
+        return null;
       }
     }
   } else {
-    return false;
+    return null;
+  }
+}
+
+function checkRoutesInRoles(roles, userRoles, reqUrl, reqMethod, prefixUrl) {
+  var allowedRoutes = [];
+
+  // iterate roles
+  for(var i=0, l=roles.length; i<l; i++) {
+    console.log(roles[i]);
+    console.log(userRoles[i]);
+    console.log('*****-----*****');
+
+    // iterate routes
+    for(var j=0, d=roles[i].routes.length; j<d; j++) {
+      var route = checkRoute(roles[i].routes[j], userRoles[i].scope, reqUrl, reqMethod, prefixUrl);
+      if(route) {
+        route.rolId = roles[i].id;
+        route.rolName = roles[i].name;
+        route.scope = userRoles[i].scope;
+        route.accessLevel = route.accessLevel || roles[i].accessLevel;
+        allowedRoutes.push(route);
+      }
+    }
+  }
+  return allowedRoutes;
+}
+
+function winningRoute(routes) {
+  if(routes.length === 1) {
+    return routes[0];
+  } else {
+    // TODO: check accessLevel, url and scope to rank compute a winner
+    return routes;
   }
 }
 
 module.exports.isAllowed = function(req, res, next) {
 
-  var reqUrl = req.originalUrl.split('?')[0]
-    , prefixUrl = '/api/v1/admin/';
+  var prefixUrl = '/api/v1/admin/'
+    , ids = []
+    , allowedRoutes;
 
   // check if user is admin
   if(!req.user || !req.user.admin) return hh.sendJsonResponse(res, 403, {message: 'You don\'t have admin privilege!'});
   // check if user has roles
-  if(!req.user.roles) return hh.sendJsonResponse(res, 403, {error: 'You don\'t have roles.'});
+  if(!req.user.roles) return hh.sendJsonResponse(res, 403, {message: 'You don\'t have roles.'});
+  // get roles ids
+  for(var i=0, l=req.user.roles.length; i<l; i++) ids.push(req.user.roles[i].id);
 
-  Rol.findOneById(req.user.roles[0].id, function(err, rol) {
-    for(var i=0, l=rol.routes.length; i<l; i++) {
-      var isAllowed = checkRoute(rol.routes[i], req.user.roles[0].scope, reqUrl, req.method, prefixUrl);
-      if(isAllowed) {
-        req.rol = isAllowed;
-        req.rol.name = rol.name;
-        req.rol.accessLevel = req.rol.accessLevel || rol.accessLevel;
-        return next();
-      }
+  Rol.findByIds(ids, function(err, roles) {
+    if(err) return hh.sendJsonResponse(res, 500, err);
+    if(!roles.length) return hh.sendJsonResponse(res, 403, {message: 'Rol not found. You don\'t have the required privilege!.'});
+
+    allowedRoutes = checkRoutesInRoles(roles, req.user.roles, req.originalUrl.split('?')[0], req.method, prefixUrl);
+    console.log(allowedRoutes);
+
+    if(allowedRoutes.length) {
+      req.rol = winningRoute(allowedRoutes);
+      return next();
+    } else {
+      return hh.sendJsonResponse(res, 403, {message: 'You don\'t have the required privilege!.'});
     }
-    return hh.sendJsonResponse(res, 403, {message: 'You don\'t have the required privilege!'});
+
   });
 };
