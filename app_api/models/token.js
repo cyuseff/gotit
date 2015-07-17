@@ -59,8 +59,25 @@ module.exports.setUserToken = function(user, callback) {
 
 function checkTokensInSet(userId) {
   var setKey = generateRedisKey(SET_PREFIX, userId)
-    , tmp = [];
+    , tmp = []
+    , script;
 
+  script = '\
+    local reply \
+    local keys = redis.call("SMEMBERS", KEYS[1]) \
+    if table.getn(keys) == 0 then return keys end \
+    for i, k in ipairs(keys) do \
+      reply = redis.call("EXISTS", k) \
+      if reply==false then redis.call("SREM", KEYS[1], k) end \
+    end \
+    return redis.call("SMEMBERS", KEYS[1])';
+
+  redis.EVAL(script, 1, setKey, function(err, reply) {
+    if(err) return console.log(err);
+    return console.log(reply);
+  });
+
+  /*
   redis.SMEMBERS(setKey, function(err, keys) {
     if(err) return console.log(err);
     if(!keys) return console.log('Set not exist');
@@ -75,6 +92,7 @@ function checkTokensInSet(userId) {
       if(tmp.length > 0) redis.SREM(setKey, tmp);
     });
   });
+  */
 }
 
 function getUserToken(userId, token, callback) {
@@ -139,14 +157,18 @@ module.exports.updateAllUserTokens = function(userId, user, callback) {
 
   user = JSON.stringify(user);
 
-  script = "\
-    local reply \
-    local keys = redis.call('smembers', KEYS[1]) \
+  script = '\
+    local ttl \
+    local keys = redis.call("SMEMBERS", KEYS[1]) \
+    if table.getn(keys) == 0 then return keys end \
     for i, k in ipairs(keys) do \
-      reply = redis.call('set', k, ARGV[1], 'xx') \
-      if reply==false then redis.call('srem', KEYS[1], k) end \
+      ttl = redis.call("TTL", k) \
+      if ttl<0 then \
+        if ttl == -1 then redis.call("DEL", k) end \
+        redis.call("SREM", KEYS[1], k) \
+      else redis.call("SETEX", k, ttl, ARGV[1]) end \
     end \
-    return redis.call('smembers', KEYS[1])";
+    return redis.call("SMEMBERS", KEYS[1])';
 
   redis.EVAL(script, 1, setKey, user, function(err, reply) {
     if(err) return callback(err);

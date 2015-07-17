@@ -35,7 +35,6 @@ function Rol(opts) {
 // Static Methods
 Rol.findOneById = function(id, callback) {
   var key = generateRedisKey(id);
-  console.log(key);
 
   redis.GET(key, function(err, rol) {
     if(err) return callback(err);
