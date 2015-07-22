@@ -73,18 +73,6 @@ Rol.findAll = function(callback) {
     for(var i=0, l=reply.length; i<l; i++) roles.push(JSON.parse(reply[i]));
     return callback(null, roles);
   });
-
-  /*redis.SMEMBERS(setKey, function(err, keys) {
-    if(err) return callback(err);
-    if(!keys.length) return callback(null, roles);
-
-    redis.MGET(keys, function(err, reply) {
-      if(err) return callback(err);
-      // convert to objects
-      for(var i=0, l=reply.length; i<l; i++) roles.push(JSON.parse(reply[i]));
-      return callback(null, roles);
-    });
-  });*/
 };
 
 Rol.remove = function(id, callback) {
@@ -96,7 +84,6 @@ Rol.remove = function(id, callback) {
     .SREM(setKey, key)
     .exec(function(err, reply) {
       if(err) return callback(err);
-      console.log(reply);
       if(!reply[1]) return callback(null, {error: 'Rol not found'});
       return callback(null, {message: 'Rol revoked'});
     });
@@ -106,11 +93,14 @@ Rol.remove = function(id, callback) {
 // Instance Methods
 Rol.prototype.addRoute = function(url, methods, recursive, accessLevel) {
   accessLevel = accessLevel || this.accessLevel;
-  if(url && methods && recursive) {
+  recursive = recursive === true;
+
+  if(url && methods) {
     this.routes.push({
       url: url,
       methods: methods,
-      recursive: recursive
+      recursive: recursive,
+      accessLevel: accessLevel
     });
   }
 };

@@ -2,8 +2,10 @@
 
 var dirName;
 // App_Api
+dirName = './app_api/models';
 // Models
-
+require(dirName + '/rol');
+/*
 // Controllers
 // Admin
 
@@ -15,3 +17,4 @@ require(dirName + '/auth/local-login');
 require(dirName + '/auth/revokeAllTokens');
 
 require(dirName + '/users');
+*/
