@@ -1,9 +1,17 @@
 'use strict';
 
-// Auth test
-require('./auth/local-signin');
-require('./auth/local-login');
-require('./auth/revokeAllTokens');
+var dirName;
+// App_Api
+// Models
 
-// Users test
-require('./users');
+// Controllers
+// Admin
+
+// Site
+dirName = './app_api/controllers/site';
+// auth
+require(dirName + '/auth/local-signin');
+require(dirName + '/auth/local-login');
+require(dirName + '/auth/revokeAllTokens');
+
+require(dirName + '/users');

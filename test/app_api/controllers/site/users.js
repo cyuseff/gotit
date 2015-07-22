@@ -1,9 +1,11 @@
 'use strict';
 
+var dirName = __dirname.substr(0, __dirname.indexOf('/test'));
+
 var request = require('supertest')
-  , app = require('../../app')
+  , app = require(dirName + '/app')
   , agent = request.agent(app)
-  , User = require('../../app_api/models/user')
+  , User = require(dirName + '/app_api/models/user')
   , url = '/api/v1/users';
 
 // Create User
@@ -28,18 +30,15 @@ describe('Users', function() {
   });
 
   it('Return a 200 with a list of Users', function(done) {
-
     agent
       .get(url+'?page=1&per_page=15&full_name=cris&order_by=test')
       .set('x-access-token', token)
       .expect(200)
       .expect('Content-Type', /json/)
       .expect(/users/i,done);
-
   });
 
   it('Return a 200 with a User', function(done) {
-
     agent
       .get(url+'/'+userid)
       .set('x-access-token', token)
@@ -52,14 +51,11 @@ describe('Users', function() {
         } else {
           throw new Error('No user!');
         }
-
       })
       .end(done);
-
   });
 
   it('Return a 400 with a no User found error', function(done) {
-
     agent
       .get(url+'/55860c3dfed88414e05a69c1')
       .set('x-access-token', token)
@@ -67,18 +63,15 @@ describe('Users', function() {
       .expect('Content-Type', /json/)
       .expect(/no\suser\sfound/i)
       .end(done);
-
   });
 
   it('Return a 500, with a ObjectID not valid', function(done) {
-
     agent
       .get(url+'/1234')
       .set('x-access-token', token)
       .expect(500)
       .expect('Content-Type', /json/)
       .end(done);
-
   });
 
   after(function(done) {

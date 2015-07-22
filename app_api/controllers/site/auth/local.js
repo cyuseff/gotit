@@ -46,9 +46,6 @@ function localSignin(req, res, email, password, confirmPassword) {
 
             // The user was created so send it back anyway even if token creation or redis fails
             if(err) console.log(err);
-
-            // return the new user with token
-            token = token || '001';
             return hh.sendJsonResponse(res, 201, { user: user.getPublicUser(), token: token });
           });
 

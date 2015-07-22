@@ -13,12 +13,7 @@ var redis = require('../../config/redis')
 function generateBuffer(callback) {
   crypto.randomBytes(TOKEN_LENGTH, function(ex, buf) {
     if(ex) return callback(ex);
-
-    if(buf) {
-      callback(null, buf.toString('hex'));
-    } else {
-      callback({error: 'Problem generating buf'});
-    }
+    callback(null, buf.toString('hex'));
   });
 }
 

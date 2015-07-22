@@ -1,9 +1,11 @@
 'use strict';
 
+var dirName = __dirname.substr(0, __dirname.indexOf('/test'));
+
 var request = require('supertest')
-  , app = require('../../app')
+  , app = require(dirName + '/app')
   , agent = request.agent(app)
-  , User = require('../../app_api/models/user')
+  , User = require(dirName + '/app_api/models/user')
   , url = '/api/v1/auth/logoutAll'
   , redis = require('redis')
   , client = redis.createClient();

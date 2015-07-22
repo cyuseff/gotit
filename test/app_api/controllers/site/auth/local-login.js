@@ -1,9 +1,11 @@
 'use strict';
 
+var dirName = __dirname.substr(0, __dirname.indexOf('/test'));
+
 var request = require('supertest')
-  , app = require('../../app')
+  , app = require(dirName + '/app')
   , agent = request.agent(app)
-  , User = require('../../app_api/models/user')
+  , User = require(dirName + '/app_api/models/user')
   , url = '/api/v1/auth/local';
 
 // Create User
@@ -25,81 +27,63 @@ describe('Login user', function() {
       });
   });
 
-
-
-
   it('Return a 400 error missing fields', function(done) {
-
     agent
       .post(url)
       .send('email=admin@email.com')
       .expect(400)
       .expect('Content-Type', /json/)
-      .expect(/missing/i, done);
-
+      .expect(/missing\scredentials/i, done);
   });
 
   it('Return a 400 error invalid Email', function(done) {
-
     agent
       .post(url)
       .send('email=admin@email&password=1234')
       .expect(400)
       .expect('Content-Type', /json/)
-      .expect(/invalid\semail/i,done);
-
+      .expect(/invalid\semail/i, done);
   });
 
   it('Return a 400 error password characters error', function(done) {
-
     agent
       .post(url)
       .send('email=admin@email.com&password=aé')
       .expect(400)
       .expect('Content-Type', /json/)
       .expect(/alpha\snumerical\scharacters/i, done);
-
   });
 
   it('Return a 403 User not found', function(done) {
-
     agent
       .post(url)
       .send('email=admin@gmail.cl&password=aqweasdd')
       .expect(403)
       .expect('Content-Type', /json/)
       .expect(/user\snot\sfound/i, done);
-
   });
 
   it('Return a 403 password error', function(done) {
-
     agent
       .post(url)
       .send('email='+email+'&password=admin1231')
       .expect(403)
       .expect('Content-Type', /json/)
       .expect(/wrong\spassword/i, done);
-
   });
 
   it('Return a 200 User with token', function(done) {
-
     agent
       .post(url)
       .send('email='+email+'&password='+password)
       .expect(200)
       .expect('Content-Type', /json/)
       .expect(/user001\@test\.com/i)
-      .expect(function(res) {
-        if(res.body.token) {
-          token = res.body.token;
-        } else {
-          throw new Error('No token!');
-        }
-      })
-      .end(done);
-
+      .end(function(err, res) {
+        if(!res.body.token) throw new Error('No token found');
+        token = res.body.token;
+        done();
+      });
   });
 
   it('Return a 200 with private content', function(done) {

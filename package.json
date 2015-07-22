@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha test/index.js"
+    "test": "./node_modules/.bin/istanbul test ./node_modules/.bin/_mocha -- -R spec"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +23,8 @@
     "validator": "^3.40.0"
   },
   "devDependencies": {
+    "chai": "^3.2.0",
+    "istanbul": "^0.3.17",
     "mocha": "^2.2.5",
     "supertest": "^1.0.1"
   }
