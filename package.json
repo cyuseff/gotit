@@ -23,9 +23,9 @@
     "validator": "^3.40.0"
   },
   "devDependencies": {
-    "chai": "^3.2.0",
     "istanbul": "^0.3.17",
     "mocha": "^2.2.5",
+    "should": "^7.0.2",
     "supertest": "^1.0.1"
   }
 }

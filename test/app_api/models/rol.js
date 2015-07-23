@@ -1,60 +1,61 @@
 'use strict';
+/*jshint expr: true*/
 
 var dirName = __dirname.substr(0, __dirname.indexOf('/test'));
 
-var expect = require('chai').expect
+var should = require('should')
   , app = require(dirName + '/app')
   , Rol = require(dirName + '/app_api/models/rol')
   , rol
   , rol2
   , allRoles;
 
-describe('Rol', function() {
+describe('Rol Model', function() {
   before(function(done) {
-    rol2 = new Rol({name: 'Rol2 Test', accessLevel: 1});
-    rol2.save(function(err, reply) {
-      done();
-    });
+    rol2 = new Rol({name: 'Rol2 Test'});
+    rol2.save(done);
+  });
+
+  after(function(done) {
+    Rol.remove(rol2.id, done);
   });
 
   it('Should create a new Rol', function(done) {
     rol = new Rol({name: 'Rol Test', accessLevel: 1});
-    expect(rol).to.exist;
-    expect(rol).have.property('name', 'Rol Test');
-    expect(rol).have.property('accessLevel', 1);
-    expect(rol).have.property('id');
-    expect(rol).have.property('routes').to.have.length(0);
+    should.exist(rol);
+    rol.should.have.properties({name: 'Rol Test', accessLevel: 1});
+    rol.should.have.property('id');
+    rol.should.have.property('routes').with.lengthOf(0);
     done();
   });
 
   it('Should add a route to Rol', function(done) {
     rol.addRoute('/url', 'GET');
-    expect(rol.routes).to.have.length(1);
+    rol.should.have.property('routes').with.lengthOf(1);
     done();
   });
 
   it('Should save rol into the DB', function(done) {
     rol.save(function(err, reply) {
-      expect(err).to.not.exist;
-      expect(reply).to.include('OK');
+      should.not.exist(err);
+      reply.should.containEql('OK');
       done();
     });
   });
 
   it('Should find the rol and return it', function(done) {
     Rol.findOneById(rol.id, function(err, dbRol) {
-      expect(err).to.not.exist;
-      expect(dbRol).to.be.eql(rol);
+      should.not.exist(err);
+      dbRol.should.be.eql(rol);
       done();
     });
   });
 
   it('Should return a list of specific roles', function(done) {
     Rol.findByIds([rol.id, rol2.id], function(err, roles) {
-      expect(err).to.not.exist;
-      expect(roles).to.have.length(2);
-      expect(roles).to.have.deep.property('[0].id', rol.id);
-      expect(roles).to.have.deep.property('[1].id', rol2.id);
+      should.not.exist(err);
+      roles.should.have.a.lengthOf(2);
+      roles.should.containDeepOrdered([{id: rol.id}, {id: rol2.id}]);
       done();
     });
   });
@@ -62,18 +63,30 @@ describe('Rol', function() {
   it('Should return all roles', function(done) {
     Rol.findAll(function(err, roles) {
       allRoles = roles;
-      expect(err).to.not.exist;
-      expect(roles).to.have.length.of.at.least(2);
+      should.not.exist(err);
+      roles.length.should.be.above(2);
       done();
     });
   });
 
   it('Should remove a rol', function(done) {
     Rol.remove(rol.id, function(err, reply) {
-      expect(err).to.not.exist;
-      expect(reply).to.have.property('message').to.match(/rol\srevoked/i);
+      should.not.exist(err);
+      reply.should.have.property('message').which.match(/rol\srevoked/i);
       Rol.findAll(function(err, roles) {
-        expect(roles).to.have.length(allRoles.length - 1);
+        roles.should.have.lengthOf(allRoles.length - 1);
+        done();
+      });
+    });
+  });
+
+  it('Should not find the removed rol', function(done) {
+    Rol.findOneById(rol.id, function(err, rRol) {
+      should.not.exist(err);
+      should.not.exist(rRol);
+      Rol.findByIds([rol.id], function(err, roles) {
+        should.not.exist(err);
+        should(roles[0]).be.exactly(null);
         done();
       });
     });
@@ -81,8 +94,8 @@ describe('Rol', function() {
 
   it('Should fail to remove an inexistence rol', function(done) {
     Rol.remove(rol.id, function(err, reply) {
-      expect(err).to.not.exist;
-      expect(reply).to.have.property('error').to.match(/rol\snot\sfound/i);
+      should.not.exist(err);
+      reply.should.have.property('error').which.match(/rol\snot\sfound/i);
       done();
     });
   });

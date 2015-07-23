@@ -52,9 +52,14 @@ Rol.findByIds = function(ids, callback) {
 
   redis.MGET(keys, function(err, reply) {
     if(err) return callback(err);
-    if(!reply.length) return callback(null, roles);
     // convert to objects
-    for(i=0, l=reply.length; i<l; i++) roles.push(JSON.parse(reply[i]));
+    for(i=0, l=reply.length; i<l; i++) {
+      if(reply[i] !== null) {
+        roles.push(JSON.parse(reply[i]));
+      } else {
+        roles.push(null);
+      }
+    }
     return callback(null, roles);
   });
 };
@@ -68,8 +73,6 @@ Rol.findAll = function(callback) {
 
   redis.EVAL(script, 1, setKey, function(err, reply) {
     if(err) return callback(err);
-    if(!reply.length) return callback(null, roles);
-    // convert to objects
     for(var i=0, l=reply.length; i<l; i++) roles.push(JSON.parse(reply[i]));
     return callback(null, roles);
   });
@@ -114,8 +117,8 @@ Rol.prototype.save = function(callback) {
     .SET(key, JSON.stringify(me))
     .SADD(setKey, key)
     .exec(function(err, reply) {
-      if(!callback) return;
       if(err) return callback(err);
+      if(!callback) return;
       return callback(null, reply);
     });
 };

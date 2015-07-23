@@ -4,6 +4,7 @@ var dirName;
 // App_Api
 dirName = './app_api/models';
 // Models
+require(dirName + '/user');
 require(dirName + '/rol');
 /*
 // Controllers
