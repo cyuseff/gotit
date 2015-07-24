@@ -10,7 +10,7 @@ var User = require('../app_api/models/user')
   , P_LAST_NAME = 'Admin'
   , P_EMAIL = 'provider-admin@gotit.com';
 
-var rol, rol2;
+var rol, rol2, rol3;
 
 Rol.findAll(function(err, roles) {
   if(!roles || !roles.length) {
@@ -39,6 +39,19 @@ Rol.findAll(function(err, roles) {
       ]
     });
     rol2.save();
+
+    rol3 = new Rol({
+      name: 'providerNestedAdmin',
+      accessLevel: 3,
+      routes: [
+        {
+          url: 'providers/:scope/nested',
+          methods: '*',
+          recursive: false
+        }
+      ]
+    });
+    rol3.save();
   }
 });
 
@@ -73,11 +86,6 @@ User
       user.roles.push({
         id: rol.id,
         scope: '*'
-      });
-      // Assign ProviderAdmin Rol
-      user.roles.push({
-        id: rol2.id,
-        scope: '3'
       });
 
       // save user before serialize into his token

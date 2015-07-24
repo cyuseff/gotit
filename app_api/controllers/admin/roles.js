@@ -71,28 +71,47 @@ module.exports.removeRol = function(req, res) {
   });
 };
 
+function rolExistInUser(rol, roles) {
+  for(var i=0, l=roles.length; i<l; i++) if(roles[i].id === rol.id && roles[i].scope === rol.scope) return true;
+  return false;
+}
 module.exports.assignRol = function(req, res) {
+  var rol;
   if(!req.body.userId) return hh.sendJsonResponse(res, 400, {error: 'User id is required.'});
 
-  console.log(req.params.rolId, req.body.userId);
+  Rol.findOneById(req.params.rolId, function(err, rol) {
+    if(err) return hh.sendJsonResponse(res, 500, err);
+    if(!rol) return hh.sendJsonResponse(res, 404, {error: 'Rol not found'});
 
-  User
-    .findById(req.body.userId)
-    .exec(function(err, user) {
-      if(err) return hh.sendJsonResponse(res, 500, err);
-      if(!user) return hh.sendJsonResponse(res, 400, {error: 'No user found'});
-
-      var rand = Math.round(Math.random() * 2) + 1;
-
-      user.admin = true;
-      user.roles = [{
-        id: req.params.rolId,
-        scope: rand.toString()
-      }];
-
-      user.save(function(err) {
+    User
+      .findById(req.body.userId)
+      .exec(function(err, user) {
         if(err) return hh.sendJsonResponse(res, 500, err);
-        return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});
+        if(!user) return hh.sendJsonResponse(res, 400, {error: 'No user found'});
+
+        // TODO: the rand attribute should be replaced by a defined scope
+        var rand = Math.round(Math.random() * 2) + 1;
+
+        rol = {id: req.params.rolId, scope: rand.toString()};
+        user.admin = true;
+        if(user.roles) {
+          if(!rolExistInUser(rol, user.roles)) {
+            user.roles.push(rol);
+
+            user.save(function(err) {
+              if(err) return hh.sendJsonResponse(res, 500, err);
+              return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});
+            });
+          } else {
+            return hh.sendJsonResponse(res, 400, {message: 'User already have this rol.', user: user});
+          }
+        } else {
+          user.roles = [rol];
+          user.save(function(err) {
+            if(err) return hh.sendJsonResponse(res, 500, err);
+            return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});
+          });
+        }
       });
-    });
+  });
 };

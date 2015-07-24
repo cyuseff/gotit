@@ -48,6 +48,8 @@ function checkRoutesInRoles(roles, userRoles, reqUrl, reqMethod, prefixUrl) {
     console.log(userRoles[i]);
     console.log('*****-----*****');
 
+    if(roles[i] === null) continue;
+
     // iterate routes
     for(var j=0, d=roles[i].routes.length; j<d; j++) {
       var route = checkRoute(roles[i].routes[j], userRoles[i].scope, reqUrl, reqMethod, prefixUrl);
@@ -67,8 +69,9 @@ function winningRoute(routes) {
   if(routes.length === 1) {
     return routes[0];
   } else {
-    // TODO: check accessLevel, url and scope to rank compute a winner
-    return routes;
+    // Rank routes by accesLevel
+    routes.sort(function(a, b) { return a.accessLevel - b.accessLevel; });
+    return routes[0];
   }
 }
 

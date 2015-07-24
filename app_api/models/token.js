@@ -53,11 +53,9 @@ module.exports.setUserToken = function(user, callback) {
 };
 
 function checkTokensInSet(userId) {
-  var setKey = generateRedisKey(SET_PREFIX, userId)
-    , tmp = []
-    , script;
+  var setKey = generateRedisKey(SET_PREFIX, userId);
 
-  script = '\
+  var script = '\
     local reply \
     local keys = redis.call("SMEMBERS", KEYS[1]) \
     if table.getn(keys) == 0 then return keys end \
@@ -71,23 +69,6 @@ function checkTokensInSet(userId) {
     if(err) return console.log(err);
     return console.log(reply);
   });
-
-  /*
-  redis.SMEMBERS(setKey, function(err, keys) {
-    if(err) return console.log(err);
-    if(!keys) return console.log('Set not exist');
-
-    var multi = redis.multi();
-    for(var i=0, l=keys.length; i<l; i++) multi.EXISTS(keys[i]);
-
-    multi.exec(function(err, reply) {
-      if(err) return console.log(err);
-
-      for(i=0; i<l; i++) if(reply[i] === 0) tmp.push(keys[i]);
-      if(tmp.length > 0) redis.SREM(setKey, tmp);
-    });
-  });
-  */
 }
 
 function getUserToken(userId, token, callback) {
@@ -169,51 +150,23 @@ module.exports.updateAllUserTokens = function(userId, user, callback) {
     if(err) return callback(err);
     return callback(null, reply);
   });
-
-  /*redis.SMEMBERS(setKey, function(err, keys) {
-    if(err) return callback(err);
-    if(!keys) return callback(null, null);
-
-    var multi = redis.multi();
-    for(var i=0, l=keys.length; i<l; i++) multi.SET(keys[i], user, 'XX');
-
-    multi.exec(function(err, reply) {
-      if(err) return callback(err);
-
-      // check if any key has expire
-      for(i=0; i<l; i++) if(!reply[i]) tmp.push(keys[i]);
-      if(tmp.length) {
-        redis.SREM(setKey, tmp, function(err) {
-          console.log('Set updated!');
-          return callback(null, reply);
-        });
-      } else {
-        return callback(null, reply);
-      }
-    });
-
-  });*/
 };
 
 module.exports.validateToken = function(token, callback) {
   jwt.verify(token, SECRET, function(err, decoded) {
     if(err) {
-      console.log(err);
       return callback({error: 'Token is not valid.'});
     } else {
       // Check if token exist
       getUserToken(decoded.id, decoded.key, function(err, user) {
         if(err) return callback(err);
-
         // Token exist on redis
         if(user && user._id === decoded.id) {
           return callback(null, user);
         } else {
           return callback({error: 'Bad token.'});
         }
-
       });
-
     }
   });
 };
