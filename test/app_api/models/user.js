@@ -34,6 +34,14 @@ describe('User Model', function() {
     });
   });
 
+  it('Mismatch Passwords', function(done) {
+    user.comparePassword('wrong_password', function(err, isMatch) {
+      should.not.exist(err);
+      should(isMatch).be.exactly(false);
+      done();
+    });
+  });
+
   it('Should return a public version of the User', function(done) {
     pUser = user.getPublicUser();
     should.exist(pUser);

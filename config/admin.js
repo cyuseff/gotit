@@ -59,7 +59,7 @@ User
   .findOne({fullName: NAME +' '+ LAST_NAME})
   .exec(function(err, admin) {
     if(err) console.log(err);
-    if(admin) return console.log('Admin Found!');
+    if(admin) return; // console.log('Admin Found!');
 
     // Create a new User
     var user = new User();
@@ -102,7 +102,7 @@ User
   .findOne({fullName: P_NAME +' '+ P_LAST_NAME})
   .exec(function(err, admin) {
     if(err) console.log(err);
-    if(admin) return console.log('Provider Admin Found!');
+    if(admin) return; // console.log('Provider Admin Found!');
 
     // Create a new User
     var user = new User();
@@ -134,7 +134,7 @@ User
       // save user before serialize into his token
       user.save(function(err) {
         if(err) return console.log(err);
-        console.log('Provider Admin Created!');
+        // console.log('Provider Admin Created!');
       });
 
     });

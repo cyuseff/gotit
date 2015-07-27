@@ -13,6 +13,7 @@ var userSchema = mongoose.Schema({
 
   // account properties
   admin:      { type: Boolean, default: false },
+  roles:      Array,
   createdAt:  { type: Date, default: Date.now },
   active:     { type: Boolean, default: true },
   verify:     { type: Boolean, default: false },
@@ -21,7 +22,7 @@ var userSchema = mongoose.Schema({
   fullName:   String,
   firstName:  String,
   lastName:   String,
-  birthAt:    String,
+  birthAt:    Date,
   sex:        String,
   phone:      Number,
 
@@ -55,10 +56,7 @@ var userSchema = mongoose.Schema({
     token:        String,
     email:        String,
     name:         String
-  },
-
-  roles: Array
-
+  }
 });
 
 
@@ -80,8 +78,8 @@ userSchema.post('save', function(user) {
   var me = this;
   Token.updateAllUserTokens(me._id, me, function(err, reply) {
     if(err) return console.log(err);
-    if(!reply) return console.log('Nothing to update');
-    return console.log('User token updated.', reply);
+    // if(!reply) return console.log('Nothing to update');
+    // return console.log('User token updated.', reply);
   });
 });
 
@@ -92,7 +90,6 @@ userSchema.methods.generateHash = function(password, callback) {
     if(err) return callback(err);
     callback(null, hash);
   });
-
 };
 
 

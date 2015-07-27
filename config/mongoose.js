@@ -8,7 +8,7 @@ var mongoose = require('mongoose')
 /** Events **/
 mongoose.connection
 	.on('connected', function() {
-		console.log('Mongoose connected to: ' + dbURI);
+		// console.log('Mongoose connected to: ' + dbURI);
 	})
 	.on('error', function(err) {
 		console.log('Mongoose connected error: ' + err);
