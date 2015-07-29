@@ -94,8 +94,9 @@ describe('Rol Model', function() {
 
   it('Should fail to remove an inexistence rol', function(done) {
     Rol.remove(rol.id, function(err, reply) {
-      should.not.exist(err);
-      reply.should.have.property('error').which.match(/rol\snot\sfound/i);
+      should.exist(err);
+      should.not.exist(reply);
+      err.should.have.properties('error', 'status');
       done();
     });
   });

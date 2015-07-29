@@ -87,7 +87,7 @@ Rol.remove = function(id, callback) {
     .SREM(setKey, key)
     .exec(function(err, reply) {
       if(err) return callback(err);
-      if(!reply[1]) return callback(null, {error: 'Rol not found'});
+      if(!reply[0]) return callback({error: 'Rol not found', status: 403});
       return callback(null, {message: 'Rol revoked'});
     });
 };
@@ -118,7 +118,6 @@ Rol.prototype.save = function(callback) {
     .SADD(setKey, key)
     .exec(function(err, reply) {
       if(err) return callback(err);
-      if(!callback) return;
       return callback(null, reply);
     });
 };

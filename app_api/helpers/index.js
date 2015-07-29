@@ -13,7 +13,22 @@ module.exports.sendJsonResponse = sendJsonResponse;
 module.exports.authToken = function(req, res, next) {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
   if(token) {
-    Token.validateToken(token, function(err, user) {
+    Token.findByJwt(token, function(err, reply) {
+      if(err) {
+        if(err.error) {
+          return sendJsonResponse(res, 403, err);
+        } else {
+          return sendJsonResponse(res, 500, err);
+        }
+      }
+      // User exist
+      req.user = reply.data;
+      next();
+    }, true, function(token, decoded) {
+      return token.data._id === decoded.id;
+    });
+
+    /*Token.validateToken(token, function(err, user) {
       if(err) {
         if(err.error) {
           return sendJsonResponse(res, 403, err);
@@ -24,7 +39,7 @@ module.exports.authToken = function(req, res, next) {
       // User exist
       req.user = user;
       next();
-    });
+    });*/
   } else {
     sendJsonResponse(res, 403, {error: 'No token provided.'});
   }

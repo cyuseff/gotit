@@ -5,6 +5,7 @@ var User = require('../../../models/user')
   , validator = require('validator')
 	, hh = require('../../../helpers');
 
+var PREFIX = 'user';
 
 function localSignin(req, res, email, password, confirmPassword) {
 
@@ -42,11 +43,16 @@ function localSignin(req, res, email, password, confirmPassword) {
           if(err) return hh.sendJsonResponse(res, 500, err);
 
           // create session token
-          Token.setUserToken(user, function(err, token) {
-
+          var token = new Token({
+            prefix: PREFIX,
+            id: user._id,
+            data: user,
+            expire: true
+          });
+          token.save(function(err, jwToken) {
             // The user was created so send it back anyway even if token creation or redis fails
             if(err) console.log(err);
-            return hh.sendJsonResponse(res, 201, { user: user.getPublicUser(), token: token });
+            return hh.sendJsonResponse(res, 201, {user: user.getPublicUser(), token: jwToken});
           });
 
         });
@@ -71,12 +77,25 @@ function localLogin(req, res, email, password) {
       if(isMatch) {
 
         // create session token
-        Token.setUserToken(user, function(err, token) {
+        // create session token
+        var token = new Token({
+          prefix: PREFIX,
+          id: user._id,
+          data: user,
+          expire: true
+        });
+        token.save(function(err, jwToken) {
+          // The user was created so send it back anyway even if token creation or redis fails
+          if(err) return hh.sendJsonResponse(res, 500, err);
+          return hh.sendJsonResponse(res, 200, {user: user.getPublicUser(), token: jwToken});
+        });
+
+        /*Token.setUserToken(user, function(err, token) {
           if(err) return hh.sendJsonResponse(res, 500, err);
 
           // return the new user with token
           return hh.sendJsonResponse(res, 200, { user: user.getPublicUser(), token: token });
-        });
+        });*/
 
       } else {
         return hh.sendJsonResponse(res, 403, {error: 'Oops! Wrong password...'});

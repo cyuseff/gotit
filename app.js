@@ -10,6 +10,7 @@ var express = require('express')
 var app = express();
 
 // Config app
+app.set('JWTSecret', 'my-cool-secret');
 app.set('view engine', 'ejs');
 require('./config/admin');
 

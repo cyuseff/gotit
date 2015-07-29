@@ -5,7 +5,7 @@ var dirName = __dirname.substr(0, __dirname.indexOf('/test'));
 
 var should = require('should')
   , app = require(dirName + '/app')
-  , Token = require(dirName + '/app_api/models/_token')
+  , Token = require(dirName + '/app_api/models/token')
   , redis = require(dirName + '/config/redis')
   , token
   , ttlToken
@@ -20,7 +20,17 @@ describe('Token Model', function() {
       data: {dummy: 'Token test with Static Set'},
       setKey: 'reset-pasword'
     });
-    staticSetToken2.save(done);
+    staticSetToken2.save(function(err, reply) {
+      done();
+    });
+  });
+
+  after('Remove all test Tokens', function(done) {
+    Token.removeAllInSet(token.prefix, token.id, function() {
+      Token.removeAllInSet(ttlToken.prefix, ttlToken.id, function() {
+        done();
+      });
+    });
   });
 
   it('Should create a new Token', function(done) {
@@ -41,7 +51,7 @@ describe('Token Model', function() {
     token.save(function(err, reply) {
       should.not.exist(err);
       should.exist(reply);
-      token.should.have.property('publicToken').and.be.exactly(reply);
+      token.should.have.property('jwToken').and.be.exactly(reply);
       done();
     });
   });
@@ -62,9 +72,9 @@ describe('Token Model', function() {
     });
   });
 
-  it('Token re-save should not generate a new publicToken', function(done) {
+  it('Token re-save should not generate a new jwToken', function(done) {
     token.save(function(err, reply) {
-      token.publicToken.should.be.exactly(reply);
+      token.jwToken.should.be.exactly(reply);
       done();
     });
   });
@@ -109,18 +119,26 @@ describe('Token Model', function() {
   });
 
   it('Should find the token and return it', function(done) {
-    Token.findAndValidate(token.publicToken, function(err, reply) {
+    Token.findByJwt(token.jwToken, function(err, reply) {
       should.not.exist(err);
       should.exist(reply);
       done();
     });
   });
 
+  it('Should return an error with a invalid token', function(done) {
+    Token.findByJwt('dummy', function(err, reply) {
+      should.not.exist(reply);
+      err.should.have.property('status', 400);
+      done();
+    });
+  });
+
   it('Should find the token and and fail the validation', function(done) {
-    Token.findAndValidate(token.publicToken, function(err, reply) {
-      should.not.exist(err);
-      should.exist(reply);
-      reply.should.have.property('error');
+    Token.findByJwt(token.jwToken, function(err, reply) {
+      should.exist(err);
+      should.not.exist(reply);
+      err.should.have.properties('error', 'status');
       done();
     },
     false,
@@ -128,10 +146,10 @@ describe('Token Model', function() {
   });
 
   it('Should find the token and pass the validation', function(done) {
-    Token.findAndValidate(token.publicToken, function(err, reply) {
+    Token.findByJwt(token.jwToken, function(err, reply) {
       should.not.exist(err);
       should.exist(reply);
-      reply.should.have.property('publicToken').be.exactly(token.publicToken);
+      reply.should.have.property('jwToken').be.exactly(token.jwToken);
       done();
     },
     false,
@@ -139,4 +157,155 @@ describe('Token Model', function() {
       return (token.id === 'token001' && token.id === decoded.id);
     });
   });
+
+  it('Should find a expirable token and update his TTL', function(done) {
+    redis.EXPIRE(ttlToken.key, 100, function(err, reply) {
+      Token.findByJwt(ttlToken.jwToken, function(err, reply) {
+        should.not.exist(err);
+        should.exist(reply);
+
+        redis.TTL(reply.key, function(err, ttl) {
+          ttl.should.be.approximately(3600, 10);
+          done();
+        });
+      },
+      true);
+    });
+  });
+
+  it('Should find a expirable token and not update his TTL', function(done) {
+    redis.EXPIRE(ttlToken.key, 100, function(err, reply) {
+      Token.findByJwt(ttlToken.jwToken, function(err, reply) {
+        should.not.exist(err);
+        should.exist(reply);
+
+        redis.TTL(reply.key, function(err, ttl) {
+          ttl.should.be.approximately(100, 10);
+          done();
+        });
+      },
+      false);
+    });
+  });
+
+  it('Should remove a token by JWT', function(done) {
+    Token.removeByJwt(token.jwToken, function(err, reply) {
+      should.not.exist(err);
+      should.exist(reply);
+      reply.should.have.property('message').match(/removed/i);
+      done();
+    });
+  });
+
+  it('Should fail to remove it again', function(done) {
+    Token.removeByJwt(token.jwToken, function(err, reply) {
+      should.not.exist(reply);
+      err.should.have.property('status', 404);
+      done();
+    });
+  });
+
+  it('Should not found the removed token', function(done) {
+    Token.findByJwt(token.jwToken, function(err, reply) {
+      should.exist(err);
+      should.not.exist(reply);
+      err.should.have.property('status').be.exactly(404);
+      done();
+    });
+  });
+
+  it('Token should not exist on his Set', function(done) {
+    redis.SISMEMBER(token.setKey, token.key, function(err, reply) {
+      should.not.exist(err);
+      reply.should.be.exactly(0);
+      done();
+    });
+  });
+
+  it('When a token dont exist, should be removed from set when findByJwt()', function(done) {
+    // insert the deleted key in set
+    redis.SADD(token.setKey, token.key, function(err, reply) {
+      // check the key in set
+      redis.SMEMBERS(token.setKey, function(err, reply) {
+        reply.should.containDeep([token.key]);
+        // exec the find method
+        Token.findByJwt(token.jwToken, function(err, reply) {
+          should.exist(err);
+          should.not.exist(reply);
+          err.should.have.property('status').be.exactly(404);
+
+          // check set in redis
+          redis.SISMEMBER(token.setKey, token.key, function(err, reply) {
+            should.not.exist(err);
+            reply.should.be.exactly(0);
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  it('Should return a list of Tokens', function(done) {
+    Token.findAllInSet(staticSetToken.prefix, 'reset-pasword', function(err, reply) {
+      should.not.exist(err);
+      should.exist(reply);
+      reply.should.be.Array();
+      reply.length.should.be.above(1);
+      done();
+    });
+  });
+
+  it('Should update all tokens data in Set', function(done) {
+    var data = {timeStamp: Date.now()};
+    Token.updateAllInSet(staticSetToken.prefix, 'reset-pasword', data, function(err, reply) {
+      should.not.exist(err);
+      should.exist(reply);
+      reply.should.be.Array();
+      reply.length.should.be.above(1);
+
+      redis.GET(reply[0], function(err, updated) {
+        updated = JSON.parse(updated);
+        updated.should.containDeepOrdered({data: {timeStamp: data.timeStamp }});
+        done();
+      });
+    });
+  });
+
+  it('When a token dont exist, should be removed from set when updateAllInSet()', function(done) {
+    // add dummy token to set
+    redis.SADD(staticSetToken.setKey, 'dummy-token', function(err, reply) {
+      // check the dummy inside SET
+      redis.SMEMBERS(staticSetToken.setKey, function(err, reply) {
+        reply.should.containDeep(['dummy-token']);
+
+        var data = {timeStamp: Date.now()};
+        Token.updateAllInSet(staticSetToken.prefix, 'reset-pasword', data, function(err, reply) {
+          should.not.exist(err);
+          should.exist(reply);
+          reply.should.be.Array();
+          reply.should.not.containDeep(['dummy-token']);
+          done();
+        });
+      });
+    });
+  });
+
+  it('Should remove all token in Set and delete the Set', function(done) {
+    Token.removeAllInSet(staticSetToken.prefix, 'reset-pasword', function(err, reply) {
+      should.not.exist(err);
+      reply.should.be.above(1);
+      // check token key
+      redis.EXISTS(staticSetToken.key, function(err, reply) {
+        should.not.exist(err);
+        reply.should.be.exactly(0);
+        // check set
+        redis.EXISTS(staticSetToken.setKey, function(err, reply) {
+          should.not.exist(err);
+          reply.should.be.exactly(0);
+          done();
+        });
+      });
+    });
+  });
+
 });

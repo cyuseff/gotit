@@ -6,7 +6,8 @@ dirName = './app_api/models';
 // Models
 require(dirName + '/user');
 require(dirName + '/rol');
-/*
+require(dirName + '/token');
+
 // Controllers
 // Admin
 
@@ -18,4 +19,3 @@ require(dirName + '/auth/local-login');
 require(dirName + '/auth/revokeAllTokens');
 
 require(dirName + '/users');
-*/

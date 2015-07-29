@@ -10,8 +10,8 @@ var router = require('express').Router()
 // Auth routes
 router.route('/auth/local').post(localCtrl.localStrategy);
 router.route('/auth/facebook').post(facebookCtrl.facebookStrategy);
-router.route('/auth/logout').get(logoutCtrl.revokeToken);
-router.route('/auth/logoutAll').get(hh.authToken, logoutCtrl.revokeAllTokens);
+router.route('/auth/logout').get(logoutCtrl.revokeUserToken);
+router.route('/auth/logoutAll').get(hh.authToken, logoutCtrl.revokeAllUserTokens);
 
 
 // Users routes

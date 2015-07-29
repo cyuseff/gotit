@@ -36,16 +36,20 @@ describe('Revoke all User Tokens', function() {
         var ss = [];
         for(var i=0; i<max; i++) {
           var rand = Math.round(Math.random() * 10000000000);
-          keys.push('got-it:token:'+id+':'+rand);
+          keys.push('got-it:user:'+id+':'+rand);
           keys.push(JSON.stringify({user: id}));
-          ss.push('got-it:token:'+id+':'+rand);
+          ss.push('got-it:user:'+id+':'+rand);
         }
 
         client.multi()
           .mset(keys)
-          .sadd('got-it:token:user-set:'+id, ss)
+          .sadd('got-it:user:set:'+id, ss)
           .exec(function(err, reply) {
-            done();
+            console.log(reply);
+            client.SCARD('got-it:user:set:'+id, function(err, reply) {
+              console.log(reply);
+              done();
+            });
           });
 
       });
@@ -60,11 +64,7 @@ describe('Revoke all User Tokens', function() {
       .set('x-access-token', token)
       .expect(200)
       .expect(new RegExp(max+2))
-      .expect(/all\stokens\srevoked/i)
-      .end(function(err, res) {
-        // console.log(res.body);
-        done();
-      });
+      .expect(/all\suser\stokens\srevoked/i, done);
   });
 
 

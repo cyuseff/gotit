@@ -84,7 +84,7 @@ describe('Signin LocalStrategy', function() {
       .get('/api/v1/auth/logout')
       .set('x-access-token', token)
       .expect(200)
-      .expect(/token\srevoked/i, done);
+      .expect(/token\sremoved/i, done);
   });
 
 
