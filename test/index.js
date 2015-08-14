@@ -7,6 +7,7 @@ dirName = './app_api/models';
 require(dirName + '/user');
 require(dirName + '/rol');
 require(dirName + '/token');
+require(dirName + '/provider');
 
 // Controllers
 // Admin

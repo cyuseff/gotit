@@ -7,7 +7,7 @@ var mongoose = require('../../config/mongoose')
   , PREFIX = 'user';
 
 
-var userSchema = mongoose.Schema({
+var userSchema = new mongoose.Schema({
 
   emails:     Array,            // all accounts emails
   accounts:   Array,            // merged accounts ids
@@ -74,9 +74,8 @@ userSchema.pre('remove', function(next) {
   });
 });
 
-userSchema.post('save', function(user) {
-  var me = this;
-  Token.updateAllInSet(PREFIX, me._id, me, function(err, reply) {
+userSchema.post('save', function() {
+  Token.updateAllInSet(PREFIX, this._id, this, function(err, reply) {
     if(err) return console.log(err);
     // if(!reply) return console.log('Nothing to update');
     // return console.log('User token updated.', reply);
@@ -84,6 +83,7 @@ userSchema.post('save', function(user) {
 });
 
 
+// Methods
 // Password setter
 userSchema.methods.generateHash = function(password, callback) {
   bcrypt.hash(password, SALT_WORK_FACTOR, function(err, hash) {

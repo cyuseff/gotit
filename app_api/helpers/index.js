@@ -21,25 +21,16 @@ module.exports.authToken = function(req, res, next) {
           return sendJsonResponse(res, 500, err);
         }
       }
-      // User exist
+      // User exist, attach it to req
       req.user = reply.data;
+      // Attach the rest of the info to the req
+      req.jwt = reply;
       next();
-    }, true, function(token, decoded) {
+    },
+    true,
+    function(token, decoded) {
       return token.data._id === decoded.id;
     });
-
-    /*Token.validateToken(token, function(err, user) {
-      if(err) {
-        if(err.error) {
-          return sendJsonResponse(res, 403, err);
-        } else {
-          return sendJsonResponse(res, 500, err);
-        }
-      }
-      // User exist
-      req.user = user;
-      next();
-    });*/
   } else {
     sendJsonResponse(res, 403, {error: 'No token provided.'});
   }

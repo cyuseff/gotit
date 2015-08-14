@@ -35,7 +35,7 @@ function generateRedisKey(prefix, primaryKey, secondaryKey) {
     data:           (required)
 
     key:            (string) redis key generated after save.
-    jwToken:    (string) public jwt generated after save. You should return this to end user.
+    jwToken:        (string) public jwt generated after save. You should return this to end user.
 
     setKey:         (string) if setted, the token will belong to a static set.
                       This will be helpfull when dealing with token that not belong to a specific model.
@@ -100,9 +100,12 @@ function _findToken(prefix, id, set, buff, touch, callback) {
   token:    (string) jwt
   callback: (fn)
   touch:    (boolean) if true, will try to update TTL on expirable tokens, default false.
-  verifyFn: (fn) expect to return a boolean value, default true.
-            It will also recibe token and decoded token as arguments, ex:
-              function(token, decoded){ return tru}
+  verifyFn: (fn) if setted, expect to return a boolean value.
+            It will recibe token (redis object) and decoded (jwt info) token as arguments.
+            This will let you compare if the info inside the public token is eql to the one
+            stored inside redis.
+            ex:
+              function(token, decoded){ return true; }
 */
 Token.findByJwt = function(jwToken, callback, touch, verifyFn) {
   touch = touch || false;
@@ -234,7 +237,7 @@ Token.prototype.save = function(callback) {
     generateBuffer(function(err, buff) {
       if(err) return callback(err);
 
-      // Generate user token
+      // Generate public token
       me.jwToken = generateToken({
         id: me.id,
         key: buff,

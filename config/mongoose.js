@@ -38,7 +38,6 @@ process
 		});
 	});
 
-
 mongoose.connect(dbURI);
 
 module.exports = mongoose;

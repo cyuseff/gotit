@@ -18,7 +18,6 @@ router.route('/auth/logoutAll').get(hh.authToken, logoutCtrl.revokeAllUserTokens
 router.route('/users').get(hh.authToken, usersCtrl.listUsers);
 router.route('/users/:userid').get(hh.authToken, usersCtrl.showUser);
 
-
 module.exports = function(app) {
   app.use('/api/v1', router);
 

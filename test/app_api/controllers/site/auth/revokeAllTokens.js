@@ -30,7 +30,7 @@ describe('Revoke all User Tokens', function() {
         var ctrl = 0
           , id = res.body.user._id;
 
-        console.log('Creating '+max+' Dummy tokens');
+        // console.log('Creating '+max+' Dummy tokens');
 
         var keys = [];
         var ss = [];
@@ -45,9 +45,8 @@ describe('Revoke all User Tokens', function() {
           .mset(keys)
           .sadd('got-it:user:set:'+id, ss)
           .exec(function(err, reply) {
-            console.log(reply);
             client.SCARD('got-it:user:set:'+id, function(err, reply) {
-              console.log(reply);
+              // console.log(reply);
               done();
             });
           });

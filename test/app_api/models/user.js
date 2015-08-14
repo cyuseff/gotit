@@ -6,9 +6,11 @@ var dirName = __dirname.substr(0, __dirname.indexOf('/test'));
 var should = require('should')
   , app = require(dirName + '/app')
   , User = require(dirName + '/app_api/models/user')
+  , Token = require(dirName + '/app_api/models/token')
   , password = '123456'
   , user
-  , pUser;
+  , pUser
+  , token;
 
 describe('User Model', function() {
   it('Should create a new User', function(done) {
@@ -50,12 +52,36 @@ describe('User Model', function() {
   });
 
   it('Should save the user into the DB', function(done) {
-    user.save(function(err) {
+    user.save(function(err, saved) {
       should.not.exist(err);
       User.findById(pUser._id, function(err, dUser) {
         should.not.exist(err);
         should.exist(dUser);
         done();
+      });
+    });
+  });
+
+  it('Should update User tokens on save (post save Hook)', function(done) {
+    // create a user token
+    token = new Token({
+      prefix: 'user',
+      id: user._id,
+      data: user
+    });
+    token.save(function(err, jwToken) {
+      should.not.exist(err);
+      // update a user property
+      user.sex = 'male';
+      user.save(function(err, updated) {
+        should.not.exist(err);
+        updated.sex.should.be.exactly('male');
+        // find the token and check sex property
+        Token.findByJwt(jwToken, function(err, updatedToken) {
+          should.not.exist(err);
+          updatedToken.data.should.have.property('sex', 'male');
+          done();
+        });
       });
     });
   });
@@ -68,6 +94,14 @@ describe('User Model', function() {
         should.not.exist(dUser);
         done();
       });
+    });
+  });
+
+  it('User Token should not exist (pre remove hook)', function(done) {
+    Token.findByJwt(token.jwToken, function(err, removedToken) {
+      should.not.exist(removedToken);
+      err.should.have.property('status', 404);
+      done();
     });
   });
 });
