@@ -61,12 +61,6 @@ var userSchema = new mongoose.Schema({
 });
 
 
-// Create Index
-userSchema.index({ emails: 1 });
-// Don't create index in producction (performance)
-if(process.ENV === 'production') userSchema.set('autoIndex', false);
-
-
 // Hooks
 userSchema.pre('remove', function(next) {
   Token.removeAllInSet(PREFIX, this._id, function(err, message) {

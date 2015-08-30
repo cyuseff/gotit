@@ -2,9 +2,10 @@
 
 var mongoose = require('../../config/mongoose');
 
+/* TODO: REDIS!*/
 var ratingSchema = new mongoose.Schema({
-  userId:     {type: String, required: true, unique: true},
-  rating:     {type: Number, required: true, default: 0, min: 1, max: 5}
+  _id:        {type: String, required: true, unique: true},
+  rating:     {type: Number, required: true, min: 1, max: 5}
 });
 
 var commentSchema = new mongoose.Schema({

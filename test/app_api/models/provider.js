@@ -57,21 +57,38 @@ describe('Provider Model', function() {
   });
 
   it('Should add a rating to Provider', function(done) {
-    provider.ratings.push({userId: '123', rating: 5});
+    provider.ratings.push({_id: '123', rating: 5});
     provider.save(function(err, saved) {
-      should.not.exist(err);
-      saved.ratings.should.have.lengthOf(1);
-      saved.rating.should.be.exactly(5);
-      done();
+      try {
+        should.not.exist(err);
+        saved.ratings.should.have.lengthOf(1);
+        saved.rating.should.be.exactly(5);
+        done();
+      } catch (err) { done(err); }
+    });
+  });
+
+  it('Should fail to add a rating from the same User', function(done) {
+    provider.ratings.push({_id: '123', rating: 1});
+    provider.save(function(err, saved) {
+      console.log(saved);
+      try {
+        should.exist(err);
+        saved.ratings.should.have.lengthOf(1);
+        saved.rating.should.be.exactly(5);
+        done();
+      } catch (err) { done(err); }
     });
   });
 
   it('Should recalculate the rating', function(done) {
-    provider.ratings.push({userId: '321', rating: 1});
+    provider.ratings.push({_id: '321', rating: 1});
     provider.save(function(err, saved) {
-      should.not.exist(err);
-      saved.rating.should.be.exactly(3);
-      done();
+      try {
+        should.not.exist(err);
+        saved.rating.should.be.exactly(3);
+        done();
+      } catch (err) { done(err); }
     });
   });
 
