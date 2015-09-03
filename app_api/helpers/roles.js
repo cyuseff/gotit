@@ -44,10 +44,6 @@ function checkRoutesInRoles(roles, userRoles, reqUrl, reqMethod, prefixUrl) {
 
   // iterate roles
   for(var i=0, l=roles.length; i<l; i++) {
-    console.log(roles[i]);
-    console.log(userRoles[i]);
-    console.log('*****-----*****');
-
     if(roles[i] === null) continue;
 
     // iterate routes
@@ -93,7 +89,6 @@ module.exports.isAllowed = function(req, res, next) {
     if(!roles.length) return hh.sendJsonResponse(res, 403, {message: 'Rol not found. You don\'t have the required privilege!.'});
 
     allowedRoutes = checkRoutesInRoles(roles, req.user.roles, req.originalUrl.split('?')[0], req.method, prefixUrl);
-    console.log(allowedRoutes);
 
     if(allowedRoutes.length) {
       req.rol = winningRoute(allowedRoutes);

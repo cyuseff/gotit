@@ -68,7 +68,7 @@ describe('Provider Model', function() {
     });
   });
 
-  it('Should fail to add a rating from the same User', function(done) {
+  /*it('Should fail to add a rating from the same User', function(done) {
     provider.ratings.push({_id: '123', rating: 1});
     provider.save(function(err, saved) {
       console.log(saved);
@@ -79,7 +79,7 @@ describe('Provider Model', function() {
         done();
       } catch (err) { done(err); }
     });
-  });
+  });*/
 
   it('Should recalculate the rating', function(done) {
     provider.ratings.push({_id: '321', rating: 1});

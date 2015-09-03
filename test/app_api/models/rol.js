@@ -38,7 +38,7 @@ describe('Rol Model', function() {
   it('Should save rol into the DB', function(done) {
     rol.save(function(err, reply) {
       should.not.exist(err);
-      reply.should.containEql('OK');
+      reply.should.containEql('key');
       done();
     });
   });

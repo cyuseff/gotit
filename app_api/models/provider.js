@@ -4,7 +4,7 @@ var mongoose = require('../../config/mongoose');
 
 /* TODO: REDIS!*/
 var ratingSchema = new mongoose.Schema({
-  _id:        {type: String, required: true, unique: true},
+  _id:        {type: String, required: true},
   rating:     {type: Number, required: true, min: 1, max: 5}
 });
 

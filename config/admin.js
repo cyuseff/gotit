@@ -21,7 +21,7 @@ Rol.findAll(function(err, roles) {
         {
           url: ':scope',
           methods: '*',
-          recursive: true
+          recursive: 1
         }
       ]
     });
@@ -34,7 +34,7 @@ Rol.findAll(function(err, roles) {
         {
           url: 'providers/:scope',
           methods: '*',
-          recursive: true
+          recursive: 1
         }
       ]
     });
@@ -47,96 +47,97 @@ Rol.findAll(function(err, roles) {
         {
           url: 'providers/:scope/nested',
           methods: '*',
-          recursive: false
+          recursive: 0
         }
       ]
     });
     rol3.save();
   }
+
+  User
+    .findOne({fullName: NAME +' '+ LAST_NAME})
+    .exec(function(err, admin) {
+      if(err) console.log(err);
+      if(admin) return; // console.log('Admin Found!');
+
+      // Create a new User
+      var user = new User();
+      user.generateHash(PASSWORD, function(err, hash) {
+
+        if(err) return console.log(err);
+
+        // Push to users emails array
+        user.emails.push(EMAIL);
+
+        // add general properties
+        user.firstName = NAME;
+        user.lastName = LAST_NAME;
+        user.fullName = NAME + ' ' + LAST_NAME;
+
+        // add strategy properties
+        user.local.email = EMAIL;
+        user.local.password = hash;
+
+        // set as Admin
+        user.admin = true;
+
+        // Assign SuperAdmin Rol
+        user.roles.push({
+          id: rol.id,
+          scope: '*'
+        });
+
+        // save user before serialize into his token
+        user.save(function(err) {
+          if(err) return console.log(err);
+          console.log('Admin Created!');
+        });
+
+      });
+
+    });
+
+  User
+    .findOne({fullName: P_NAME +' '+ P_LAST_NAME})
+    .exec(function(err, admin) {
+      if(err) console.log(err);
+      if(admin) return; // console.log('Provider Admin Found!');
+
+      // Create a new User
+      var user = new User();
+      user.generateHash(PASSWORD, function(err, hash) {
+
+        if(err) return console.log(err);
+
+        // Push to users emails array
+        user.emails.push(P_EMAIL);
+
+        // add general properties
+        user.firstName = P_NAME;
+        user.lastName = P_LAST_NAME;
+        user.fullName = P_NAME + ' ' + P_LAST_NAME;
+
+        // add strategy properties
+        user.local.email = P_EMAIL;
+        user.local.password = hash;
+
+        /*// set as Admin
+        user.admin = true;
+
+        // Assign SuperAdmin Rol
+        user.roles.push({
+          id: rol2.id,
+          scope: '3'
+        });*/
+
+        // save user before serialize into his token
+        user.save(function(err) {
+          if(err) return console.log(err);
+          // console.log('Provider Admin Created!');
+        });
+
+      });
+
+    });
+
 });
-
-User
-  .findOne({fullName: NAME +' '+ LAST_NAME})
-  .exec(function(err, admin) {
-    if(err) console.log(err);
-    if(admin) return; // console.log('Admin Found!');
-
-    // Create a new User
-    var user = new User();
-    user.generateHash(PASSWORD, function(err, hash) {
-
-      if(err) return console.log(err);
-
-      // Push to users emails array
-      user.emails.push(EMAIL);
-
-      // add general properties
-      user.firstName = NAME;
-      user.lastName = LAST_NAME;
-      user.fullName = NAME + ' ' + LAST_NAME;
-
-      // add strategy properties
-      user.local.email = EMAIL;
-      user.local.password = hash;
-
-      // set as Admin
-      user.admin = true;
-
-      // Assign SuperAdmin Rol
-      user.roles.push({
-        id: rol.id,
-        scope: '*'
-      });
-
-      // save user before serialize into his token
-      user.save(function(err) {
-        if(err) return console.log(err);
-        console.log('Admin Created!');
-      });
-
-    });
-
-  });
-
-User
-  .findOne({fullName: P_NAME +' '+ P_LAST_NAME})
-  .exec(function(err, admin) {
-    if(err) console.log(err);
-    if(admin) return; // console.log('Provider Admin Found!');
-
-    // Create a new User
-    var user = new User();
-    user.generateHash(PASSWORD, function(err, hash) {
-
-      if(err) return console.log(err);
-
-      // Push to users emails array
-      user.emails.push(P_EMAIL);
-
-      // add general properties
-      user.firstName = P_NAME;
-      user.lastName = P_LAST_NAME;
-      user.fullName = P_NAME + ' ' + P_LAST_NAME;
-
-      // add strategy properties
-      user.local.email = P_EMAIL;
-      user.local.password = hash;
-
-      /*// set as Admin
-      user.admin = true;
-
-      // Assign SuperAdmin Rol
-      user.roles.push({
-        id: rol2.id,
-        scope: '3'
-      });*/
-
-      // save user before serialize into his token
-      user.save(function(err) {
-        if(err) return console.log(err);
-        // console.log('Provider Admin Created!');
-      });
-
-    });
-
-  });

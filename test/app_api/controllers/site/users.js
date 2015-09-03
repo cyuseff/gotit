@@ -35,7 +35,7 @@ describe('Users', function() {
       .set('x-access-token', token)
       .expect(200)
       .expect('Content-Type', /json/)
-      .expect(/users/i,done);
+      .expect(/users/i, done);
   });
 
   it('Return a 200 with a User', function(done) {

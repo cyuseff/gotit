@@ -5,7 +5,7 @@ var User = require('../../../models/user')
   , validator = require('validator')
 	, hh = require('../../../helpers');
 
-var PREFIX = 'user';
+var SET = 'user';
 
 function localSignin(req, res, email, password, confirmPassword) {
 
@@ -44,10 +44,10 @@ function localSignin(req, res, email, password, confirmPassword) {
 
           // create session token
           var token = new Token({
-            prefix: PREFIX,
+            set: SET,
             id: user._id,
             data: user,
-            expire: true
+            expire: 1
           });
           token.save(function(err, jwToken) {
             // The user was created so send it back anyway even if token creation or redis fails
@@ -79,10 +79,10 @@ function localLogin(req, res, email, password) {
         // create session token
         // create session token
         var token = new Token({
-          prefix: PREFIX,
+          set: SET,
           id: user._id,
           data: user,
-          expire: true
+          expire: 1
         });
         token.save(function(err, jwToken) {
           // The user was created so send it back anyway even if token creation or redis fails

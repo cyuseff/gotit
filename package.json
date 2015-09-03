@@ -9,16 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aerospike": "^1.0.50",
     "bcrypt": "^0.8.4",
     "body-parser": "^1.13.2",
     "chai": "^3.2.0",
     "ejs": "^2.3.3",
     "express": "^4.13.1",
-    "hiredis": "https://registry.npmjs.org/hiredis/-/hiredis-0.4.0.tgz",
     "jsonwebtoken": "^5.0.4",
     "mongoose": "^4.1.0",
     "morgan": "^1.6.1",
-    "redis": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz",
     "request": "^2.60.0",
     "uuid": "https://registry.npmjs.org/uuid/-/uuid-2.0.1.tgz",
     "validator": "^3.43.0"

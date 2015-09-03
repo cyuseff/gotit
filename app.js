@@ -2,7 +2,7 @@
 
 var express = require('express')
   , mongoose = require('./config/mongoose')
-  , redis = require('./config/redis')
+  , aero = require('./config/aero')
   , morgan = require('morgan')
   , bodyParser = require('body-parser');
 

@@ -4,7 +4,9 @@ var Rol = require('../../models/rol')
   , User = require('../../models/user')
   , hh = require('../../helpers');
 
+/* TODO: this is not well implemented */
 module.exports.newRol = function(req, res) {
+  if(!req.body.name) return hh.sendJsonResponse(res, 400, {error: 'Rol name is required.'});
 
   var routes = req.routes;
 
@@ -37,6 +39,9 @@ module.exports.showRol = function(req, res) {
 
 };
 
+/*
+  This method can be improved using for in + hasOwnProperty
+*/
 function updateRol(rol, vars) {
   rol.name = vars.name || rol.name;
   rol.scope = vars.scope || rol.scope;
@@ -77,7 +82,7 @@ function rolExistInUser(rol, roles) {
 }
 module.exports.assignRol = function(req, res) {
   var rol;
-  if(!req.body.userId) return hh.sendJsonResponse(res, 400, {error: 'User id is required.'});
+  if(!req.body.userId || !req.body.scope) return hh.sendJsonResponse(res, 400, {error: 'User id and Scope are both required.'});
 
   Rol.findOneById(req.params.rolId, function(err, rol) {
     if(err) return hh.sendJsonResponse(res, 500, err);
@@ -89,10 +94,7 @@ module.exports.assignRol = function(req, res) {
         if(err) return hh.sendJsonResponse(res, 500, err);
         if(!user) return hh.sendJsonResponse(res, 400, {error: 'No user found'});
 
-        // TODO: the rand attribute should be replaced by a defined scope
-        var rand = Math.round(Math.random() * 2) + 1;
-
-        rol = {id: req.params.rolId, scope: rand.toString()};
+        rol = {id: req.params.rolId, scope: req.body.scope};
         user.admin = true;
         if(user.roles) {
           if(!rolExistInUser(rol, user.roles)) {

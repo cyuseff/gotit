@@ -6,42 +6,46 @@ var dirName = __dirname.substr(0, __dirname.indexOf('/test'));
 var should = require('should')
   , app = require(dirName + '/app')
   , Token = require(dirName + '/app_api/models/token')
-  , redis = require(dirName + '/config/redis')
+  , aerospike = require(dirName + '/config/aero').aero
+  , aero = require(dirName + '/config/aero').client
+  , status = aerospike.status
   , token
   , ttlToken
   , staticSetToken
-  , staticSetToken2;
+  , staticSetToken2
+  , TTL = 20;
 
 describe('Token Model', function() {
   before(function(done) {
     staticSetToken2 = new Token({
-      prefix: 'test',
-      id: 'Static002',
-      data: {dummy: 'Token test with Static Set'},
-      setKey: 'reset-pasword'
+      set: 'test',
+      sid: 'StaticTokens',
+      data: {dummy: 'Token test 001'}
     });
     staticSetToken2.save(function(err, reply) {
       done();
     });
   });
 
-  after('Remove all test Tokens', function(done) {
-    Token.removeAllInSet(token.prefix, token.id, function() {
-      Token.removeAllInSet(ttlToken.prefix, ttlToken.id, function() {
-        done();
-      });
+  /*after(function(done) {
+    Token.removeAllInSetbySid(ttlToken.set, ttlToken.sid, function(err, info) {
+      console.log(err, info);
+      done();
     });
-  });
+  });*/
 
   it('Should create a new Token', function(done) {
     token = new Token({
-      prefix: 'test',
-      id: 'token001',
+      set: 'test',
+      sid: 'token001',
       data: {dummy: 'Token test'}
     });
-
     should.exist(token);
-    token.should.have.properties({prefix: 'test', id: 'token001', data: {dummy: 'Token test'}});
+    token.should.have.properties({
+      set: 'test',
+      sid: 'token001',
+      data: JSON.stringify({dummy: 'Token test'})
+    });
     token.should.have.property('createdAt').and.not.be.NaN();
     token.should.have.property('ttl').and.not.be.NaN();
     done();
@@ -56,18 +60,13 @@ describe('Token Model', function() {
     });
   });
 
-  it('Token should belong to a Token Set', function(done) {
-    redis.SISMEMBER(token.setKey, token.key, function(err, reply) {
-      should.not.exist(err);
-      reply.should.be.exactly(1);
-      done();
-    });
-  });
-
   it('Token should not have a TTL', function(done) {
-    redis.TTL(token.key, function(err, reply) {
-      should.not.exist(err);
-      reply.should.be.exactly(-1);
+    var udf = {
+      module: 'scripts',
+      funcname: 'getTTL'
+    };
+    aero.execute(aerospike.key('test', token.set, token.key), udf, function(err, ttl) {
+      ttl.should.be.exactly(0);
       done();
     });
   });
@@ -81,38 +80,22 @@ describe('Token Model', function() {
 
   it('Should create a Expirable Token', function(done) {
     ttlToken = new Token({
-      prefix: 'test',
-      id: 'TTL001',
+      set: 'test',
+      sid: 'TTL001',
       data: {dummy: 'Token test with TTL'},
-      expire: true
+      ttl: TTL
     });
 
-    ttlToken.save(function(err, reply) {
+    ttlToken.save(function(err, jwt) {
       should.not.exist(err);
-      ttlToken.should.have.property('expire').true();
+      ttlToken.should.have.property('ttl', TTL);
 
-      redis.TTL(ttlToken.key, function(err, reply) {
-        should.not.exist(err);
-        reply.should.be.above(1);
-        done();
-      });
-    });
-  });
-
-  it('Should create a Static Set Token', function(done) {
-    staticSetToken = new Token({
-      prefix: 'test',
-      id: 'Static001',
-      data: {dummy: 'Token test with Static Set'},
-      setKey: 'reset-pasword'
-    });
-    staticSetToken.save(function(err, reply) {
-      should.not.exist(err);
-      staticSetToken.setKey.should.be.exactly('got-it:test:set:reset-pasword');
-      redis.SMEMBERS(staticSetToken.setKey, function(err, reply) {
-        reply.should.be.Array();
-        reply.length.should.be.above(1);
-        reply.should.containDeep([staticSetToken.key, staticSetToken2.key]);
+      var udf = {
+        module: 'scripts',
+        funcname: 'getTTL'
+      };
+      aero.execute(aerospike.key('test', ttlToken.set, ttlToken.key), udf, function(err, ttl) {
+        ttl.should.be.approximately(TTL, 5);
         done();
       });
     });
@@ -154,37 +137,65 @@ describe('Token Model', function() {
     },
     false,
     function(token, decoded) {
-      return (token.id === 'token001' && token.id === decoded.id);
+      return (token.sid === 'token001' && token.sid === decoded.sid);
     });
   });
 
   it('Should find a expirable token and update his TTL', function(done) {
-    redis.EXPIRE(ttlToken.key, 100, function(err, reply) {
-      Token.findByJwt(ttlToken.jwToken, function(err, reply) {
-        should.not.exist(err);
-        should.exist(reply);
+    var key = aerospike.key('test', ttlToken.set, ttlToken.key)
+      , op = aerospike.operator;
 
-        redis.TTL(reply.key, function(err, ttl) {
-          ttl.should.be.approximately(3600, 10);
-          done();
-        });
-      },
-      true);
+    // increase the TTL
+    aero.operate(key, [op.touch(100)], function() {
+      var udf = {
+        module: 'scripts',
+        funcname: 'getTTL'
+      };
+      // Check the increased TTL
+      aero.execute(key, udf, function(err, ttl) {
+        ttl.should.be.approximately(100, 5);
+        // Execute the find command with TOUCH enabled
+        // this must return the TTL to his original value
+        Token.findByJwt(ttlToken.jwToken, function(err, record) {
+          should.not.exist(err);
+          should.exist(record);
+
+          // Check the touched TTL
+          aero.execute(key, udf, function(err, ttl) {
+            ttl.should.be.approximately(TTL, 5);
+            done();
+          });
+        }, true);
+      });
     });
   });
 
   it('Should find a expirable token and not update his TTL', function(done) {
-    redis.EXPIRE(ttlToken.key, 100, function(err, reply) {
-      Token.findByJwt(ttlToken.jwToken, function(err, reply) {
-        should.not.exist(err);
-        should.exist(reply);
+    var key = aerospike.key('test', ttlToken.set, ttlToken.key)
+      , op = aerospike.operator;
 
-        redis.TTL(reply.key, function(err, ttl) {
-          ttl.should.be.approximately(100, 10);
-          done();
-        });
-      },
-      false);
+    // increase the TTL
+    aero.operate(key, [op.touch(100)], function() {
+      var udf = {
+        module: 'scripts',
+        funcname: 'getTTL'
+      };
+      // Check the increased TTL
+      aero.execute(key, udf, function(err, ttl) {
+        ttl.should.be.approximately(100, 5);
+        // Execute the find command with TOUCH enabled
+        // this must return the TTL to his original value
+        Token.findByJwt(ttlToken.jwToken, function(err, record) {
+          should.not.exist(err);
+          should.exist(record);
+
+          // Check the touched TTL
+          aero.execute(key, udf, function(err, ttl) {
+            ttl.should.be.approximately(100, 5);
+            done();
+          });
+        }, false);
+      });
     });
   });
 
@@ -211,33 +222,61 @@ describe('Token Model', function() {
       should.not.exist(reply);
       err.should.have.property('status').be.exactly(404);
       done();
-    });
+    }, true);
   });
 
-  it('Token should not exist on his Set', function(done) {
-    redis.SISMEMBER(token.setKey, token.key, function(err, reply) {
+  it('Should add a new token with a sid StaticTokens', function(done) {
+    staticSetToken = new Token({
+      set: 'test',
+      sid: 'StaticTokens',
+      data: {dummy: 'Token test 002'}
+    });
+    staticSetToken.save(function(err, jwt) {
       should.not.exist(err);
-      reply.should.be.exactly(0);
+      jwt.should.be.exactly(staticSetToken.jwToken);
       done();
     });
   });
 
-  it('When a token dont exist, should be removed from set when findByJwt()', function(done) {
-    // insert the deleted key in set
-    redis.SADD(token.setKey, token.key, function(err, reply) {
-      // check the key in set
-      redis.SMEMBERS(token.setKey, function(err, reply) {
-        reply.should.containDeep([token.key]);
-        // exec the find method
-        Token.findByJwt(token.jwToken, function(err, reply) {
-          should.exist(err);
-          should.not.exist(reply);
-          err.should.have.property('status').be.exactly(404);
+  it('Should return a list of Tokens', function(done) {
+    Token.findAllInSetBySid(staticSetToken.set, staticSetToken.sid, function(err, reply) {
+      should.not.exist(err);
+      should.exist(reply);
+      reply.should.be.Array();
+      reply.length.should.be.above(1);
+      done();
+    });
+  });
 
-          // check set in redis
-          redis.SISMEMBER(token.setKey, token.key, function(err, reply) {
-            should.not.exist(err);
-            reply.should.be.exactly(0);
+  it('Should update all tokens data in Set with the same sid', function(done) {
+    var data = {timeStamp: Date.now()};
+    Token.updateAllInSetBySid(staticSetToken.set, staticSetToken.sid, data, function(err, info) {
+      should.not.exist(err);
+      Token.findByJwt(staticSetToken.jwToken, function(err, updated) {
+        updated.should.containDeepOrdered({data: {timeStamp: data.timeStamp }});
+        done();
+      });
+    });
+  });
+
+  it('Should update all TTL tokens and don\'t modify their TTL', function(done) {
+    var udf, data, ttl;
+    udf = {
+      module: 'scripts',
+      funcname: 'getTTL'
+    };
+    data = {timeStamp: Date.now(), ttl: 'Updated'};
+
+    // get current TTL
+    aero.execute(aerospike.key('test', ttlToken.set, ttlToken.key), udf, function(err, n) {
+      ttl = n;
+      Token.updateAllInSetBySid(ttlToken.set, ttlToken.sid, data, function(err, info) {
+        should.not.exist(err);
+        Token.findByJwt(ttlToken.jwToken, function(err, updated) {
+          should.not.exist(err);
+          updated.should.containDeepOrdered({data: {timeStamp: data.timeStamp, ttl: 'Updated'}});
+          aero.execute(aerospike.key('test', ttlToken.set, ttlToken.key), udf, function(err, nn) {
+            nn.should.be.approximately(ttl, 5);
             done();
           });
         });
@@ -245,66 +284,11 @@ describe('Token Model', function() {
     });
   });
 
-  it('Should return a list of Tokens', function(done) {
-    Token.findAllInSet(staticSetToken.prefix, 'reset-pasword', function(err, reply) {
+  it('Should remove all token in Set with the same sid', function(done) {
+    Token.removeAllInSetbySid(staticSetToken.set, staticSetToken.sid, function(err, info) {
       should.not.exist(err);
-      should.exist(reply);
-      reply.should.be.Array();
-      reply.length.should.be.above(1);
+      info.should.have.property('removed').be.above(0);
       done();
-    });
-  });
-
-  it('Should update all tokens data in Set', function(done) {
-    var data = {timeStamp: Date.now()};
-    Token.updateAllInSet(staticSetToken.prefix, 'reset-pasword', data, function(err, reply) {
-      should.not.exist(err);
-      should.exist(reply);
-      reply.should.be.Array();
-      reply.length.should.be.above(1);
-
-      redis.GET(reply[0], function(err, updated) {
-        updated = JSON.parse(updated);
-        updated.should.containDeepOrdered({data: {timeStamp: data.timeStamp }});
-        done();
-      });
-    });
-  });
-
-  it('When a token dont exist, should be removed from set when updateAllInSet()', function(done) {
-    // add dummy token to set
-    redis.SADD(staticSetToken.setKey, 'dummy-token', function(err, reply) {
-      // check the dummy inside SET
-      redis.SMEMBERS(staticSetToken.setKey, function(err, reply) {
-        reply.should.containDeep(['dummy-token']);
-
-        var data = {timeStamp: Date.now()};
-        Token.updateAllInSet(staticSetToken.prefix, 'reset-pasword', data, function(err, reply) {
-          should.not.exist(err);
-          should.exist(reply);
-          reply.should.be.Array();
-          reply.should.not.containDeep(['dummy-token']);
-          done();
-        });
-      });
-    });
-  });
-
-  it('Should remove all token in Set and delete the Set', function(done) {
-    Token.removeAllInSet(staticSetToken.prefix, 'reset-pasword', function(err, reply) {
-      should.not.exist(err);
-      reply.should.be.above(1);
-      // check token key
-      redis.EXISTS(staticSetToken.key, function(err, reply) {
-        should.not.exist(err);
-        reply.should.be.exactly(0);
-        // check set
-        redis.EXISTS(staticSetToken.setKey, function(err, reply) {
-          should.not.exist(err);
-          reply.should.be.exactly(0);
-          done();
-        });
-      });
     });
   });
 
