@@ -16,7 +16,7 @@ module.exports.revokeUserToken = function(req, res) {
 };
 
 module.exports.revokeAllUserTokens = function(req, res) {
-	Token.removeAllInSet(req.jwt.prefix, req.jwt.id, function(err, reply) {
+	Token.removeAllInSetbySid(req.jwt.set, req.jwt.sid, function(err, reply) {
 		if(err) return hh.sendJsonResponse(res, 500, err);
 		return hh.sendJsonResponse(res, 200, {count: reply, message: 'All user tokens revoked.'});
 	});

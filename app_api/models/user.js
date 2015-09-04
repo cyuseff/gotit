@@ -4,7 +4,7 @@ var mongoose = require('../../config/mongoose')
   , Token = require('./token')
   , bcrypt = require('bcrypt')
   , SALT_WORK_FACTOR = 2 // 8 => 12, been 12 the recommended factor
-  , PREFIX = 'user';
+  , SET = 'user';
 
 
 var userSchema = new mongoose.Schema({
@@ -63,21 +63,24 @@ var userSchema = new mongoose.Schema({
 
 // Hooks
 userSchema.pre('remove', function(next) {
-  Token.removeAllInSet(PREFIX, this._id, function(err, message) {
+  Token.removeAllInSetbySid(SET, this._id, function(err, message) {
     next();
   });
 });
 
-userSchema.post('save', function() {
-  Token.updateAllInSet(PREFIX, this._id, this, function(err, reply) {
-    if(err) return console.log(err);
-    // if(!reply) return console.log('Nothing to update');
-    // return console.log('User token updated.', reply);
-  });
-});
-
-
 // Methods
+// Save Method
+userSchema.methods.saveAndUpdate = function(callback) {
+  var me = this;
+  me.save(function(err, user) {
+    if(err) return callback(err);
+    Token.updateAllInSetBySid(SET, me._id, me, function(err, reply) {
+      if(err) return callback({error: 'Tokens not updated', code: 400});
+      return callback(null, user);
+    });
+  });
+};
+
 // Password setter
 userSchema.methods.generateHash = function(password, callback) {
   bcrypt.hash(password, SALT_WORK_FACTOR, function(err, hash) {

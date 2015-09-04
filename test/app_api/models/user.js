@@ -52,7 +52,7 @@ describe('User Model', function() {
   });
 
   it('Should save the user into the DB', function(done) {
-    user.save(function(err, saved) {
+    user.saveAndUpdate(function(err, saved) {
       should.not.exist(err);
       User.findById(pUser._id, function(err, dUser) {
         should.not.exist(err);
@@ -65,17 +65,18 @@ describe('User Model', function() {
   it('Should update User tokens on save (post save Hook)', function(done) {
     // create a user token
     token = new Token({
-      prefix: 'user',
-      id: user._id,
+      set: 'user',
+      sid: user._id,
       data: user
     });
     token.save(function(err, jwToken) {
       should.not.exist(err);
       // update a user property
       user.sex = 'male';
-      user.save(function(err, updated) {
+      user.saveAndUpdate(function(err, updated) {
         should.not.exist(err);
         updated.sex.should.be.exactly('male');
+
         // find the token and check sex property
         Token.findByJwt(jwToken, function(err, updatedToken) {
           should.not.exist(err);

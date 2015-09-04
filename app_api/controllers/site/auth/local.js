@@ -5,7 +5,8 @@ var User = require('../../../models/user')
   , validator = require('validator')
 	, hh = require('../../../helpers');
 
-var SET = 'user';
+var SET = 'user'
+  , TTL = 360;
 
 function localSignin(req, res, email, password, confirmPassword) {
 
@@ -45,12 +46,12 @@ function localSignin(req, res, email, password, confirmPassword) {
           // create session token
           var token = new Token({
             set: SET,
-            id: user._id,
+            sid: user._id,
             data: user,
-            expire: 1
+            ttl: TTL
           });
           token.save(function(err, jwToken) {
-            // The user was created so send it back anyway even if token creation or redis fails
+            // The user was created so send it back anyway even if token creation or aerospike fails
             if(err) console.log(err);
             return hh.sendJsonResponse(res, 201, {user: user.getPublicUser(), token: jwToken});
           });
@@ -75,28 +76,18 @@ function localLogin(req, res, email, password) {
     user.comparePassword(password, function(err, isMatch) {
       if(err) return hh.sendJsonResponse(res, 500, err);
       if(isMatch) {
-
-        // create session token
         // create session token
         var token = new Token({
           set: SET,
-          id: user._id,
+          sid: user._id,
           data: user,
-          expire: 1
+          ttl: TTL
         });
         token.save(function(err, jwToken) {
           // The user was created so send it back anyway even if token creation or redis fails
           if(err) return hh.sendJsonResponse(res, 500, err);
           return hh.sendJsonResponse(res, 200, {user: user.getPublicUser(), token: jwToken});
         });
-
-        /*Token.setUserToken(user, function(err, token) {
-          if(err) return hh.sendJsonResponse(res, 500, err);
-
-          // return the new user with token
-          return hh.sendJsonResponse(res, 200, { user: user.getPublicUser(), token: token });
-        });*/
-
       } else {
         return hh.sendJsonResponse(res, 403, {error: 'Oops! Wrong password...'});
       }

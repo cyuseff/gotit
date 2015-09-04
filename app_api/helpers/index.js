@@ -29,7 +29,7 @@ module.exports.authToken = function(req, res, next) {
     },
     true,
     function(token, decoded) {
-      return token.data._id === decoded.id;
+      return token.data._id === decoded.sid;
     });
   } else {
     sendJsonResponse(res, 403, {error: 'No token provided.'});

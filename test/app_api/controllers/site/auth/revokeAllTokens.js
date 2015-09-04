@@ -7,8 +7,9 @@ var request = require('supertest')
   , agent = request.agent(app)
   , User = require(dirName + '/app_api/models/user')
   , url = '/api/v1/auth/logoutAll'
-  , redis = require('redis')
-  , client = redis.createClient();
+  , aerospike = require(dirName + '/config/aero').aero
+  , aero = require(dirName + '/config/aero').client
+  , status = aerospike.status;
 
 // Create User
 var email = 'user002@test.com'
@@ -28,29 +29,18 @@ describe('Revoke all User Tokens', function() {
         token = res.body.token;
 
         var ctrl = 0
-          , id = res.body.user._id;
+          , id = res.body.user._id.toString();
+
+        var cb = function() {
+          ctrl++;
+          if(ctrl >= max) done();
+        };
 
         // console.log('Creating '+max+' Dummy tokens');
-
-        var keys = [];
-        var ss = [];
         for(var i=0; i<max; i++) {
           var rand = Math.round(Math.random() * 10000000000);
-          keys.push('got-it:user:'+id+':'+rand);
-          keys.push(JSON.stringify({user: id}));
-          ss.push('got-it:user:'+id+':'+rand);
+          aero.put(aerospike.key('test', 'user', 'pk'+rand), {key: 'pk'+rand, sid: id}, cb);
         }
-
-        client.multi()
-          .mset(keys)
-          .sadd('got-it:user:set:'+id, ss)
-          .exec(function(err, reply) {
-            client.SCARD('got-it:user:set:'+id, function(err, reply) {
-              // console.log(reply);
-              done();
-            });
-          });
-
       });
 
   });
@@ -62,7 +52,7 @@ describe('Revoke all User Tokens', function() {
       .get(url)
       .set('x-access-token', token)
       .expect(200)
-      .expect(new RegExp(max+2))
+      .expect(new RegExp(max+1))
       .expect(/all\suser\stokens\srevoked/i, done);
   });
 

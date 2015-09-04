@@ -52,13 +52,20 @@ Rol.findAll(function(err, roles) {
       ]
     });
     rol3.save();
+  } else {
+    for(var i=0, l=roles.length; i<l; i++) {
+      if(roles[i].name === 'superAdmin') {
+        rol = roles[i];
+        break;
+      }
+    }
   }
 
   User
     .findOne({fullName: NAME +' '+ LAST_NAME})
     .exec(function(err, admin) {
       if(err) console.log(err);
-      if(admin) return; // console.log('Admin Found!');
+      if(admin) return console.log('Admin Found!');
 
       // Create a new User
       var user = new User();

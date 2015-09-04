@@ -100,7 +100,7 @@ module.exports.assignRol = function(req, res) {
           if(!rolExistInUser(rol, user.roles)) {
             user.roles.push(rol);
 
-            user.save(function(err) {
+            user.saveAndUpdate(function(err) {
               if(err) return hh.sendJsonResponse(res, 500, err);
               return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});
             });
@@ -108,7 +108,7 @@ module.exports.assignRol = function(req, res) {
             return hh.sendJsonResponse(res, 400, {message: 'User already have this rol.', user: user});
           }
         } else {
-          user.roles = [rol];
+          user.saveAndUpdate = [rol];
           user.save(function(err) {
             if(err) return hh.sendJsonResponse(res, 500, err);
             return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});

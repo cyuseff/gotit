@@ -48,7 +48,7 @@ function Token(opts) {
   if(!opts.set || !opts.sid || !opts.data) return null;
 
   this.set = opts.set;
-  this.sid = opts.sid;
+  this.sid = opts.sid.toString();
   this.data = JSON.stringify(opts.data);
   this.createdAt = Date.now();
   this.key = opts.key || null;
@@ -145,7 +145,7 @@ function getAllKeysInSetBySid(set, sid, callback) {
   query = aero.query(NAMESPACE, set, args);
   stream = query.execute();
   stream
-    .on('error', function(err) { console.log(err); })
+    .on('error', function(err) { console.log('err', err); })
     .on('data', function(rec) { tokens.push(rec.bins); })
     .on('end', function(rec) { callback(tokens); });
 }
@@ -188,10 +188,12 @@ function batchRemove(set, tokens, callback) {
 }
 
 Token.findAllInSetBySid = function(set, sid, callback) {
+  sid = sid.toString();
   getAllKeysInSetBySid(set, sid, function(tokens) { callback(null, tokens); });
 };
 
 Token.updateAllInSetBySid = function(set, sid, data, callback) {
+  sid = sid.toString();
   getAllKeysInSetBySid(set, sid, function(tokens) {
     if(tokens.length) return batchUpdate(set, tokens, data, callback);
     return callback(null, {scaned: 0, updated: 0});
@@ -199,6 +201,7 @@ Token.updateAllInSetBySid = function(set, sid, data, callback) {
 };
 
 Token.removeAllInSetbySid = function(set, sid, callback) {
+  sid = sid.toString();
   getAllKeysInSetBySid(set, sid, function(tokens) {
     if(tokens.length) return batchRemove(set, tokens, callback);
     return callback(null, {scaned: 0, removed: 0});
