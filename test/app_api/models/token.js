@@ -287,7 +287,6 @@ describe('Token Model', function() {
   it('Should remove all token in Set with the same sid', function(done) {
     Token.removeAllInSetbySid(staticSetToken.set, staticSetToken.sid, function(err, info) {
       should.not.exist(err);
-      console.log(info);
       info.should.have.property('removed').be.above(0);
       done();
     });

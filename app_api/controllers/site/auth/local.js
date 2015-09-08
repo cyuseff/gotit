@@ -5,7 +5,7 @@ var User = require('../../../models/user')
   , validator = require('validator')
 	, hh = require('../../../helpers');
 
-var SET = 'user'
+var SET = 'users'
   , TTL = 360;
 
 function localSignin(req, res, email, password, confirmPassword) {

@@ -73,22 +73,23 @@ describe('Rol Model', function() {
     Rol.remove(rol.id, function(err, reply) {
       should.not.exist(err);
       reply.should.have.property('message').which.match(/rol\srevoked/i);
-      Rol.findAll(function(err, roles) {
-        roles.should.have.lengthOf(allRoles.length - 1);
-        done();
-      });
+      done();
     });
   });
 
-  it('Should not find the removed rol', function(done) {
+  it('Should not find the removed rol (Rol.findOneById method)', function(done) {
     Rol.findOneById(rol.id, function(err, rRol) {
       should.not.exist(err);
       should.not.exist(rRol);
-      Rol.findByIds([rol.id], function(err, roles) {
-        should.not.exist(err);
-        should(roles[0]).be.exactly(null);
-        done();
-      });
+      done();
+    });
+  });
+
+  it('Should not find the removed rol (Rol.findByIds method)', function(done) {
+    Rol.findByIds([rol.id], function(err, roles) {
+      should.not.exist(err);
+      should(roles[0]).be.exactly(null);
+      done();
     });
   });
 

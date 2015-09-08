@@ -4,7 +4,7 @@ var mongoose = require('../../config/mongoose')
   , Token = require('./token')
   , bcrypt = require('bcrypt')
   , SALT_WORK_FACTOR = 2 // 8 => 12, been 12 the recommended factor
-  , SET = 'user';
+  , SET = 'users';
 
 
 var userSchema = new mongoose.Schema({
@@ -64,7 +64,11 @@ var userSchema = new mongoose.Schema({
 // Hooks
 userSchema.pre('remove', function(next) {
   Token.removeAllInSetbySid(SET, this._id, function(err, message) {
-    next();
+    if(message.scaned !== message.removed) {
+      next(new Error('Not all tokens where removed.'));
+    } else {
+      next();
+    }
   });
 });
 

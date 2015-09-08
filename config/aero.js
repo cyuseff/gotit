@@ -14,15 +14,9 @@ function connectCb(err, client) {
     console.log('Aerospike Connection Success');
 
     /* Register Lua modules */
-    console.log(__dirname);
     client.udfRegister(__dirname + '/udf/scripts.lua', function(err) {
-      // check for err.code in the callback function.
-      // AEROSPIKE_OK signifies UDF register request has been submitted to the server.
-      if(err.code !== status.AEROSPIKE_OK) {
-        console.log(err);
-      } else {
-        console.log('Lua registered!');
-      }
+      if(err.code !== status.AEROSPIKE_OK) return console.log(err);
+      console.log('Lua registered!');
     });
 
   }

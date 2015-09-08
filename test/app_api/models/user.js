@@ -65,7 +65,7 @@ describe('User Model', function() {
   it('Should update User tokens on save (post save Hook)', function(done) {
     // create a user token
     token = new Token({
-      set: 'user',
+      set: 'users',
       sid: user._id,
       data: user
     });

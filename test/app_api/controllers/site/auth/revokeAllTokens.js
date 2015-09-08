@@ -39,7 +39,7 @@ describe('Revoke all User Tokens', function() {
         // console.log('Creating '+max+' Dummy tokens');
         for(var i=0; i<max; i++) {
           var rand = Math.round(Math.random() * 10000000000);
-          aero.put(aerospike.key('test', 'user', 'pk'+rand), {key: 'pk'+rand, sid: id}, cb);
+          aero.put(aerospike.key('test', 'users', 'pk'+rand), {key: 'pk'+rand, sid: id}, cb);
         }
       });
 

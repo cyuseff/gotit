@@ -28,6 +28,7 @@ function Rol(opts) {
   this.name = opts.name;
   this.accessLevel = opts.accessLevel || null;
   this.routes = opts.routes || [];
+  this.createdAt = opts.createdAt || Date.now();
 }
 
 
@@ -72,12 +73,18 @@ Rol.findByIds = function(ids, callback) {
 };
 
 Rol.findAll = function(callback) {
+  var filter, args, query, stream, roles;
 
-  var statement = {concurrent: true, nobins: false}
-    , scan = aero.query(NAMESPACE, SET, statement)
-    , roles = []
-    , stream = scan.execute();
+  filter = aerospike.filter;
+  args = {
+    nobins: false,
+    concurrent: true,
+    filters: [filter.range('createdAt', 0, Date.now())]
+  };
 
+  roles = [];
+  query = aero.query(NAMESPACE, SET, args);
+  stream = query.execute();
   stream
     .on('data', function(record) { roles.push(record.bins); })
     .on('error', function(err) { return callback(err); })
@@ -88,7 +95,7 @@ Rol.remove = function(id, callback) {
   var key = generateAeroKey(id);
 
   aero.remove(key, function(err, key) {
-    if(err.code === status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback({error: 'Rol not found', status: 403});
+    if(err.code === status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback({error: 'Rol not found', status: 404});
     if(err.code !== status.AEROSPIKE_OK) return callback(err.message);
     return callback(null, {message: 'Rol revoked'});
   });
