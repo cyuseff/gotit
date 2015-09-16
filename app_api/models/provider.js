@@ -2,19 +2,6 @@
 
 var mongoose = require('../../config/mongoose');
 
-/* TODO: REDIS!*/
-var ratingSchema = new mongoose.Schema({
-  _id:        {type: String, required: true},
-  rating:     {type: Number, required: true, min: 1, max: 5}
-});
-
-var commentSchema = new mongoose.Schema({
-  userId:     {type: String, required: true},
-  userName:   {type: String, required: true},
-  comment:    {type: String, required: true},
-  createdAt:  {type: Date, default: Date.now}
-});
-
 var locationSchema = new mongoose.Schema({
   name:     String,
   address:  {type: String, required: true},
@@ -23,34 +10,42 @@ var locationSchema = new mongoose.Schema({
 
 var providerSchema = new mongoose.Schema({
   // main properties
-  name:         {type: String, require: true},
-  description:  {type: String, require: true},
+  name:         {type: String, required: true},
+  slug:         {type: String, required: true, unique: true},
+  description:  {type: String, required: true},
   avatar:       String,
+  createdAt:    {type: Date, default: Date.now()},
 
   // query properties
-  category:     Array,
+  category:     String,
   tags:         Array,
 
   // aditional info
-  email:  String,
-  phone:  String,
-  url:    String,
+  emails:  Array,
+  phones:  Array,
+  urls:    Array,
 
   //
-  locations:  [locationSchema],
-  comments:   [commentSchema],
-  rating:     {type: Number},
-  ratings:    [ratingSchema]
+  locations:  [locationSchema]
 });
 
-// Hooks
-providerSchema.pre('save', function(next) {
-  var n = 0;
-  if(this.ratings.length) {
-    for(var i=0, l=this.ratings.length; i<l; i++) n += this.ratings[i].rating;
-    if(n !== 0) this.rating = Math.round(n / l);
+// Methods
+// Rate
+/*providerSchema.methods.rate = function(userId, rate, callback) {
+  userId = userId.toString().trim();
+  if(!userId || !rate) return callback({error: 'UserId and rate are both required.', status: 400});
+  if(isNaN(rate) || rate <= 0 || rate > 5) return callback({error: 'Rate must be a number between 1 and 5.', status: 400});
+
+  this.ratings = this.ratings || {};
+
+  var n = 0, l = 0, old = this.rating;
+  this.ratings[userId] = rate;
+  for(var i in this.ratings) {
+    n += this.ratings[i];
+    l++;
   }
-  next();
-});
+  this.rating = Math.round(n / l);
+  return callback(null, {rating: this.rating, old: old});
+};*/
 
 module.exports = mongoose.model('Provider', providerSchema);
