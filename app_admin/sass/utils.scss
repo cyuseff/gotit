@@ -1,0 +1,258 @@
+/******* UTILITY CLASSES *******/
+// Text Alignment
+.float-left {
+  display: inline;
+  float: left;
+}
+.float-right {
+  display: inline;
+  float: right;
+}
+.title {
+  color: $heavenly;
+  margin-bottom: $spacing-sm;
+}
+.text-normal { font-weight: $text-normal; }
+.text-light { font-weight: $text-light; }
+.text-semibold { font-weight: $text-semibold; }
+.text-bold { font-weight: $text-bold; }
+
+.nowrap { white-space: nowrap; }
+
+// Margin classes
+.margin { margin: $spacing-sm $spacing !important; }
+.margin-t { margin-top: $spacing!important; }
+.margin-b { margin-bottom: $spacing!important; }
+.margin-l { margin-left: $spacing!important; }
+.margin-r { margin-right: $spacing!important; }
+.margin-t-lg { margin-top: $spacing-lg!important; }
+.margin-b-lg { margin-bottom: $spacing-lg!important; }
+.margin-l-lg { margin-left: $spacing-lg!important; }
+.margin-r-lg { margin-right: $spacing-lg!important; }
+.margin-t-md { margin-top: $spacing-md!important; }
+.margin-b-md { margin-bottom: $spacing-md!important; }
+.margin-l-md { margin-left: $spacing-md!important; }
+.margin-r-md { margin-right: $spacing-md!important; }
+.margin-t-sm { margin-top: $spacing-sm!important; }
+.margin-b-sm { margin-bottom: $spacing-sm!important; }
+.margin-l-sm { margin-left: $spacing-sm!important; }
+.margin-r-sm { margin-right: $spacing-sm!important; }
+.margin-t-xs { margin-top: $spacing-xs!important; }
+.margin-b-xs { margin-bottom: $spacing-xs!important; }
+.margin-l-xs { margin-left: $spacing-xs!important; }
+.margin-r-xs { margin-right: $spacing-xs!important; }
+.margin-t-min { margin-top: $spacing-min!important; }
+.margin-b-min { margin-bottom: $spacing-min!important; }
+.margin-l-min { margin-left: $spacing-min!important; }
+.margin-r-min { margin-right: $spacing-min!important; }
+.margin-tb { margin: $spacing 0!important; }
+.margin-lr { margin: 0 $spacing!important; }
+
+.no-margin { margin: 0!important; }
+.no-margin-t { margin-top: 0!important; }
+.no-margin-b { margin-bottom: 0!important; }
+.no-margin-l { margin-left: 0!important; }
+.no-margin-r { margin-right: 0!important; }
+
+/* Padding */
+.padding { padding: $spacing-sm $spacing !important; }
+.padding-t { padding-top: $spacing!important; }
+.padding-b { padding-bottom: $spacing!important; }
+.padding-l { padding-left: $spacing!important; }
+.padding-r { padding-right: $spacing!important; }
+.padding-all-lg { padding: $spacing-lg!important; }
+.padding-all-md { padding: $spacing-md!important; }
+.padding-all { padding: $spacing!important; }
+.padding-all-sm { padding: $spacing-sm!important; }
+.padding-all-xs { padding: $spacing-xs!important; }
+.padding-all-min { padding: $spacing-min!important; }
+
+.no-padding { padding: 0!important; }
+.no-padding-t { padding-top: 0!important; }
+.no-padding-b { padding-bottom: 0!important; }
+
+// Color classes
+.green {
+  color: $green;
+  &[class*="text"] {
+    color: $green;
+  }
+  &[class*="label"] {
+    color: #fff;
+    background-color: $green;
+  }
+}
+a.green {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $dark-green;
+  }
+}
+.heavenly {
+  color: $heavenly;
+  &[class*="text"] {
+    color: $heavenly;
+  }
+  &[class*="label"] {
+    color: #fff;
+    background-color: $heavenly;
+  }
+}
+a.heavenly {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $dark-heavenly;
+  }
+}
+.blue {
+  color: $blue;
+  &[class*="text"] {
+    color: $blue;
+  }
+  &[class*="label"] {
+    color: #fff;
+    background-color: $blue;
+  }
+}
+a.blue {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $dark-blue;
+  }
+}
+.red {
+  color: $red;
+  &[class*="text"] {
+    color: $red;
+  }
+  &[class*="label"] {
+    color: #fff;
+    background-color: $red;
+  }
+}
+a.red {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $dark-red;
+  }
+}
+.yellow {
+  color: $yellow;
+  &[class*="text"] {
+    color: $yellow;
+  }
+  &[class*="label"] {
+    color: #fff;
+    background-color: $yellow;
+  }
+}
+a.yellow {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $dark-yellow;
+  }
+}
+.orange {
+  color: $orange;
+  &[class*="text"] {
+    color: $orange;
+  }
+  &[class*="label"] {
+    color: #fff;
+    background-color: $orange;
+  }
+}
+a.orange {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $dark-orange;
+  }
+}
+.gray {
+  color: $gray;
+  &[class*="text"] {
+    color: $gray;
+  }
+  &[class*="label"] {
+    color: #fff;
+    background-color: $gray;
+  }
+}
+a.gray {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $dark-gray;
+  }
+}
+.light-gray {
+  color: $light-gray;
+  &[class*="text"] {
+    color: $light-gray;
+  }
+  &[class*="label"] {
+    color: #fff;
+    background-color: $light-gray;
+  }
+}
+a.light-gray {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $dark-light-gray;
+  }
+}
+.black {
+  color: $black;
+  &[class*="text"] {
+    color: $black;
+  }
+  &[class*="label"] {
+    color: #fff;
+    background-color: $black;
+  }
+}
+a.black {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $gray;
+  }
+}
+.white {
+  color: $white;
+  &[class*="text"] {
+    color: $white;
+  }
+  &[class*="label"] {
+    color: $body-color;
+    background-color: $white;
+  }
+}
+a.white {
+  &:hover,
+  &:focus,
+  &:active {
+    color: $light-gray;
+  }
+}
+
+/* Animation classes */
+.css-ani-all {
+  -webkit-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+/* MIXINS */
+@mixin clearfix {
+  &::after {
+    clear: both;
+    content: "";
+    display: table;
+  }
+}

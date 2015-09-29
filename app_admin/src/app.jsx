@@ -3,13 +3,12 @@ var React = require('react')
   , HashHistory = require('react-router/lib/hashhistory')
   , Router = ReactRouter.Router
   , Route = ReactRouter.Route
-  , Main = require('./components/main')
-  , About = require('./components/about');
+  , Main = require('./components/main');
 
-React.render((
+var routes = (
   <Router history={new HashHistory}>
-    <Route path="/" component={Main}>
-      <Route path="about" component={About}></Route>
-    </Route>
+    <Route path="/" component={Main}></Route>
   </Router>
-), document.body);
+);
+
+React.render(routes, document.body);
