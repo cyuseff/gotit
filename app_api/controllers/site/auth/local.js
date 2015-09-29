@@ -112,7 +112,7 @@ module.exports.localStrategy = function(req, res) {
   if(!validator.isAlphanumeric(password)) return hh.sendJsonResponse(res, 400, {error: 'Password can only have alpha numerical characters'});
 
   // Check password length
-  if(password.length < 6) return hh.sendJsonResponse(res, 400, {error: 'Password must have at least 6 characthers length'});
+  if(password.length < 6 && confirmPassword) return hh.sendJsonResponse(res, 400, {error: 'Password must have at least 6 characthers length'});
 
 
   if(!confirmPassword) {

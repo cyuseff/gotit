@@ -34,7 +34,7 @@ module.exports = React.createClass({
           </div>
         </div>
 
-        <button type="submit" className="btn btn-primary">Sign Up</button>
+        <button type="submit" className="btn btn-primary">Sign Un</button>
       </form>
     </div>);
   }
