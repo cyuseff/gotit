@@ -9,19 +9,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^0.8.4",
-    "body-parser": "^1.13.2",
-    "chai": "^3.2.0",
-    "ejs": "^2.3.3",
-    "express": "^4.13.1",
+    "bcrypt": "https://registry.npmjs.org/bcrypt/-/bcrypt-0.8.3.tgz",
+    "body-parser": "https://registry.npmjs.org/body-parser/-/body-parser-1.12.4.tgz",
+    "express": "https://registry.npmjs.org/express/-/express-4.12.4.tgz",
     "hiredis": "https://registry.npmjs.org/hiredis/-/hiredis-0.4.0.tgz",
-    "jsonwebtoken": "^5.0.4",
-    "mongoose": "^4.1.0",
-    "morgan": "^1.6.1",
+    "jsonwebtoken": "https://registry.npmjs.org/jsonwebtoken/-/jsonwebtoken-5.0.1.tgz",
+    "mongoose": "https://registry.npmjs.org/mongoose/-/mongoose-4.0.5.tgz",
     "redis": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz",
-    "request": "^2.60.0",
+    "request": "https://registry.npmjs.org/request/-/request-2.57.0.tgz",
     "uuid": "https://registry.npmjs.org/uuid/-/uuid-2.0.1.tgz",
-    "validator": "^3.43.0"
+    "validator": "https://registry.npmjs.org/validator/-/validator-3.40.0.tgz"
   },
   "devDependencies": {
     "istanbul": "*",
