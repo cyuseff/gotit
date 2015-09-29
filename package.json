@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "browserify": "^9.0.3",
+    "cookies-js": "^1.2.2",
     "gulp": "^3.8.11",
     "gulp-concat": "^2.5.2",
     "gulp-react": "^3.0.1",

@@ -12,6 +12,9 @@ module.exports = React.createClass({
   getInitialState: function() {
     return {token: null};
   },
+  componentDidMount: function() {
+    Actions.checkCookies();
+  },
   render: function() {
     return (<div>
       <Header />

@@ -15,6 +15,10 @@ router.route('/auth/logoutAll').get(hh.authToken, logoutCtrl.revokeAllUserTokens
 
 
 // Users routes
+router.route('/me').get(hh.authToken, function(req, res) {
+  hh.sendJsonResponse(res, 200, {user: req.user});
+});
+
 router.route('/users').get(hh.authToken, usersCtrl.listUsers);
 router.route('/users/:userid').get(hh.authToken, usersCtrl.showUser);
 

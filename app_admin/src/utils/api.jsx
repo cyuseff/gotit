@@ -17,8 +17,14 @@ function parseJSON(res) {
 }
 
 module.exports = {
-  get: function(url) {
-    return fetch(ROOT_URL + url, {})
+  get: function(url, token) {
+    return fetch(ROOT_URL + url, {
+      headers: {
+        'x-access-token': token,
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
       .then(function(res) {
         return res.json();
       });
