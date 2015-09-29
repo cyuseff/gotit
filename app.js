@@ -3,7 +3,6 @@
 var express = require('express')
   , mongoose = require('./config/mongoose')
   , aero = require('./config/aero')
-  , morgan = require('morgan')
   , bodyParser = require('body-parser');
 
 // Create app
@@ -14,7 +13,6 @@ app.set('JWTSecret', 'my-cool-secret');
 app.set('view engine', 'ejs');
 
 // Middlewares
-// app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
@@ -32,9 +30,6 @@ require('./app_api/routes/site')(app);
 
 // Api Admin routes
 require('./app_api/routes/admin')(app);
-
-// Site routes
-require('./app_site/routes')(app);
 
 // Not found
 app.use(function(req, res) {

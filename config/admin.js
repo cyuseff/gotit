@@ -82,3 +82,8 @@ function createAdmin(cb) {
 
     });
 }
+
+createRoles(createAdmin(function() {
+  console.log('Roles and Admin created');
+  process.exit();
+}));
