@@ -20,10 +20,6 @@
     "validator": "^3.43.0"
   },
   "devDependencies": {
-    "istanbul": "*",
-    "mocha": "*",
-    "should": "*",
-    "supertest": "*",
     "browserify": "^9.0.3",
     "gulp": "^3.8.11",
     "gulp-concat": "^2.5.2",
@@ -32,9 +28,14 @@
     "gulp-server-livereload": "^1.3.0",
     "gulp-util": "^3.0.4",
     "gulp-watch": "^4.2.4",
+    "istanbul": "*",
+    "mocha": "*",
     "node-notifier": "^4.2.1",
     "react": "^0.13.1",
+    "react-router": "^1.0.0-beta2",
     "reactify": "^1.1.0",
+    "should": "*",
+    "supertest": "*",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^2.4.0"
   }
