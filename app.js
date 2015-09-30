@@ -19,8 +19,8 @@ app.use(bodyParser.json());
 // CORS enabled
 app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, Authorization, x-access-token');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, x-access-token');
   next();
 });
 

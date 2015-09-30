@@ -13,7 +13,7 @@ module.exports = React.createClass({
     return {token: null};
   },
   componentDidMount: function() {
-    Actions.checkCookies();
+    Actions.getProfile();
   },
   render: function() {
     return (<div>

@@ -8,18 +8,24 @@ function setCookie(value) {
   if(value) Cookies.set(COOKIE, value);
 }
 
-function getCookie() {
-  return Cookies.get(COOKIE);
-}
-
 function removeCookie() {
   Cookies.expire(COOKIE);
 }
 
 module.exports = Reflux.createStore({
   listenables: [Actions],
+  signInUser: function(data) {
+    Api.post('/auth/local', data)
+      .then(function(res) {
+        this.err = res.error;
+        this.token = res.token;
+        this.user = res.user;
+        setCookie(this.token);
+        this.triggerChange();
+      }.bind(this));
+  },
   logInUser: function(data) {
-    Api.post('api/v1/auth/local', data)
+    Api.post('/auth/local', data)
       .then(function(res) {
         this.err = res.error;
         this.token = res.token;
@@ -29,22 +35,22 @@ module.exports = Reflux.createStore({
       }.bind(this));
   },
   logOutUser: function() {
-    this.err = this.token = this.user = null;
-    removeCookie();
-    this.triggerChange();
+    Api.get('/auth/logout')
+      .then(function(res) {
+        if(res.error) return;
+        this.err = this.token = this.user = null;
+        removeCookie();
+        this.triggerChange();
+      }.bind(this));
   },
-  checkCookies: function() {
-    var token = getCookie();
-    if(token) {
-      Api.get('api/v1/me', token)
-        .then(function(res) {
-          console.log(res);
-          if(res.error) return;
-          this.token = token;
-          this.user = res.user;
-          this.triggerChange();
-        }.bind(this));
-    }
+  getProfile: function() {
+    Api.get('/auth')
+      .then(function(res) {
+        if(res.error) return;
+        this.token = res.token;
+        this.user = res.user;
+        this.triggerChange();
+      }.bind(this));
   },
   triggerChange: function() {
     this.trigger('change', this.err);

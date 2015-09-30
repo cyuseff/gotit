@@ -8,6 +8,12 @@ var router = require('express').Router()
   , hh = require('../helpers');
 
 // Auth routes
+router.route('/auth').get(hh.authToken, function(req, res) {
+  hh.sendJsonResponse(res, 200, {
+    user: req.user,
+    token: (req.body.token || req.query.token || req.headers['x-access-token'])
+  });
+});
 router.route('/auth/local').post(localCtrl.localStrategy);
 router.route('/auth/facebook').post(facebookCtrl.facebookStrategy);
 router.route('/auth/logout').get(logoutCtrl.revokeUserToken);
@@ -15,10 +21,6 @@ router.route('/auth/logoutAll').get(hh.authToken, logoutCtrl.revokeAllUserTokens
 
 
 // Users routes
-router.route('/me').get(hh.authToken, function(req, res) {
-  hh.sendJsonResponse(res, 200, {user: req.user});
-});
-
 router.route('/users').get(hh.authToken, usersCtrl.listUsers);
 router.route('/users/:userid').get(hh.authToken, usersCtrl.showUser);
 
