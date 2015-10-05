@@ -1,0 +1,35 @@
+{
+  "status": {
+    "GOTIT_100": {
+      "code": 100,
+      "status": 403,
+      "msg": "No token provided."
+    },
+    "GOTIT_101": {
+      "code": 101,
+      "status": 404,
+      "msg": "Token not found."
+    },
+    "GOTIT_102": {
+      "code": 102,
+      "status": 400,
+      "msg": "Token is not valid."
+    },
+    "GOTIT_103": {
+      "code": 103,
+      "status": 400,
+      "msg": "Bad token."
+    },
+
+
+
+
+
+
+    "GOTIT_200": {
+      "code": 200,
+      "status": 400,
+      "msg": "Aerospike error."
+    }
+  }
+}

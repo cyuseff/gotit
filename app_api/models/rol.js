@@ -4,6 +4,7 @@ var aerospike = require('../../config/aero').aero
   , aero = require('../../config/aero').client
   , status = aerospike.status
   , uuid = require('uuid')
+  , STATUS = require('../helpers/status-codes')
   , NAMESPACE = 'test'
   , SET = 'roles';
 

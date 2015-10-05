@@ -3,13 +3,16 @@
 var User = require('../../../models/user')
   , Token = require('../../../models/token')
   , request = require('request')
-  , hh = require('../../../helpers')
+  , hh = require('../../../helpers');
+
+var SET = 'users'
+  , TTL = 360
   , ID = '909396282439703'
   , SECRET = 'd7062dfb81a1574860aff74f1a7cfcad';
 
 
 function facebookSignin(req, res, token) {
-
+  console.log('facebookSignin');
   // Get info from Facebook
   var options = {
     url: 'https://graph.facebook.com/v2.2/me?access_token='+token,
@@ -40,14 +43,18 @@ function facebookSignin(req, res, token) {
       if(err) return hh.sendJsonResponse(res, 500, err);
 
       // create session token
-      Token.setUserToken(user, function(err, token) {
-
+      var userToken = new Token({
+        set: SET,
+        sid: user._id,
+        data: user,
+        ttl: TTL
+      });
+      userToken.save(function(err, jwToken) {
         // The user was created so send it back anyway even if token creation or Token fails
         if(err) console.log(err);
-
         // return the new user with token
-        token = token || '001';
-        return hh.sendJsonResponse(res, 201, { user: user.getPublicUser(), token: token });
+        jwToken = jwToken || '001';
+        return hh.sendJsonResponse(res, 201, { user: user.getPublicUser(), token: jwToken });
       });
     });
 
@@ -55,34 +62,39 @@ function facebookSignin(req, res, token) {
 }
 
 function facebookLogin(req, res, user, token) {
+  console.log('facebookLogin');
+  var userToken;
+
   // Check token
   if(user.facebook.token === token) {
     console.log('Token Match!');
-
     // create session token
-    Token.setUserToken(user, function(err, token) {
-      if(err) return hh.sendJsonResponse(res, 500, err);
-
-      // return the new user with token
-      return hh.sendJsonResponse(res, 200, { user: user.getPublicUser(), token: token });
+    userToken = new Token({
+      set: SET,
+      sid: user._id,
+      data: user,
+      ttl: TTL
     });
-
+    userToken.save(function(err, jwToken) {
+      if(err) return hh.sendJsonResponse(res, 500, err);
+      return hh.sendJsonResponse(res, 200, {user: user.getPublicUser(), token: jwToken});
+    });
   } else {
     console.log('New Token!');
-
     // Update Facebook Token
     user.facebook.token = token;
     user.save(function(err) {
       if(err) return hh.sendJsonResponse(res, 500, err);
-
       // create session token
-      Token.setUserToken(user, function(err, token) {
-
-        // Its necesary send back a valid token
+      userToken = new Token({
+        set: SET,
+        sid: user._id,
+        data: user,
+        ttl: TTL
+      });
+      userToken.save(function(err, jwToken) {
         if(err) return hh.sendJsonResponse(res, 500, err);
-
-        // return the user with the new token
-        return hh.sendJsonResponse(res, 200, { user: user.getPublicUser(), token: token });
+        return hh.sendJsonResponse(res, 200, {user: user.getPublicUser(), token: jwToken});
       });
     });
 
@@ -111,9 +123,7 @@ module.exports.facebookStrategy = function(req, res) {
     User
       .findOne({ 'facebook.id': userId })
       .exec(function(err, user) {
-
         if(err) return hh.sendJsonResponse(res, 500, err);
-
         if(user) {
           // Old user, start login flow
           facebookLogin(req, res, user, token);
@@ -121,7 +131,6 @@ module.exports.facebookStrategy = function(req, res) {
           // New user, start signin flow
           facebookSignin(req, res, token);
         }
-
       });
 
   });

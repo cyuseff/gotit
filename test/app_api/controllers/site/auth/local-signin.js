@@ -41,7 +41,7 @@ describe('Signin LocalStrategy', function() {
   it('Return a 400 error password length error', function(done) {
     agent
       .post(url)
-      .send('email=admin@email.com&password=12345')
+      .send('email=admin@email.com&password=12345&confirm_password=12345')
       .expect(400)
       .expect('Content-Type', /json/)
       .expect(/\d\scharacthers\slength/i, done);

@@ -4,6 +4,7 @@ var aerospike = require('./aero.js').aero
   , aero = require('./aero.js').client
   , User = require('../app_api/models/user')
   , Rol = require('../app_api/models/rol')
+  , Mongo = require('./mongoose')
   , PASSWORD = '123456'
   , NAME = 'GotIt'
   , LAST_NAME = 'Admin'
@@ -26,6 +27,7 @@ function createRoles(cb) {
       });
       rol.save(cb);
     } else {
+      console.log('Rol Found!');
       for(var i=0, l=roles.length; i<l; i++) {
         if(roles[i].name === 'superAdmin') {
           rol = roles[i];
@@ -42,7 +44,10 @@ function createAdmin(cb) {
     .findOne({fullName: NAME +' '+ LAST_NAME})
     .exec(function(err, admin) {
       if(err) console.log(err);
-      if(admin) return cb();// console.log('Admin Found!');
+      if(admin) {
+        console.log('Admin Found!');
+        return cb();
+      }
 
       // Create a new User
       var user = new User();
@@ -83,7 +88,50 @@ function createAdmin(cb) {
     });
 }
 
-createRoles(createAdmin(function() {
-  console.log('Roles and Admin created');
-  process.exit();
-}));
+function removeAllRoles(callback) {
+  var n = 0;
+  Rol.findAll(function(err, roles) {
+    if(!roles || !roles.length) {
+      console.log('No Roles found!');
+      return callback();
+    }
+    var cb = function() {
+      n++;
+      if(n === roles.length) {
+        console.log('All rol removed');
+        callback();
+      }
+    };
+    for(var i=0, l=roles.length; i<l; i++) Rol.remove(roles[i].id, cb);
+  });
+}
+
+function removeAllUsers(callback) {
+  User.remove({}, function(err, reply) {
+    if(err) return console.log(err);
+    return callback();
+  });
+}
+
+function setAdmins() {
+  createRoles(function() {
+    createAdmin(function() {
+      console.log('Roles and Admin created');
+      process.exit();
+    });
+  });
+}
+
+if(process.env.NODE_ENV === 'reset') {
+  removeAllRoles(function() {
+    removeAllUsers(function() {
+      setAdmins();
+    });
+  });
+} else {
+  setAdmins();
+}
+
+/*createRoles(createAdmin(function() {
+
+}));*/

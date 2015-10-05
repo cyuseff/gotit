@@ -118,7 +118,7 @@ describe('Logout user', function() {
     agent
       .get('/private')
       .set('x-access-token', token)
-      .expect(403)
+      .expect(404)
       .expect(/token\snot\sfound/i, done);
   });
 

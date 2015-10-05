@@ -6,6 +6,7 @@ var aerospike = require('../../config/aero').aero
   , crypto = require('crypto')
   , jwt = require('jsonwebtoken')
   , env = require('../../config/env')
+  , STATUS = require('../helpers/status-codes')
   , SECRET = env.JWT_SECRET
   , NAMESPACE = 'test'
   , TTL = -1
@@ -66,14 +67,14 @@ function _findToken(set, buff, touch, callback) {
       funcname: 'getAndTouchRecord'
     };
     aero.execute(key, udf, function(err, record) {
-      if(err.code !== status.AEROSPIKE_OK) return callback(err.message);
-      if(record === null) return callback({error: 'Token not found.', status: 404});
+      if(err.code !== status.AEROSPIKE_OK) return callback(STATUS.code(200, err.message));
+      if(record === null) return callback(STATUS.code(101));
       return callback(null, record);
     });
   } else {
     aero.get(key, function(err, record, meta) {
-      if(err.code === status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback({error: 'Token not found.', status: 404});
-      if(err.code !== status.AEROSPIKE_OK) return callback(err.message);
+      if(err.code === status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback(STATUS.code(101));
+      if(err.code !== status.AEROSPIKE_OK) return callback(STATUS.code(200, err.message));
       return callback(null, record, meta);
     });
   }
@@ -98,7 +99,7 @@ Token.findByJwt = function(jwToken, callback, touch, verifyFn) {
 
   jwt.verify(jwToken, SECRET, function(err, decoded) {
     if(err) {
-      return callback({error: 'Token is not valid.', status: 400});
+      return callback(STATUS.code(102));
     } else {
       _findToken(decoded.set, decoded.key, touch, function(err, token, meta) {
         if(err) return callback(err);
@@ -109,7 +110,7 @@ Token.findByJwt = function(jwToken, callback, touch, verifyFn) {
           if(verifyFn(token, decoded)) {
             return callback(null, token, meta);
           } else {
-            return callback({error: 'Bad token.', status: 400});
+            return callback(STATUS.code(103));
           }
         } else {
           return callback(null, token, meta);
@@ -124,8 +125,8 @@ Token.removeByJwt = function(jwToken, callback) {
     var key = generateAeroKey(decoded.set, decoded.key);
 
     aero.remove(key, function(err, key) {
-      if(err.code === aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback({error: 'Token not found', status: 404});
-      if(err.code !== aerospike.status.AEROSPIKE_OK) return callback(err.message);
+      if(err.code === aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback(STATUS.code(101));
+      if(err.code !== aerospike.status.AEROSPIKE_OK) return callback(STATUS.code(200, err.message));
       return callback(null, {message: 'Token removed'});
     });
   });
@@ -216,7 +217,7 @@ Token.prototype.save = function(callback) {
 
   function save(key) {
     aero.put(key, me, {ttl: me.ttl}, function(err, k) {
-      if(err.code !== aerospike.status.AEROSPIKE_OK) return callback(err.message, null);
+      if(err.code !== aerospike.status.AEROSPIKE_OK) return callback(STATUS.code(200), null);
       return callback(null, me.jwToken);
     });
   }

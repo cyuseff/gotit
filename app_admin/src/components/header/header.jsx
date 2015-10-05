@@ -5,6 +5,11 @@ var React = require('react')
   , Actions = require('../../actions')
   , UserHeader = require('./user-header');
 
+var menu = [
+  {name: 'Users', slug: 'users'},
+  {name: 'Roles', slug: 'roles'}
+];
+
 module.exports = React.createClass({
   mixins: [
     Reflux.listenTo(UserStore, 'onChange')
@@ -20,18 +25,22 @@ module.exports = React.createClass({
         </div>
         <div id="navbar" className="collapse navbar-collapse">
           <ul className="nav navbar-nav navbar-right">
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="about">About</Link></li>
-            <li>{this.renderUser()}</li>
+            {this.renderMenu()}
+            {this.renderUser()}
           </ul>
         </div>
       </div>
     </nav>);
   },
-  renderUser: function() {
+  renderMenu: function() {
     if(this.state.user) {
-      return (<UserHeader user={this.state.user} />);
+      return menu.map(function(item) {
+        return (<li><Link to={'admin/' + item.slug}>{item.name}</Link></li>);
+      });
     }
+  },
+  renderUser: function() {
+    if(this.state.user) return (<li><UserHeader user={this.state.user} /></li>);
   },
   onChange: function(e, err) {
     if(!err) this.setState({user: UserStore.user});

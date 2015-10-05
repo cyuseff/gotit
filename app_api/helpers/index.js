@@ -2,7 +2,8 @@
 
 var User = require('../models/user')
   , Token = require('../models/token')
-  , validator = require('validator');
+  , validator = require('validator')
+  , STATUS = require('./status-codes');
 
 function sendJsonResponse(res, status, content) {
   // console.log(content);
@@ -11,16 +12,12 @@ function sendJsonResponse(res, status, content) {
 module.exports.sendJsonResponse = sendJsonResponse;
 
 module.exports.authToken = function(req, res, next) {
-  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+  var token = req.body.token || req.query.token || req.headers['x-access-token']
+    , status;
+
   if(token) {
     Token.findByJwt(token, function(err, reply) {
-      if(err) {
-        if(err.error) {
-          return sendJsonResponse(res, 403, err);
-        } else {
-          return sendJsonResponse(res, 500, err);
-        }
-      }
+      if(err) return sendJsonResponse(res, err.status, {error: err});
       // User exist, attach it to req
       req.user = reply.data;
       // Attach the rest of the info to the req
@@ -32,7 +29,8 @@ module.exports.authToken = function(req, res, next) {
       return token.data._id === decoded.sid;
     });
   } else {
-    sendJsonResponse(res, 403, {error: 'No token provided.'});
+    status = STATUS.code(100).status;
+    sendJsonResponse(res, status.status, {error: status});
   }
 };
 
