@@ -67,14 +67,14 @@ function _findToken(set, buff, touch, callback) {
       funcname: 'getAndTouchRecord'
     };
     aero.execute(key, udf, function(err, record) {
-      if(err.code !== status.AEROSPIKE_OK) return callback(STATUS.code(200, err.message));
-      if(record === null) return callback(STATUS.code(101));
+      if(err.code !== status.AEROSPIKE_OK) return callback(STATUS.code(500, err.message));
+      if(record === null) return callback(STATUS.code(100));
       return callback(null, record);
     });
   } else {
     aero.get(key, function(err, record, meta) {
-      if(err.code === status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback(STATUS.code(101));
-      if(err.code !== status.AEROSPIKE_OK) return callback(STATUS.code(200, err.message));
+      if(err.code === status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback(STATUS.code(100));
+      if(err.code !== status.AEROSPIKE_OK) return callback(STATUS.code(500, err.message));
       return callback(null, record, meta);
     });
   }
@@ -125,8 +125,8 @@ Token.removeByJwt = function(jwToken, callback) {
     var key = generateAeroKey(decoded.set, decoded.key);
 
     aero.remove(key, function(err, key) {
-      if(err.code === aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback(STATUS.code(101));
-      if(err.code !== aerospike.status.AEROSPIKE_OK) return callback(STATUS.code(200, err.message));
+      if(err.code === aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback(STATUS.code(100));
+      if(err.code !== aerospike.status.AEROSPIKE_OK) return callback(STATUS.code(500, err.message));
       return callback(null, {message: 'Token removed'});
     });
   });
@@ -217,7 +217,7 @@ Token.prototype.save = function(callback) {
 
   function save(key) {
     aero.put(key, me, {ttl: me.ttl}, function(err, k) {
-      if(err.code !== aerospike.status.AEROSPIKE_OK) return callback(STATUS.code(200), null);
+      if(err.code !== aerospike.status.AEROSPIKE_OK) return callback(STATUS.code(500), null);
       return callback(null, me.jwToken);
     });
   }

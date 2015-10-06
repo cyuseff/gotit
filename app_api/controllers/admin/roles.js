@@ -2,11 +2,16 @@
 
 var Rol = require('../../models/rol')
   , User = require('../../models/user')
-  , hh = require('../../helpers');
+  , hh = require('../../helpers')
+  , STATUS = require('../../helpers/status-codes')
+  , code;
 
 /* TODO: this is not well implemented */
 module.exports.newRol = function(req, res) {
-  if(!req.body.name) return hh.sendJsonResponse(res, 400, {error: 'Rol name is required.'});
+  if(!req.body.name) {
+    code = STATUS.code(114);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
   var routes = req.routes;
 
@@ -16,24 +21,39 @@ module.exports.newRol = function(req, res) {
 
   rol.addRoute('*', '*', true);
   rol.save(function(err, reply) {
-    if(err) return hh.sendJsonResponse(res, 500, err);
+    if(err) {
+      code = STATUS.code(500, err);
+      return hh.sendJsonResponse(res, code.status, err);
+    }
     return hh.sendJsonResponse(res, 201, rol);
   });
 };
 
 module.exports.listRoles = function(req, res) {
   Rol.findAll(function(err, roles) {
-    if(err) return hh.sendJsonResponse(res, 500, err);
+    if(err) {
+      code = STATUS.code(500, err);
+      return hh.sendJsonResponse(res, code.status, err);
+    }
     return hh.sendJsonResponse(res, 200, {roles: roles});
   });
 };
 
 module.exports.showRol = function(req, res) {
-  if(!req.params.rolId) return hh.sendJsonResponse(res, 400, {error: 'No id supplied.'});
+  if(!req.params.rolId) {
+    code = STATUS.code(111);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
   Rol.findOneById(req.params.rolId, function(err, rol) {
-    if(err) return hh.sendJsonResponse(res, 500, err);
-    if(!rol) return hh.sendJsonResponse(res, 404, {error: 'Rol not found'});
+    if(err) {
+      code = STATUS.code(500, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
+    if(!rol) {
+      code = STATUS.code(110);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
     return hh.sendJsonResponse(res, 200, rol);
   });
 
@@ -50,16 +70,28 @@ function updateRol(rol, vars) {
   return rol;
 }
 module.exports.updateRol = function(req, res) {
-  if(!req.params.rolId) return hh.sendJsonResponse(res, 400, {error: 'No id supplied.'});
+  if(!req.params.rolId) {
+    code = STATUS.code(111);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
   Rol.findOneById(req.params.rolId, function(err, rol) {
-    if(err) return hh.sendJsonResponse(res, 500, err);
-    if(!rol) return hh.sendJsonResponse(res, 404, {error: 'Rol not found'});
+    if(err) {
+      code = STATUS.code(500, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
+    if(!rol) {
+      code = STATUS.code(110);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
 
     rol = updateRol(rol, req.body);
 
     rol.save(function(err, reply) {
-      if(err) return hh.sendJsonResponse(res, 500, err);
+      if(err) {
+        code = STATUS.code(500, err);
+        return hh.sendJsonResponse(res, code.status, err);
+      }
       return hh.sendJsonResponse(res, 200, rol);
     });
 
@@ -68,10 +100,16 @@ module.exports.updateRol = function(req, res) {
 
 module.exports.removeRol = function(req, res) {
 
-  if(!req.params.rolId) return hh.sendJsonResponse(res, 400, {error: 'No id supplied.'});
+  if(!req.params.rolId) {
+    code = STATUS.code(110);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
   Rol.remove(req.params.rolId, function(err, message) {
-    if(err) return hh.sendJsonResponse(res, 500, err);
+    if(err) {
+      code = STATUS.code(500, err);
+      return hh.sendJsonResponse(res, code.status, err);
+    }
     return hh.sendJsonResponse(res, 200, message);
   });
 };
@@ -82,17 +120,32 @@ function rolExistInUser(rol, roles) {
 }
 module.exports.assignRol = function(req, res) {
   var rol;
-  if(!req.body.userId || !req.body.scope) return hh.sendJsonResponse(res, 400, {error: 'User id and Scope are both required.'});
+  if(!req.body.userId || !req.body.scope) {
+    code = STATUS.code(112);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
   Rol.findOneById(req.params.rolId, function(err, rol) {
-    if(err) return hh.sendJsonResponse(res, 500, err);
-    if(!rol) return hh.sendJsonResponse(res, 404, {error: 'Rol not found'});
+    if(err) {
+      code = STATUS.code(500, err);
+      return hh.sendJsonResponse(res, code.status, err);
+    }
+    if(!rol) {
+      code = STATUS.code(110);
+      return hh.sendJsonResponse(res, code.status, err);
+    }
 
     User
       .findById(req.body.userId)
       .exec(function(err, user) {
-        if(err) return hh.sendJsonResponse(res, 500, err);
-        if(!user) return hh.sendJsonResponse(res, 400, {error: 'No user found'});
+        if(err) {
+          code = STATUS.code(501, err);
+          return hh.sendJsonResponse(res, code.status, err);
+        }
+        if(!user) {
+          code = STATUS.code(120);
+          return hh.sendJsonResponse(res, code.status, {error: code});
+        }
 
         rol = {id: req.params.rolId, scope: req.body.scope};
         user.admin = true;
@@ -101,16 +154,23 @@ module.exports.assignRol = function(req, res) {
             user.roles.push(rol);
 
             user.saveAndUpdate(function(err) {
-              if(err) return hh.sendJsonResponse(res, 500, err);
+              if(err) {
+                code = STATUS.code(501, err);
+                return hh.sendJsonResponse(res, code.status, {error: code});
+              }
               return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});
             });
           } else {
-            return hh.sendJsonResponse(res, 400, {message: 'User already have this rol.', user: user});
+            code = STATUS.code(113);
+            return hh.sendJsonResponse(res, code.status, {error: code});
           }
         } else {
           user.saveAndUpdate = [rol];
           user.save(function(err) {
-            if(err) return hh.sendJsonResponse(res, 500, err);
+            if(err) {
+              code = STATUS.code(501, err);
+              return hh.sendJsonResponse(res, code.status, {error: code});
+            }
             return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});
           });
         }

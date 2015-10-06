@@ -1,7 +1,8 @@
 'use strict';
 
 var Rol = require('../models/rol')
-  , hh = require('./index');
+  , hh = require('./index')
+  , STATUS = require('./status-codes');
 
 function checkRoute(route, scope, reqUrl, reqMethod, prefixUrl) {
   var url = route.url
@@ -75,18 +76,31 @@ module.exports.isAllowed = function(req, res, next) {
 
   var prefixUrl = '/api/v1/admin/'
     , ids = []
-    , allowedRoutes;
+    , allowedRoutes
+    , code;
 
   // check if user is admin
-  if(!req.user || !req.user.admin) return hh.sendJsonResponse(res, 403, {message: 'You don\'t have admin privilege!'});
+  if(!req.user || !req.user.admin) {
+    code = STATUS.code(115);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
   // check if user has roles
-  if(!req.user.roles) return hh.sendJsonResponse(res, 403, {message: 'You don\'t have roles.'});
+  if(!req.user.roles) {
+    code = STATUS.code(116);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
   // get roles ids
   for(var i=0, l=req.user.roles.length; i<l; i++) ids.push(req.user.roles[i].id);
 
   Rol.findByIds(ids, function(err, roles) {
-    if(err) return hh.sendJsonResponse(res, 500, err);
-    if(!roles.length) return hh.sendJsonResponse(res, 403, {message: 'Rol not found. You don\'t have the required privilege!.'});
+    if(err) {
+      code = STATUS.code(500, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
+    if(!roles.length) {
+      code = STATUS.code(117);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
 
     allowedRoutes = checkRoutesInRoles(roles, req.user.roles, req.originalUrl.split('?')[0], req.method, prefixUrl);
 
@@ -94,7 +108,8 @@ module.exports.isAllowed = function(req, res, next) {
       req.rol = winningRoute(allowedRoutes);
       return next();
     } else {
-      return hh.sendJsonResponse(res, 403, {message: 'You don\'t have the required privilege!.'});
+      code = STATUS.code(118);
+      return hh.sendJsonResponse(res, code.status, {error: code});
     }
 
   });

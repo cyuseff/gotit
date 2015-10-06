@@ -63,6 +63,6 @@ module.exports = Reflux.createStore({
       }.bind(this));
   },
   triggerChange: function() {
-    this.trigger('change', this.err);
+    this.trigger('change');
   }
 });

@@ -36,7 +36,8 @@ module.exports = React.createClass({
   renderError: function() {
     return (<div>{this.state.err}</div>);
   },
-  onChange: function(e, err) {
-    if(err) this.setState({err: UserStore.err});
+  onChange: function(e) {
+    console.log('aca');
+    this.setState({err: UserStore.err});
   }
 });

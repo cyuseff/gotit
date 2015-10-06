@@ -29,7 +29,7 @@ module.exports.authToken = function(req, res, next) {
       return token.data._id === decoded.sid;
     });
   } else {
-    status = STATUS.code(100).status;
+    status = STATUS.code(101).status;
     sendJsonResponse(res, status.status, {error: status});
   }
 };

@@ -2,13 +2,13 @@
   "status": {
     "GOTIT_100": {
       "code": 100,
-      "status": 403,
-      "msg": "No token provided."
+      "status": 404,
+      "msg": "Token not found or expired."
     },
     "GOTIT_101": {
       "code": 101,
-      "status": 404,
-      "msg": "Token not found."
+      "status": 403,
+      "msg": "No token provided."
     },
     "GOTIT_102": {
       "code": 102,
@@ -23,13 +23,74 @@
 
 
 
-
-
-
-    "GOTIT_200": {
-      "code": 200,
+    "GOTIT_110": {
+      "code": 110,
+      "status": 404,
+      "msg": "Rol not found."
+    },
+    "GOTIT_111": {
+      "code": 111,
       "status": 400,
+      "msg": "No rol id supplied."
+    },
+    "GOTIT_112": {
+      "code": 112,
+      "status": 400,
+      "msg": "User id and Scope are both required."
+    },
+    "GOTIT_113": {
+      "code": 113,
+      "status": 400,
+      "msg": "User already have this rol."
+    },
+    "GOTIT_114": {
+      "code": 114,
+      "status": 400,
+      "msg": "Rol name is required."
+    },
+    "GOTIT_115": {
+      "code": 115,
+      "status": 403,
+      "msg": "You don't have admin privilege!"
+    },
+    "GOTIT_116": {
+      "code": 116,
+      "status": 403,
+      "msg": "You don't have roles."
+    },
+    "GOTIT_117": {
+      "code": 117,
+      "status": 403,
+      "msg": "Rol not found. You don't have the required privilege!."
+    },
+    "GOTIT_118": {
+      "code": 118,
+      "status": 403,
+      "msg": "You don't have the required privilege!."
+    },
+
+
+
+    "GOTIT_120": {
+      "code": 120,
+      "status": 404,
+      "msg": "User not found."
+    },
+
+
+
+
+
+
+    "GOTIT_500": {
+      "code": 500,
+      "status": 500,
       "msg": "Aerospike error."
+    },
+    "GOTIT_501": {
+      "code": 501,
+      "status": 500,
+      "msg": "Mongo error."
     }
   }
 }

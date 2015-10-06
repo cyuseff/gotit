@@ -4,15 +4,6 @@ var Fetch = require('whatwg-fetch')
   , COOKIE = 'gotit-token'
   , ROOT_URL = '//localhost:5000/api/v1/';
 
-function checkStatus(res) {
-  if (res.status >= 200 && res.status < 300) {
-    return res;
-  } else {
-    console.log(res);
-    return {error: res, status: res.status};
-  }
-}
-
 function getOpts(method, data) {
   var opts = {
     method: (method || 'get'),
@@ -39,9 +30,6 @@ function parseJSON(res) {
 
 function _fetch(method, url, data) {
   return fetch(ROOT_URL + url, getOpts(method, data))
-    .then(function(res) {
-      return checkStatus(res);
-    })
     .then(function(res) {
       return parseJSON(res);
     });
