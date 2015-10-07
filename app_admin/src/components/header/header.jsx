@@ -35,7 +35,7 @@ module.exports = React.createClass({
   renderMenu: function() {
     if(this.state.user) {
       return menu.map(function(item) {
-        return (<li><Link to={'admin/' + item.slug}>{item.name}</Link></li>);
+        return (<li><Link to={'/'+item.slug}>{item.name}</Link></li>);
       });
     }
   },

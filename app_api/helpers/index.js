@@ -13,7 +13,7 @@ module.exports.sendJsonResponse = sendJsonResponse;
 
 module.exports.authToken = function(req, res, next) {
   var token = req.body.token || req.query.token || req.headers['x-access-token']
-    , status;
+    , code;
 
   if(token) {
     Token.findByJwt(token, function(err, reply) {
@@ -29,8 +29,8 @@ module.exports.authToken = function(req, res, next) {
       return token.data._id === decoded.sid;
     });
   } else {
-    status = STATUS.code(101).status;
-    sendJsonResponse(res, status.status, {error: status});
+    code = STATUS.code(101);
+    sendJsonResponse(res, code.status, {error: code});
   }
 };
 

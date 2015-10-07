@@ -3,7 +3,7 @@ var gulp = require('gulp')
   , source = require('vinyl-source-stream')
   , browserify = require('browserify')
   , watchify = require('watchify')
-  , babelify = require('babelify')
+  , reactify = require('reactify')
   , notifier = require('node-notifier')
   , server = require('gulp-server-livereload')
   , concat = require('gulp-concat')
@@ -11,8 +11,8 @@ var gulp = require('gulp')
   , watch = require('gulp-watch');
 
 var notify = function(error) {
-  var message = 'In: '
-    , title = 'Error: ';
+  var message = 'In: ';
+  var title = 'Error: ';
 
   if(error.description) {
     title += error.description;
@@ -34,9 +34,11 @@ var notify = function(error) {
 
 var bundler = watchify(browserify({
   entries: ['./app_admin/src/app.jsx'],
-  transform: [babelify],
+  transform: [reactify],
   extensions: ['.jsx'],
   debug: true,
+  cache: {},
+  packageCache: {},
   fullPaths: true
 }));
 
@@ -45,12 +47,12 @@ function bundle() {
     .bundle()
     .on('error', notify)
     .pipe(source('main.js'))
-    .pipe(gulp.dest('./app_admin/'));
+    .pipe(gulp.dest('./app_admin/'))
 }
-bundler.on('update', bundle);
+bundler.on('update', bundle)
 
 gulp.task('build', function() {
-  bundle();
+  bundle()
 });
 
 gulp.task('serve', function(done) {
@@ -60,26 +62,25 @@ gulp.task('serve', function(done) {
         enable: true,
         filter: function(filePath, cb) {
           if(/main.js/.test(filePath)) {
-            cb(true);
-          } else if(/style.css/.test(filePath)) {
-            cb(true);
+            cb(true)
+          } else if(/style.css/.test(filePath)){
+            cb(true)
           }
         }
       },
-      open: true,
-      defaultFile: '/index.html'
+      open: true
     }));
 });
 
-gulp.task('sass', function() {
+gulp.task('sass', function () {
   gulp.src('./app_admin/sass/**/*.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(concat('style.css'))
     .pipe(gulp.dest('./app_admin/'));
 });
 
-gulp.task('watch', function() {
+gulp.task('default', ['build', 'serve', 'sass', 'watch']);
+
+gulp.task('watch', function () {
   gulp.watch('./app_admin/sass/**/*.scss', ['sass']);
 });
-
-gulp.task('default', ['build', 'serve', 'sass', 'watch']);

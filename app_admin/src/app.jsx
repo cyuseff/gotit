@@ -1,22 +1,19 @@
-var React = require('react')
-  , ReactRouter = require('react-router')
-  , HashHistory = require('react-router/lib/hashhistory')
-  , Router = ReactRouter.Router
-  , Route = ReactRouter.Route
-  , Redirect = ReactRouter.Redirect
-  , Main = require('./components/main')
-  , Roles = require('./components/roles/index')
-  , RolesShow = require('./components/roles/show');
+import React from 'react'
+import { createHistory, useBasename } from 'history'
+import { Router, Route } from 'react-router'
+import Main from './components/main'
 
-var routes = (
-  <Router history={new HashHistory}>
-    <Redirect from="/" to="/admin" />
-    <Route path="/admin" component={Main}>
-      <Route path="roles" component={Roles}>
-        <Route path=":rolId" component={RolesShow} />
-      </Route>
-    </Route>
-  </Router>
-);
+let history = useBasename(createHistory)({
+  basename: '/'
+})
 
-React.render(routes, document.body);
+let rootRoute = {
+  path: '/',
+  component: Main,
+  childRoutes: [
+    require('./routes/roles'),
+    require('./routes/users')
+  ]
+}
+
+React.render(<Router routes={rootRoute} />, document.body)

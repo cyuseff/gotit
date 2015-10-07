@@ -3,7 +3,16 @@
 var router = require('express').Router()
   , hh = require('../helpers')
   , rh = require('../helpers/roles')
+  , userCtrl = require('../controllers/admin/users')
   , rolCtrl = require('../controllers/admin/roles');
+
+// Users
+router.route('/users')
+  .all(hh.authToken, rh.isAllowed)
+  .get(userCtrl.listUsers);
+router.route('/users/:userId')
+  .all(hh.authToken, rh.isAllowed)
+  .get(userCtrl.showUsers);
 
 // Roles
 router.route('/roles')

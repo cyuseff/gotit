@@ -1,31 +1,32 @@
 var React = require('react')
-  , Api = require('../../utils/api')
+  , Api = require('../../../utils/api')
   , Link = require('react-router').Link;
 
 module.exports = React.createClass({
   getInitialState: function() {
-    return {roles: []};
+    return {users: []};
   },
   componentDidMount: function() {
-    Api.get('admin/roles')
+    Api.get('admin/users')
       .then(function(res) {
         console.log(res);
-        this.setState({roles: res.roles});
+        this.setState({users: res.users});
       }.bind(this));
   },
   render: function() {
+    if(this.props.children) return this.props.children;
     return (<div>
-      <h2>Rol List</h2>
+      <h2>Users List</h2>
       <ul className="list-unstyled">
         {this.renderList()}
       </ul>
     </div>);
   },
   renderList: function() {
-    return this.state.roles.map(function(rol) {
+    return this.state.users.map(function(user) {
       return (<li>
-        <Link to={'/admin/roles/' + rol.id}><h4>{rol.name}</h4></Link>
-        <small>{rol.id}</small>
+        <Link to={'/users/' + user._id}><h4>{user.fullName}</h4></Link>
+        <small>{user._id}</small>
       </li>);
     });
   }

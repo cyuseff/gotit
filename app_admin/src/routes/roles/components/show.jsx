@@ -1,5 +1,5 @@
 var React = require('react')
-  , Api = require('../../utils/api');
+  , Api = require('../../../utils/api');
 
 module.exports = React.createClass({
   getInitialState: function() {
