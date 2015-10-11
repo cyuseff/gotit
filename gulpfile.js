@@ -28,7 +28,7 @@ var notify = function(error) {
   if(error.lineNumber) {
     message += '\nOn Line: ' + error.lineNumber;
   }
-
+  console.log({title: title, message: message});
   notifier.notify({title: title, message: message});
 };
 

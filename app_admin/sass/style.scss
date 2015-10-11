@@ -1,6 +1,10 @@
 @import "./vars";
 @import "./utils";
 
+body {
+  font-family: $font-family;
+}
+
 .content {
   margin-top: 50px;
 }

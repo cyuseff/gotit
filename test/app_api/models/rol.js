@@ -64,7 +64,7 @@ describe('Rol Model', function() {
     Rol.findAll(function(err, roles) {
       allRoles = roles;
       should.not.exist(err);
-      roles.length.should.be.above(2);
+      roles.length.should.be.aboveOrEqual(2);
       done();
     });
   });
