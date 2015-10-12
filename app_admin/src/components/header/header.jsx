@@ -17,6 +17,9 @@ module.exports = React.createClass({
   getInitialState: function() {
     return {user: null};
   },
+  componentDidMount: function() {
+    this.setState({user: UserStore.user});
+  },
   render: function() {
     return (<nav className="navbar navbar-inverse navbar-fixed-top">
       <div className="container">
@@ -42,7 +45,8 @@ module.exports = React.createClass({
   renderUser: function() {
     if(this.state.user) return (<li><UserHeader user={this.state.user} /></li>);
   },
-  onChange: function(e, err) {
-    if(!err) this.setState({user: UserStore.user});
+  onChange: function() {
+    console.log( 'onChange', UserStore.user )
+    this.setState({user: UserStore.user});
   }
 });

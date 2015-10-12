@@ -9,14 +9,16 @@ module.exports = React.createClass({
   componentDidMount: function() {
     Api.get('admin/roles')
       .then(function(res) {
-        console.log(res);
         this.setState({roles: res.roles});
       }.bind(this));
   },
   render: function() {
     if(this.props.children) return this.props.children;
     return (<div>
-      <h2>Rol List</h2>
+      <div className="margin-b">
+        <Link to="/roles/new" className="pull-right btn btn-primary">New</Link>
+        <h2>Rol List</h2>
+      </div>
       <ul className="list-unstyled">
         {this.renderList()}
       </ul>

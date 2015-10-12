@@ -14,6 +14,7 @@ React.render((
     <Route path="/" component={require('./components/main')}>
       <Route path="roles">
         <IndexRoute component={require('./views/roles/list')}/>
+        <Route path="new" component={require('./views/roles/new')} />
         <Route path=":rolId" component={require('./views/roles/show')} />
       </Route>
       <Route path="users">

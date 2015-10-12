@@ -9,7 +9,6 @@ module.exports = React.createClass({
   componentDidMount: function() {
     Api.get('admin/users')
       .then(function(res) {
-        console.log(res);
         this.setState({users: res.users});
       }.bind(this));
   },

@@ -6,24 +6,25 @@ var Rol = require('../../models/rol')
   , STATUS = require('../../helpers/status-codes')
   , code;
 
-/* TODO: this is not well implemented */
 module.exports.newRol = function(req, res) {
-  if(!req.body.name) {
+  if(!req.body.name || !req.body.accessLevel || !req.body.routes.length) {
     code = STATUS.code(114);
     return hh.sendJsonResponse(res, code.status, {error: code});
   }
 
-  var routes = req.routes;
-
   var rol = new Rol({
-    name: 'superadmin'
+    name: req.body.name,
+    accessLevel: req.body.accessLevel
   });
 
-  rol.addRoute('*', '*', true);
+  req.body.routes.map(function(route) {
+    rol.addRoute(route.url, route.methods, route.recursive, route.accessLevel);
+  });
+
   rol.save(function(err, reply) {
     if(err) {
       code = STATUS.code(500, err);
-      return hh.sendJsonResponse(res, code.status, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
     }
     return hh.sendJsonResponse(res, 201, rol);
   });
@@ -90,7 +91,7 @@ module.exports.updateRol = function(req, res) {
     rol.save(function(err, reply) {
       if(err) {
         code = STATUS.code(500, err);
-        return hh.sendJsonResponse(res, code.status, err);
+        return hh.sendJsonResponse(res, code.status, {error: code});
       }
       return hh.sendJsonResponse(res, 200, rol);
     });
@@ -108,7 +109,7 @@ module.exports.removeRol = function(req, res) {
   Rol.remove(req.params.rolId, function(err, message) {
     if(err) {
       code = STATUS.code(500, err);
-      return hh.sendJsonResponse(res, code.status, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
     }
     return hh.sendJsonResponse(res, 200, message);
   });
