@@ -27,7 +27,8 @@ module.exports = React.createClass({
       <h2>New Rol</h2>
       <div className="row">
         <div className="col-md-8">
-          <Form routes={this.state.routes} />
+          <Form routes={this.state.routes}
+            removeRoute={this.removeRoute} />
         </div>
 
         <div className="col-md-4">

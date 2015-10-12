@@ -70,7 +70,7 @@ module.exports = React.createClass({
     var me = this;
     return this.props.routes.map(function(route, idx) {
       return (<li>
-        <a onClick={me.removeRoute} rel={idx} className="pull-right">Borrar</a>
+        <a onClick={me.props.removeRoute} rel={idx} className="pull-right">Borrar</a>
         <h4>{route.url}</h4>
         <ul>
           <li>Methods: {route.methods}</li>

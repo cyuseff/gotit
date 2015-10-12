@@ -48,7 +48,8 @@ module.exports = React.createClass({
             id={this.props.params.rolId}
             name={this.state.name}
             accessLevel={this.state.accessLevel}
-            routes={this.state.routes} />
+            routes={this.state.routes}
+            removeRoute={this.removeRoute} />
         </div>
 
         <div className="col-md-4">
