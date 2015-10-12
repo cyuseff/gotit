@@ -1,5 +1,6 @@
 var React = require('react')
-  , Api = require('../../utils/api');
+  , Api = require('../../utils/api')
+  , Link = require('react-router').Link;
 
 module.exports = React.createClass({
   getInitialState: function() {
@@ -11,11 +12,36 @@ module.exports = React.createClass({
         this.setState({rol: rol});
       }.bind(this));
   },
+  handleClick: function(e) {
+    e.preventDefault();
+    if(confirm('Sure?')) {
+      Api.del('admin/roles/' + this.props.params.rolId)
+        .then(function(res) {
+          console.log(res);
+          window.location.href = '/#/roles';
+        });
+    }
+  },
   render: function() {
     return (<div>
-      <h3>{this.state.rol.name}</h3>
-      <small>{this.state.rol.id} -  {this.state.rol.accessLevel}</small>
-      <ul>
+      <div className="pull-right">
+        <Link to={'/roles/edit/' +  this.props.params.rolId} className="btn btn-default">
+          <i className="fa fa-edit"></i> Edit
+        </Link>
+        <button onClick={this.handleClick} className="btn btn-danger">
+          <i className="fa fa-trash"></i> Delete
+        </button>
+      </div>
+
+      <div className="margin-b-md">
+        <h3>{this.state.rol.name}</h3>
+        <small>{this.state.rol.id}</small>
+
+        <div>AccesLevel: {this.state.rol.accessLevel}</div>
+      </div>
+
+      <h5><strong>Routes:</strong></h5>
+      <ul className="list-unstyled">
         {this.renderRoutes()}
       </ul>
     </div>);
@@ -27,6 +53,7 @@ module.exports = React.createClass({
         <div>url: {route.url}</div>
         <div>methods: {route.methods}</div>
         <div>recursive: {route.recursive}</div>
+        <div>accessLevel: {route.accessLevel}</div>
       </li>);
     });
   }

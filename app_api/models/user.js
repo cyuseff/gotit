@@ -113,6 +113,7 @@ userSchema.methods.getPublicUser = function() {
     isAdmin: this.admin,
     active: this.active,
     createdAt: this.createdAt,
+    roles: this.roles,
 
     // user properties
     fullName: this.fullName

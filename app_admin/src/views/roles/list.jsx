@@ -16,7 +16,9 @@ module.exports = React.createClass({
     if(this.props.children) return this.props.children;
     return (<div>
       <div className="margin-b">
-        <Link to="/roles/new" className="pull-right btn btn-primary">New</Link>
+        <Link to="/roles/new" className="pull-right btn btn-primary">
+          <i className="fa fa-plus-circle"></i> New
+        </Link>
         <h2>Rol List</h2>
       </div>
       <ul className="list-unstyled">

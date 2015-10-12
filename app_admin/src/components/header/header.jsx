@@ -15,10 +15,7 @@ module.exports = React.createClass({
     Reflux.listenTo(UserStore, 'onChange')
   ],
   getInitialState: function() {
-    return {user: null};
-  },
-  componentDidMount: function() {
-    this.setState({user: UserStore.user});
+    return {user: UserStore.user};
   },
   render: function() {
     return (<nav className="navbar navbar-inverse navbar-fixed-top">

@@ -46,7 +46,6 @@ module.exports = Reflux.createStore({
   getProfile: function() {
     Api.get('auth')
       .then(function(res) {
-        //if(res.error) return;
         this.token = res.token;
         this.user = res.user;
         this.triggerChange();

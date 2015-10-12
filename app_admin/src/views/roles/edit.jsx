@@ -1,10 +1,26 @@
 var React = require('react')
   , Form = require('./_form')
-  , Routes = require('./_routes');
+  , Routes = require('./_routes')
+  , Api = require('../../utils/api');
 
 module.exports = React.createClass({
   getInitialState: function() {
-    return {routes: []};
+    return {
+      name: '',
+      accessLevel: null,
+      routes: []
+    };
+  },
+
+  componentDidMount: function() {
+    Api.get('admin/roles/' +  this.props.params.rolId)
+      .then(function(rol) {
+        this.setState({
+          name: rol.name,
+          accessLevel: rol.accessLevel,
+          routes: rol.routes
+        });
+      }.bind(this));
   },
 
   addRoute: function(route) {
@@ -24,10 +40,15 @@ module.exports = React.createClass({
 
   render: function() {
     return (<div>
-      <h2>New Rol</h2>
+      <h2>Edit Rol</h2>
       <div className="row">
         <div className="col-md-8">
-          <Form routes={this.state.routes} />
+          <Form
+            action="PUT"
+            id={this.props.params.rolId}
+            name={this.state.name}
+            accessLevel={this.state.accessLevel}
+            routes={this.state.routes} />
         </div>
 
         <div className="col-md-4">

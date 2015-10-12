@@ -60,19 +60,20 @@ module.exports.showRol = function(req, res) {
 
 };
 
-/*
-  This method can be improved using for in + hasOwnProperty
-*/
 function updateRol(rol, vars) {
-  rol.name = vars.name || rol.name;
-  rol.scope = vars.scope || rol.scope;
-  rol.accessLevel = vars.accessLevel || rol.accessLevel;
-  rol.routes = vars.routes || rol.routes;
+  rol.name = vars.name;
+  rol.accessLevel = vars.accessLevel;
+  rol.routes = vars.routes;
   return rol;
 }
 module.exports.updateRol = function(req, res) {
   if(!req.params.rolId) {
     code = STATUS.code(111);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
+
+  if(!req.body.name || !req.body.accessLevel || !req.body.routes.length) {
+    code = STATUS.code(114);
     return hh.sendJsonResponse(res, code.status, {error: code});
   }
 
