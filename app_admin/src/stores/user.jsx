@@ -14,7 +14,8 @@ function removeCookie() {
 
 module.exports = Reflux.createStore({
   listenables: [Actions],
-  signInUser: function(data) {
+  // Local
+  signIn: function(data) {
     Api.post('auth/local', data)
       .then(function(res) {
         this.err = res.error;
@@ -24,17 +25,8 @@ module.exports = Reflux.createStore({
         this.triggerChange();
       }.bind(this));
   },
-  logInUser: function(data) {
-    Api.post('auth/local', data)
-      .then(function(res) {
-        this.err = res.error;
-        this.token = res.token;
-        this.user = res.user;
-        setCookie(this.token);
-        this.triggerChange();
-      }.bind(this));
-  },
-  logOutUser: function() {
+
+  signOut: function() {
     Api.get('auth/logout')
       .then(function(res) {
         if(res.error) return;
@@ -43,15 +35,9 @@ module.exports = Reflux.createStore({
         this.triggerChange();
       }.bind(this));
   },
-  getProfile: function() {
-    Api.get('auth')
-      .then(function(res) {
-        this.token = res.token;
-        this.user = res.user;
-        this.triggerChange();
-      }.bind(this));
-  },
-  logInFacebook: function(id, token) {
+
+  // Socials
+  signInFacebook: function(id, token) {
     Api.post('auth/facebook', {id: id, token: token})
       .then(function(res) {
         if(res.error) return;
@@ -61,6 +47,16 @@ module.exports = Reflux.createStore({
         this.triggerChange();
       }.bind(this));
   },
+
+  getProfile: function() {
+    Api.get('auth')
+      .then(function(res) {
+        this.token = res.token;
+        this.user = res.user;
+        this.triggerChange();
+      }.bind(this));
+  },
+
   triggerChange: function() {
     this.trigger('change');
   }

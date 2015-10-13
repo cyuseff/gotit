@@ -10,6 +10,14 @@ var menu = [
   {name: 'Roles', slug: 'roles'}
 ];
 
+var MenuItem = React.createClass({
+  render: function() {
+    return (<li>
+      <Link to={'/'+this.props.item.slug}>{this.props.item.name}</Link>
+    </li>);
+  }
+});
+
 module.exports = React.createClass({
   mixins: [
     Reflux.listenTo(UserStore, 'onChange')
@@ -35,7 +43,7 @@ module.exports = React.createClass({
   renderMenu: function() {
     if(this.state.user) {
       return menu.map(function(item) {
-        return (<li><Link to={'/'+item.slug}>{item.name}</Link></li>);
+        return <MenuItem key={item.slug} item={item} />;
       });
     }
   },
@@ -43,7 +51,6 @@ module.exports = React.createClass({
     if(this.state.user) return (<li><UserHeader user={this.state.user} /></li>);
   },
   onChange: function() {
-    console.log( 'onChange', UserStore.user )
     this.setState({user: UserStore.user});
   }
 });

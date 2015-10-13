@@ -28,7 +28,7 @@ module.exports = React.createClass({
   },
   renderList: function() {
     return this.state.roles.map(function(rol) {
-      return (<li>
+      return (<li key={rol.id}>
         <Link to={'/roles/' + rol.id}><h4>{rol.name}</h4></Link>
         <small>{rol.id}</small>
       </li>);

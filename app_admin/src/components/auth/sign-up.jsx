@@ -20,7 +20,7 @@ module.exports = React.createClass({
       , confirm_password = React.findDOMNode(this.refs.confirm_password).value;
 
     if(!first_name || !last_name || !email || !password || !confirm_password) return;
-    Actions.signInUser({
+    Actions.signIn({
       first_name: first_name,
       last_name: last_name,
       email: email,

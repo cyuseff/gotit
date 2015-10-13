@@ -14,6 +14,6 @@ module.exports = React.createClass({
   },
   handleClick: function(e) {
     e.preventDefault();
-    Actions.logOutUser();
+    Actions.signOut();
   }
 });

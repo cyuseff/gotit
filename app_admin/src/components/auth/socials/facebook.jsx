@@ -60,7 +60,7 @@ module.exports = React.createClass({
           me.setState({err: true});
           return;
         }
-        Actions.logInFacebook(me.uid, me.token);
+        Actions.signInFacebook(me.uid, me.token);
       });
     }, this.state.err);
   },

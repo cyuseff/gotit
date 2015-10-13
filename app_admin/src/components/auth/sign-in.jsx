@@ -17,7 +17,7 @@ module.exports = React.createClass({
       , password = React.findDOMNode(this.refs.password).value;
 
     if(!email || !password) return;
-    Actions.logInUser({email: email, password: password});
+    Actions.signIn({email: email, password: password});
   },
   render: function() {
     return (<div>
