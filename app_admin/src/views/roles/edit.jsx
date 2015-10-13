@@ -1,62 +1,65 @@
 var React = require('react')
+  , Reflux = require('reflux')
+  , RolesStore = require('../../stores/roles')
+  , Actions = require('../../actions')
   , Form = require('./_form')
   , Routes = require('./_routes')
-  , Api = require('../../utils/api');
+  , Loading = require('../../components/loading');
 
 module.exports = React.createClass({
+  mixins: [
+    Reflux.listenTo(RolesStore, 'onChange')
+  ],
   getInitialState: function() {
-    return {
-      name: '',
-      accessLevel: null,
-      routes: []
-    };
+    return {rol: null};
   },
-
   componentDidMount: function() {
-    Api.get('admin/roles/' +  this.props.params.rolId)
-      .then(function(rol) {
-        this.setState({
-          name: rol.name,
-          accessLevel: rol.accessLevel,
-          routes: rol.routes
-        });
-      }.bind(this));
+    Actions.getRol(this.props.params.rolId);
+  },
+  onChange: function() {
+    this.setState({rol: RolesStore.rol});
   },
 
   addRoute: function(route) {
-    var routes = this.state.routes;
-    routes.push(route);
-    this.setState({routes: routes});
+    var rol = this.state.rol;
+    rol.routes.push(route);
+    this.setState({rol: rol});
   },
 
   removeRoute: function(e) {
     e.preventDefault();
     var id = parseInt(e.target.rel)
-      , routes = this.state.routes;
+      , rol = this.state.rol;
 
-    routes.splice(id, 1);
-    this.setState({routes: routes});
+    rol.routes.splice(id, 1);
+    this.setState({rol: rol});
   },
 
   render: function() {
     return (<div>
       <h2>Edit Rol</h2>
-      <div className="row">
+      {this.renderForm()}
+    </div>);
+  },
+
+  renderForm: function() {
+    if(this.state.rol) {
+      return (<div className="row">
         <div className="col-md-8">
           <Form
             action="PUT"
-            id={this.props.params.rolId}
-            name={this.state.name}
-            accessLevel={this.state.accessLevel}
-            routes={this.state.routes}
-            removeRoute={this.removeRoute} />
+            {...this.state.rol}
+            removeRoute={this.removeRoute}
+            saveTeaxt="Save"/>
         </div>
 
         <div className="col-md-4">
           <Routes addRoute={this.addRoute} />
         </div>
-      </div>
-    </div>);
+      </div>);
+    } else {
+      return <Loading />;
+    }
   }
 
 });

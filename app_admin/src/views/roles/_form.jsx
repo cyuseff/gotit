@@ -3,7 +3,10 @@ var React = require('react')
 
 module.exports = React.createClass({
   getInitialState: function() {
-    return {name: ''};
+    return {
+      name: this.props.name,
+      accessLevel: this.props.accessLevel
+    };
   },
 
   handleSubmit: function(e) {
@@ -37,58 +40,58 @@ module.exports = React.createClass({
     this.setState({name: e.target.value});
   },
 
+  handleSelectChange: function(e) {
+    this.setState({accessLevel: e.target.value});
+  },
+
   render: function() {
-    return (
-      <form onSubmit={this.handleSubmit}>
-        <div className="form-group">
-          <input
-            value={this.state.name || this.props.name}
-            onChange={this.handleTextChange}
-            type="text"
-            ref="rolName"
-            className="form-control"
-            placeholder="Nombre" />
-        </div>
+    return (<form onSubmit={this.handleSubmit}>
+      <div className="form-group">
+        <input
+          value={this.state.name}
+          onChange={this.handleTextChange}
+          type="text"
+          ref="rolName"
+          className="form-control"
+          placeholder="Nombre" />
+      </div>
 
-        <div className="form-group">
-          <label>Access Level</label>
-          <select ref="accessLevel" className="form-control">
-            {this.renderAccessLevel()}
-          </select>
-        </div>
+      <div className="form-group">
+        <label>Access Level</label>
+        <select ref="accessLevel" onChange={this.handleSelectChange} value={this.state.accessLevel} className="form-control">
+          {this.renderAccessLevel()}
+        </select>
+      </div>
 
-        <hr />
-        <h3>Routes</h3>
-        {this.renderRoutes()}
+      <hr />
+      <h3>Routes</h3>
+      {this.renderRoutes()}
 
-        <button className="btn btn-primary">Create</button>
-      </form>
-    );
+      <button className="btn btn-primary">{this.props.saveTeaxt || 'Create'}</button>
+    </form>);
   },
 
   renderRoutes: function() {
     var me = this;
-    return this.props.routes.map(function(route, idx) {
-      return (<li>
-        <a onClick={me.props.removeRoute} rel={idx} className="pull-right">Borrar</a>
-        <h4>{route.url}</h4>
-        <ul>
-          <li>Methods: {route.methods}</li>
-          <li>Recursive: {route.recursive}</li>
-          <li>AccessLevel: {route.accessLevel}</li>
-        </ul>
-      </li>);
-    });
+    if(this.props.routes) {
+      return this.props.routes.map(function(route, idx) {
+        return (<li key={idx}>
+          <a onClick={me.props.removeRoute} rel={idx} className="pull-right">Borrar</a>
+          <h4>{route.url}</h4>
+          <ul>
+            <li>Methods: {route.methods}</li>
+            <li>Recursive: {route.recursive}</li>
+            <li>AccessLevel: {route.accessLevel}</li>
+          </ul>
+        </li>);
+      });
+    }
   },
 
   renderAccessLevel: function() {
     var lvls = [];
     for(var i=1; i<10; i++) {
-      if(this.props.accessLevel === i.toString()) {
-        lvls.push(<option selected="selected" value={i}>{i}</option>);
-      } else {
-        lvls.push(<option value={i}>{i}</option>);
-      }
+      lvls.push(<option value={i}>{i}</option>);
     }
     return lvls;
   }

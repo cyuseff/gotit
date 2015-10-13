@@ -1,16 +1,22 @@
 var React = require('react')
-  , Api = require('../../utils/api')
-  , Link = require('react-router').Link;
+  , Reflux = require('reflux')
+  , RolesStore = require('../../stores/roles')
+  , Actions = require('../../actions')
+  , Link = require('react-router').Link
+  , Loading = require('../../components/loading');
 
 module.exports = React.createClass({
+  mixins: [
+    Reflux.listenTo(RolesStore, 'onChange')
+  ],
   getInitialState: function() {
-    return {roles: []};
+    return {roles: null};
   },
   componentDidMount: function() {
-    Api.get('admin/roles')
-      .then(function(res) {
-        this.setState({roles: res.roles});
-      }.bind(this));
+    Actions.getRoles();
+  },
+  onChange: function() {
+    this.setState({roles: RolesStore.roles});
   },
   render: function() {
     if(this.props.children) return this.props.children;
@@ -27,11 +33,15 @@ module.exports = React.createClass({
     </div>);
   },
   renderList: function() {
-    return this.state.roles.map(function(rol) {
-      return (<li key={rol.id}>
-        <Link to={'/roles/' + rol.id}><h4>{rol.name}</h4></Link>
-        <small>{rol.id}</small>
-      </li>);
-    });
+    if(this.state.roles) {
+      return this.state.roles.map(function(rol) {
+        return (<li key={rol.id}>
+          <Link to={'/roles/' + rol.id}><h4>{rol.name}</h4></Link>
+          <small>{rol.id}</small>
+        </li>);
+      });
+    } else {
+      return <Loading />;
+    }
   }
 });
