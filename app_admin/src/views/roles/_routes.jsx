@@ -1,15 +1,16 @@
-var React = require('react');
+var React = require('react')
+  , ReactDom = require('react-dom');
 
 function getRoute(refs) {
-  var url = React.findDOMNode(refs.url)
-    , methodAll = React.findDOMNode(refs.methodAll)
-    , methodGet = React.findDOMNode(refs.methodGet)
-    , methodPost = React.findDOMNode(refs.methodPost)
-    , methodPut = React.findDOMNode(refs.methodPut)
-    , methodDelete = React.findDOMNode(refs.methodDelete)
+  var url = ReactDom.findDOMNode(refs.url)
+    , methodAll = ReactDom.findDOMNode(refs.methodAll)
+    , methodGet = ReactDom.findDOMNode(refs.methodGet)
+    , methodPost = ReactDom.findDOMNode(refs.methodPost)
+    , methodPut = ReactDom.findDOMNode(refs.methodPut)
+    , methodDelete = ReactDom.findDOMNode(refs.methodDelete)
     , methods = []
-    , recursive = React.findDOMNode(refs.recursive)
-    , accessLevel = React.findDOMNode(refs.routeAccessLevel)
+    , recursive = ReactDom.findDOMNode(refs.recursive)
+    , accessLevel = ReactDom.findDOMNode(refs.routeAccessLevel)
     , route;
 
   if(methodAll.checked) methods.push(methodAll.value);
@@ -18,10 +19,10 @@ function getRoute(refs) {
   if(!methodPut.disabled && methodPut.checked) methods.push(methodPut.value);
   if(!methodDelete.disabled && methodDelete.checked) methods.push(methodDelete.value);
 
-  if(!url.value || !methods.length) return null;
+  if(!url.value.trim() || !methods.length) return null;
 
   route =  {
-    url: url.value,
+    url: url.value.trim(),
     methods: methods.toString(),
     recursive: recursive.checked? 1 : 0,
     accessLevel: accessLevel.value
@@ -38,10 +39,10 @@ function getRoute(refs) {
 module.exports = React.createClass({
   allChecked: function(e) {
     var methods = [
-      React.findDOMNode(this.refs.methodGet),
-      React.findDOMNode(this.refs.methodPost),
-      React.findDOMNode(this.refs.methodPut),
-      React.findDOMNode(this.refs.methodDelete)
+      ReactDom.findDOMNode(this.refs.methodGet),
+      ReactDom.findDOMNode(this.refs.methodPost),
+      ReactDom.findDOMNode(this.refs.methodPut),
+      ReactDom.findDOMNode(this.refs.methodDelete)
     ]
     , disabled = e.target.checked? 'disabled' : false;
 

@@ -12,6 +12,10 @@ function removeCookie() {
   Cookies.expire(COOKIE);
 }
 
+function getCookie() {
+  return Cookies.get(COOKIE);
+}
+
 module.exports = Reflux.createStore({
   listenables: [Actions],
 
@@ -33,6 +37,7 @@ module.exports = Reflux.createStore({
         this.token = this.user = null;
         removeCookie();
         this.triggerChange();
+        window.location.href = '/#';
       }.bind(this));
   },
 
@@ -49,8 +54,14 @@ module.exports = Reflux.createStore({
   },
 
   getProfile: function() {
+    if(!getCookie()) {
+      this.token = this.user = null;
+      this.triggerChange();
+      return;
+    }
     Api.get('auth')
       .then(function(res) {
+        if(res.error && res.error.code === 100) removeCookie();
         this.token = res.token;
         this.user = res.user;
         this.triggerChange();
@@ -60,6 +71,7 @@ module.exports = Reflux.createStore({
   expireUser: function() {
     if(this.token) {
       console.log('expireUser');
+      removeCookie();
       this.token = this.user = null;
       this.triggerChange();
     }

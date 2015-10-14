@@ -127,7 +127,7 @@ Token.removeByJwt = function(jwToken, callback) {
     aero.remove(key, function(err, key) {
       if(err.code === aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback(STATUS.code(100));
       if(err.code !== aerospike.status.AEROSPIKE_OK) return callback(STATUS.code(500, err.message));
-      return callback(null, {message: 'Token removed'});
+      return callback(null, 1);
     });
   });
 };

@@ -10,12 +10,13 @@ module.exports = React.createClass({
   getInitialState: function() {
     return {
       err: FlashStore.err,
-      msg: FlashStore.msg
+      msg: FlashStore.msg,
+      rand: 0
     };
   },
   render: function() {
     if(this.state.msg || this.state.err) {
-      return (<div key={this.state.msg || this.state.err} className="flash-holder">
+      return (<div key={this.state.rand || this.state.err} className="flash-holder">
         <div className={this.state.err? 'flash-content flash-error' : 'flash-content'}>
           {this.state.msg || this.state.err}
         </div>
@@ -28,8 +29,9 @@ module.exports = React.createClass({
     if(FlashStore.err || FlashStore.msg) {
       this.setState({
         err: FlashStore.err,
-        msg: FlashStore.msg
-      });  
+        msg: FlashStore.msg,
+        rand: Math.random() * 100000
+      });
     }
   }
 });

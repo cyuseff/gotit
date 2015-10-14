@@ -13,21 +13,33 @@ var SET = 'users'
 function localSignin(req, res, email, password, confirmPassword) {
 
   // Check password and confirmation
-  if(password !== confirmPassword) return hh.sendJsonResponse(res, 400, {error: 'Passwords don\'t match'});
+  if(password !== confirmPassword) {
+    code = STATUS.code(123);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
   User
     .findOne({'local.email': email })
     // .findOne({ emails:{ $in: [email] } })
     .exec(function(err, usr) {
 
-      if(err) return hh.sendJsonResponse(res, 500, err);
-      if(usr) return hh.sendJsonResponse(res, 409, { error: 'User already exits.' });
+      if(err) {
+        code = STATUS.code(501, err);
+        return hh.sendJsonResponse(res, code.status, {error: code});
+      }
+      if(usr) {
+        code = STATUS.code(122, err);
+        return hh.sendJsonResponse(res, code.status, {error: code});
+      }
 
       // Create a new User
       var user = new User();
       user.generateHash(password, function(err, hash) {
 
-        if(err) return hh.sendJsonResponse(res, 500, err);
+        if(err) {
+          code = STATUS.code(501, err);
+          return hh.sendJsonResponse(res, code.status, {error: code});
+        }
 
         // Push to users emails array
         user.emails.push(email);
@@ -43,7 +55,10 @@ function localSignin(req, res, email, password, confirmPassword) {
 
         // save user before serialize into his token
         user.save(function(err) {
-          if(err) return hh.sendJsonResponse(res, 500, err);
+          if(err) {
+            code = STATUS.code(501, err);
+            return hh.sendJsonResponse(res, code.status, {error: code});
+          }
 
           // create session token
           var token = new Token({
@@ -55,7 +70,7 @@ function localSignin(req, res, email, password, confirmPassword) {
           token.save(function(err, jwToken) {
             // The user was created so send it back anyway even if token creation or aerospike fails
             if(err) console.log(err);
-            return hh.sendJsonResponse(res, 201, {user: user.getPublicUser(), token: jwToken});
+            return hh.sendJsonResponse(res, 201, {message: 'User created', user: user.getPublicUser(), token: jwToken});
           });
 
         });

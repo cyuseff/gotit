@@ -3,7 +3,7 @@
     "GOTIT_100": {
       "code": 100,
       "status": 404,
-      "msg": "Token not found or expired"
+      "msg": "Token expired"
     },
     "GOTIT_101": {
       "code": 101,
@@ -80,6 +80,16 @@
       "code": 121,
       "status": 404,
       "msg": "User id not supplied"
+    },
+    "GOTIT_122": {
+      "code": 122,
+      "status": 409,
+      "msg": "This email is already in use"
+    },
+    "GOTIT_123": {
+      "code": 123,
+      "status": 400,
+      "msg": "Passwords don't match"
     },
 
 
