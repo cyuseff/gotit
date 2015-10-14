@@ -24,13 +24,11 @@ module.exports = React.createClass({
     if(this.props.action === 'PUT') {
       Api.put('admin/roles/' + this.props.id, rol)
         .then(function(res) {
-          console.log(res);
           window.location.href = '/#/roles';
         });
     } else {
       Api.post('admin/roles', rol)
         .then(function(res) {
-          console.log(res);
           window.location.href = '/#/roles';
         });
     }
@@ -75,7 +73,7 @@ module.exports = React.createClass({
     var me = this;
     if(this.props.routes) {
       return this.props.routes.map(function(route, idx) {
-        return (<li key={idx}>
+        return (<li key={'route-'+idx}>
           <a onClick={me.props.removeRoute} rel={idx} className="pull-right">Borrar</a>
           <h4>{route.url}</h4>
           <ul>

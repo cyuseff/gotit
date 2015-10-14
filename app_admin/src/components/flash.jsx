@@ -15,7 +15,7 @@ module.exports = React.createClass({
   },
   render: function() {
     if(this.state.msg || this.state.err) {
-      return (<div className="flash-holder">
+      return (<div key={this.state.msg || this.state.err} className="flash-holder">
         <div className={this.state.err? 'flash-content flash-error' : 'flash-content'}>
           {this.state.msg || this.state.err}
         </div>
@@ -25,9 +25,11 @@ module.exports = React.createClass({
     }
   },
   onChange: function() {
-    this.setState({
-      err: FlashStore.err,
-      msg: FlashStore.msg
-    });
+    if(FlashStore.err || FlashStore.msg) {
+      this.setState({
+        err: FlashStore.err,
+        msg: FlashStore.msg
+      });  
+    }
   }
 });

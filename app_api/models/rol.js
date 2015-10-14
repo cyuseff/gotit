@@ -98,7 +98,7 @@ Rol.remove = function(id, callback) {
   aero.remove(key, function(err, key) {
     if(err.code === status.AEROSPIKE_ERR_RECORD_NOT_FOUND) return callback({error: 'Rol not found', status: 404});
     if(err.code !== status.AEROSPIKE_OK) return callback(err.message);
-    return callback(null, {message: 'Rol revoked'});
+    return callback(null, 1);
   });
 };
 

@@ -64,7 +64,7 @@ module.exports = React.createClass({
         </div>
         <div className="form-group">
           <h5>Methods</h5>
-          <div class="checkbox">
+          <div className="checkbox">
             <label><input onChange={this.allChecked} ref="methodAll" value="*" type="checkbox" /> ALL</label>
           </div>
           <label className="checkbox-inline"><input ref="methodGet" value="GET" type="checkbox" /> GET</label>

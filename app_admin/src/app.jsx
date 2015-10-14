@@ -1,4 +1,5 @@
 var React = require('react')
+  , ReactDom = require('react-dom')
   , ReactRouter = require('react-router')
   , Router = ReactRouter.Router
   , Route = ReactRouter.Route
@@ -9,7 +10,7 @@ var history = h.useBasename(h.createHistory)({
   basename: '/'
 });*/
 
-React.render((
+ReactDom.render((
   <Router>
     <Route path="/" component={require('./components/main')}>
       <Route path="roles">
@@ -24,4 +25,4 @@ React.render((
       </Route>
     </Route>
   </Router>
-), document.body);
+), document.getElementById('react-app'));

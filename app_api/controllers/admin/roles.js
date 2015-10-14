@@ -26,7 +26,7 @@ module.exports.newRol = function(req, res) {
       code = STATUS.code(500, err);
       return hh.sendJsonResponse(res, code.status, {error: code});
     }
-    return hh.sendJsonResponse(res, 201, rol);
+    return hh.sendJsonResponse(res, 201, {message: 'Rol created', rol: rol});
   });
 };
 
@@ -94,7 +94,7 @@ module.exports.updateRol = function(req, res) {
         code = STATUS.code(500, err);
         return hh.sendJsonResponse(res, code.status, {error: code});
       }
-      return hh.sendJsonResponse(res, 200, rol);
+      return hh.sendJsonResponse(res, 200, {message: 'Rol updated', rol: rol});
     });
 
   });
@@ -107,12 +107,12 @@ module.exports.removeRol = function(req, res) {
     return hh.sendJsonResponse(res, code.status, {error: code});
   }
 
-  Rol.remove(req.params.rolId, function(err, message) {
+  Rol.remove(req.params.rolId, function(err, reply) {
     if(err) {
       code = STATUS.code(500, err);
       return hh.sendJsonResponse(res, code.status, {error: code});
     }
-    return hh.sendJsonResponse(res, 200, message);
+    return hh.sendJsonResponse(res, 200, {message: 'Rol deleted'});
   });
 };
 
@@ -160,7 +160,7 @@ module.exports.assignRol = function(req, res) {
                 code = STATUS.code(501, err);
                 return hh.sendJsonResponse(res, code.status, {error: code});
               }
-              return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user.getPublicUser()});
+              return hh.sendJsonResponse(res, 200, {message: 'Rol assigned', user: user.getPublicUser()});
             });
           } else {
             code = STATUS.code(113);
@@ -173,7 +173,7 @@ module.exports.assignRol = function(req, res) {
               code = STATUS.code(501, err);
               return hh.sendJsonResponse(res, code.status, {error: code});
             }
-            return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user.getPublicUser()});
+            return hh.sendJsonResponse(res, 200, {message: 'Rol assigned', user: user.getPublicUser()});
           });
         }
       });
@@ -215,7 +215,7 @@ module.exports.removeUserRol = function(req, res) {
             code = STATUS.code(501, err);
             return hh.sendJsonResponse(res, code.status, err);
           }
-          return hh.sendJsonResponse(res, 200, {message: 'Rol removed.', user: user.getPublicUser()});
+          return hh.sendJsonResponse(res, 200, {message: 'Rol removed', user: user.getPublicUser()});
         });
       } else {
         return hh.sendJsonResponse(res, 400, {error: 'No rol on user'});
