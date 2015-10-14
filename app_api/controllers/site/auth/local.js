@@ -3,7 +3,9 @@
 var User = require('../../../models/user')
   , Token = require('../../../models/token')
   , validator = require('validator')
-	, hh = require('../../../helpers');
+	, hh = require('../../../helpers')
+  , STATUS = require('../../../helpers/status-codes')
+  , code;
 
 var SET = 'users'
   , TTL = 360;
@@ -69,12 +71,21 @@ function localLogin(req, res, email, password) {
 
   User.findOne({'local.email': email}, function(err, user) {
 
-    if(err) return hh.sendJsonResponse(res, 500, err);
-    if(!user) return hh.sendJsonResponse(res, 403, {error: 'User not found.'});
+    if(err) {
+      code = STATUS.code(501, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
+    if(!user) {
+      code = STATUS.code(120, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
 
     // Check password
     user.comparePassword(password, function(err, isMatch) {
-      if(err) return hh.sendJsonResponse(res, 500, err);
+      if(err) {
+        code = STATUS.code(501, err);
+        return hh.sendJsonResponse(res, code.status, {error: code});
+      }
       if(isMatch) {
         // create session token
         var token = new Token({
@@ -85,11 +96,15 @@ function localLogin(req, res, email, password) {
         });
         token.save(function(err, jwToken) {
           // The user was created so send it back anyway even if token creation or redis fails
-          if(err) return hh.sendJsonResponse(res, 500, err);
+          if(err) {
+            code = STATUS.code(501, err);
+            return hh.sendJsonResponse(res, code.status, {error: code});
+          }
           return hh.sendJsonResponse(res, 200, {user: user.getPublicUser(), token: jwToken});
         });
       } else {
-        return hh.sendJsonResponse(res, 403, {error: 'Oops! Wrong password...'});
+        code = STATUS.code(134);
+        return hh.sendJsonResponse(res, code.status, {error: code});
       }
     });
 
@@ -103,16 +118,28 @@ module.exports.localStrategy = function(req, res) {
     , password = req.body.password
     , confirmPassword = req.body.confirm_password;
 
-  if(!email || !password) return hh.sendJsonResponse(res, 400, {error: 'Missing credentials'});
+  if(!email || !password) {
+    code = STATUS.code(130);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
   // Check email
-  if(!validator.isEmail(email, {allow_utf8_local_part: false})) return hh.sendJsonResponse(res, 400, {error: 'Invalid email address'});
+  if(!validator.isEmail(email, {allow_utf8_local_part: false})) {
+    code = STATUS.code(131);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
   // Check password
-  if(!validator.isAlphanumeric(password)) return hh.sendJsonResponse(res, 400, {error: 'Password can only have alpha numerical characters'});
+  if(!validator.isAlphanumeric(password)) {
+    code = STATUS.code(132);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
   // Check password length
-  if(password.length < 6 && confirmPassword) return hh.sendJsonResponse(res, 400, {error: 'Password must have at least 6 characthers length'});
+  if(password.length < 6 && confirmPassword) {
+    code = STATUS.code(133);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
 
 
   if(!confirmPassword) {

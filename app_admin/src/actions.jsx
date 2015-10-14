@@ -9,9 +9,12 @@ module.exports = Reflux.createActions([
 
   'getRoles',
   'getRol',
+  'removeRol',
 
   'getUsers',
   'getUser',
   'addRolToUser',
-  'removeRolToUser'
+  'removeRolToUser',
+
+  'setFlashMessage'
 ]);

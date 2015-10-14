@@ -21,13 +21,7 @@ module.exports = React.createClass({
 
   handleClick: function(e) {
     e.preventDefault();
-    if(confirm('Sure?')) {
-      Api.del('admin/roles/' + this.props.params.rolId)
-        .then(function(res) {
-          console.log(res);
-          window.location.href = '/#/roles';
-        });
-    }
+    if(confirm('Sure?')) Actions.removeRol(this.props.params.rolId);
   },
   render: function() {
     return (<div>

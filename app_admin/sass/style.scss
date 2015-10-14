@@ -13,3 +13,33 @@ body {
   width: 500px;
   margin: 20px auto;
 }
+
+.flash-holder {
+  position: absolute;
+  color: #fff;
+  top: -$spacing-lg;;
+  left: 0;
+  right: 0;
+  height: $spacing-lg;
+  text-align: center;
+  z-index: 10000;
+  pointer-events: none;
+
+  .flash-content {
+    display: inline-block;
+    height: $spacing-lg;
+    padding: $spacing;
+    background-color: #444;
+    border: solid 1px #000;
+    border-top: 0;
+  }
+
+  animation-name: fadein;
+  animation-duration: 3s;
+
+  @keyframes fadein {
+    0% { top: 0; }
+    66% { top: 0; }
+    100% { top: -$spacing-lg; }
+  }
+}

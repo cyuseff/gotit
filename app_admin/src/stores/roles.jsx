@@ -24,6 +24,13 @@ module.exports = Reflux.createStore({
       }.bind(this));
   },
 
+  removeRol: function(rolId) {
+    Api.del('admin/roles/' + rolId)
+      .then(function(res) {
+        window.location.href = '/#/roles';
+      });
+  },
+
   triggerChange: function() {
     this.trigger('change');
   }

@@ -19,7 +19,6 @@ module.exports = Reflux.createStore({
   signIn: function(data) {
     Api.post('auth/local', data)
       .then(function(res) {
-        this.err = res.error;
         this.token = res.token;
         this.user = res.user;
         setCookie(this.token);
@@ -31,7 +30,7 @@ module.exports = Reflux.createStore({
     Api.get('auth/logout')
       .then(function(res) {
         if(res.error) return;
-        this.err = this.token = this.user = null;
+        this.token = this.user = null;
         removeCookie();
         this.triggerChange();
       }.bind(this));
@@ -61,7 +60,6 @@ module.exports = Reflux.createStore({
   expireUser: function() {
     if(this.token) {
       console.log('expireUser');
-      this.err = 'Session Expired!';
       this.token = this.user = null;
       this.triggerChange();
     }

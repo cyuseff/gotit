@@ -37,6 +37,7 @@ function _fetch(method, url, data) {
     })
     .then(function(res) {
       if(res.error && res.error.code === 100) Actions.expireUser();
+      Actions.setFlashMessage(res.error, res.message);
       return res;
     });
 }

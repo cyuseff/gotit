@@ -198,6 +198,7 @@ module.exports.removeUserRol = function(req, res) {
         return hh.sendJsonResponse(res, code.status, {error: code});
       }
 
+      //
       var idx = null;
       for(var i=0, l=user.roles.length; i<l; i++) {
         if(user.roles[i].id === req.params.rolId) {
@@ -205,23 +206,20 @@ module.exports.removeUserRol = function(req, res) {
           break;
         }
       }
-      console.log(idx);
+
       if(idx !== null) {
-        console.log(user.roles);
         user.roles.splice(idx, 1);
-        console.log(user.roles);
         user.admin = (user.roles.length > 0);
-        console.log('user.admin', user.admin);
         user.saveAndUpdate(function(err) {
           if(err) {
             code = STATUS.code(501, err);
             return hh.sendJsonResponse(res, code.status, err);
           }
-          return hh.sendJsonResponse(res, 200, {message:'Rol removed.', user:user.getPublicUser()});
+          return hh.sendJsonResponse(res, 200, {message: 'Rol removed.', user: user.getPublicUser()});
         });
       } else {
         return hh.sendJsonResponse(res, 400, {error: 'No rol on user'});
       }
 
     });
-}
+};

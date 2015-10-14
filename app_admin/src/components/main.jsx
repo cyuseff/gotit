@@ -3,7 +3,8 @@ var React = require('react')
   , UserStore = require('../stores/user')
   , Actions = require('../actions')
   , Header = require('./header/header')
-  , Auth = require('./auth/auth');
+  , Auth = require('./auth/auth')
+  , Flash = require('./flash');
 
 module.exports = React.createClass({
   mixins: [
@@ -23,6 +24,7 @@ module.exports = React.createClass({
       return (<div>Loading...</div>)
     } else {
       return (<div>
+        <Flash />
         <Header />
         <div className="content container">
           {this.content()}

@@ -7,9 +7,6 @@ module.exports = React.createClass({
   mixins: [
     Reflux.listenTo(UserStore, 'onChange')
   ],
-  getInitialState: function() {
-    return {err: null};
-  },
   handleSubmit: function(e) {
     e.preventDefault();
 
@@ -21,7 +18,6 @@ module.exports = React.createClass({
   },
   render: function() {
     return (<div>
-      {this.renderError()}
       <form onSubmit={this.handleSubmit}>
         <div className="form-group">
           <input type="email" placeholder="Email" className="form-control" ref="email" required />
@@ -33,11 +29,8 @@ module.exports = React.createClass({
       </form>
     </div>);
   },
-  renderError: function() {
-    return (<div>{this.state.err}</div>);
-  },
   onChange: function(e) {
     console.log('aca');
-    this.setState({err: UserStore.err});
+    //this.setState({err: UserStore.err});
   }
 });

@@ -60,7 +60,7 @@ module.exports = React.createClass({
       <form onSubmit={this.handleRouteSubmit}>
         <div className="form-group">
           <input type="text" ref="url" className="form-control" placeholder="Url" />
-          <small className="help-block">Ex: "/provider/:scope/some-nested-route"</small>
+          <small className="help-block">Ex: "provider/:scope/some-nested-route"</small>
         </div>
         <div className="form-group">
           <h5>Methods</h5>

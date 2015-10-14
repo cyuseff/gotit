@@ -61,21 +61,28 @@ module.exports = React.createClass({
     });
   },
   renderRoles: function() {
-    var me = this;
     return this.props.userRoles.map(function(rol) {
       return (<li key={rol.id}>
         <a onClick={this.handleClick.bind(this, rol.id)}><i className="fa fa-trash pull-right"></i></a>
-        <h5>{me.getRolName(rol.id)}</h5>
-        <small>Scope: {rol.scope}</small>
+        {this.getRolName(rol.id)}
+        <span>Scope: {rol.scope}</span>
       </li>);
     }, this);
   },
   getRolName: function(id) {
     var rol = _findRolById(id, this.state.roles);
     if(rol) {
-      return rol.name;
+      return (<div>
+        <h5>{rol.name}</h5>
+        <small className="gray">{id}</small>
+      </div>);
     } else {
-      return id;
+      return (<div>
+        <h5 className="red">
+          <i className="fa fa-exclamation-triangle"></i> This Rol is Invalid, remove it!
+        </h5>
+        <small className="gray">{id}</small>
+      </div>);
     }
   }
 });
