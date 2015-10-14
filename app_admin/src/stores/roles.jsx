@@ -8,18 +8,18 @@ module.exports = Reflux.createStore({
 
   listenables: [Actions],
 
-  getRoles: function() {
-    Api.get('admin/roles')
-      .then(function(res) {
-        this.roles = res.roles;
-        this.triggerChange();
-      }.bind(this));
-  },
-
   getRol: function(rolId) {
     Api.get('admin/roles/' +  rolId)
       .then(function(rol) {
         this.rol = rol;
+        this.triggerChange();
+      }.bind(this));
+  },
+
+  getRoles: function() {
+    Api.get('admin/roles')
+      .then(function(res) {
+        this.roles = res.roles;
         this.triggerChange();
       }.bind(this));
   },

@@ -14,6 +14,7 @@ function removeCookie() {
 
 module.exports = Reflux.createStore({
   listenables: [Actions],
+
   // Local
   signIn: function(data) {
     Api.post('auth/local', data)
@@ -55,6 +56,15 @@ module.exports = Reflux.createStore({
         this.user = res.user;
         this.triggerChange();
       }.bind(this));
+  },
+
+  expireUser: function() {
+    if(this.token) {
+      console.log('expireUser');
+      this.err = 'Session Expired!';
+      this.token = this.user = null;
+      this.triggerChange();
+    }
   },
 
   triggerChange: function() {

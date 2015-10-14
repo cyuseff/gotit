@@ -28,7 +28,8 @@ router.route('/roles/:rolId')
 
 router.route('/roles/:rolId/assign')
   .all(hh.authToken, rh.isAllowed)
-  .post(rolCtrl.assignRol);
+  .post(rolCtrl.assignRol)
+  .delete(rolCtrl.removeUserRol);
 
 
 // Providers

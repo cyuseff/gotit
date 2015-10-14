@@ -5,6 +5,13 @@ module.exports = Reflux.createActions([
   'signOut',
   'signInFacebook',
   'getProfile',
+  'expireUser',
+
   'getRoles',
-  'getRol'
+  'getRol',
+
+  'getUsers',
+  'getUser',
+  'addRolToUser',
+  'removeRolToUser'
 ]);

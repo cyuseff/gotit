@@ -76,6 +76,11 @@
       "status": 404,
       "msg": "User not found."
     },
+    "GOTIT_121": {
+      "code": 121,
+      "status": 404,
+      "msg": "User id not supplied."
+    },
 
 
 

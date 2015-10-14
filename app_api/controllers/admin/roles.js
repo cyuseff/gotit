@@ -160,22 +160,68 @@ module.exports.assignRol = function(req, res) {
                 code = STATUS.code(501, err);
                 return hh.sendJsonResponse(res, code.status, {error: code});
               }
-              return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});
+              return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user.getPublicUser()});
             });
           } else {
             code = STATUS.code(113);
             return hh.sendJsonResponse(res, code.status, {error: code});
           }
         } else {
-          user.saveAndUpdate = [rol];
-          user.save(function(err) {
+          user.roles = [rol];
+          user.saveAndUpdate(function(err) {
             if(err) {
               code = STATUS.code(501, err);
               return hh.sendJsonResponse(res, code.status, {error: code});
             }
-            return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user});
+            return hh.sendJsonResponse(res, 200, {message: 'Rol assigned.', user: user.getPublicUser()});
           });
         }
       });
   });
 };
+
+module.exports.removeUserRol = function(req, res) {
+  if(!req.body.userId) {
+    code = STATUS.code(121);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
+
+  User
+    .findById(req.body.userId)
+    .exec(function(err, user) {
+      if(err) {
+        code = STATUS.code(501, err);
+        return hh.sendJsonResponse(res, code.status, err);
+      }
+      if(!user) {
+        code = STATUS.code(120);
+        return hh.sendJsonResponse(res, code.status, {error: code});
+      }
+
+      var idx = null;
+      for(var i=0, l=user.roles.length; i<l; i++) {
+        if(user.roles[i].id === req.params.rolId) {
+          idx = i;
+          break;
+        }
+      }
+      console.log(idx);
+      if(idx !== null) {
+        console.log(user.roles);
+        user.roles.splice(idx, 1);
+        console.log(user.roles);
+        user.admin = (user.roles.length > 0);
+        console.log('user.admin', user.admin);
+        user.saveAndUpdate(function(err) {
+          if(err) {
+            code = STATUS.code(501, err);
+            return hh.sendJsonResponse(res, code.status, err);
+          }
+          return hh.sendJsonResponse(res, 200, {message:'Rol removed.', user:user.getPublicUser()});
+        });
+      } else {
+        return hh.sendJsonResponse(res, 400, {error: 'No rol on user'});
+      }
+
+    });
+}

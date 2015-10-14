@@ -26,6 +26,7 @@ module.exports = React.createClass({
   },
   handleClick: function(id, e) {
     e.preventDefault();
+    this.props.removeRol(id);
   },
   render: function() {
     return (<div>
@@ -62,12 +63,12 @@ module.exports = React.createClass({
   renderRoles: function() {
     var me = this;
     return this.props.userRoles.map(function(rol) {
-      return (<li>
-        <a onClick={me.handleClick.bind(this, rol.id)}><i className="fa fa-trash pull-right"></i></a>
+      return (<li key={rol.id}>
+        <a onClick={this.handleClick.bind(this, rol.id)}><i className="fa fa-trash pull-right"></i></a>
         <h5>{me.getRolName(rol.id)}</h5>
         <small>Scope: {rol.scope}</small>
       </li>);
-    });
+    }, this);
   },
   getRolName: function(id) {
     var rol = _findRolById(id, this.state.roles);

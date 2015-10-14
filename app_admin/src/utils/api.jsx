@@ -1,5 +1,7 @@
 var Fetch = require('whatwg-fetch')
+  , Reflux = require('reflux')
   , UserStore = require('../stores/user')
+  , Actions = require('../actions')
   , Cookies = require('cookies-js')
   , COOKIE = 'gotit-token'
   , ROOT_URL = '//localhost:5000/api/v1/';
@@ -15,7 +17,7 @@ function getOpts(method, data) {
 }
 
 function getHeader() {
-  var token = UserStore.token || Cookies.get(COOKIE);
+  var token = Cookies.get(COOKIE);
   var header = {
     Accept: 'application/json',
     'Content-Type': 'application/json'
@@ -32,6 +34,10 @@ function _fetch(method, url, data) {
   return fetch(ROOT_URL + url, getOpts(method, data))
     .then(function(res) {
       return parseJSON(res);
+    })
+    .then(function(res) {
+      if(res.error && res.error.code === 100) Actions.expireUser();
+      return res;
     });
 }
 
