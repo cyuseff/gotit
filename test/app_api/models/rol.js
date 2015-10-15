@@ -72,7 +72,7 @@ describe('Rol Model', function() {
   it('Should remove a rol', function(done) {
     Rol.remove(rol.id, function(err, reply) {
       should.not.exist(err);
-      reply.should.have.property('message').which.match(/rol\srevoked/i);
+      reply.should.be.exactly(1);
       done();
     });
   });

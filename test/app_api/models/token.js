@@ -203,7 +203,7 @@ describe('Token Model', function() {
     Token.removeByJwt(token.jwToken, function(err, reply) {
       should.not.exist(err);
       should.exist(reply);
-      reply.should.have.property('message').match(/removed/i);
+      reply.should.be.exactly(1);
       done();
     });
   });

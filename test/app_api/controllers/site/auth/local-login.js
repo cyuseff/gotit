@@ -54,11 +54,11 @@ describe('Login user', function() {
       .expect(/alpha\snumerical\scharacters/i, done);
   });
 
-  it('Return a 403 User not found', function(done) {
+  it('Return a 404 User not found', function(done) {
     agent
       .post(url)
       .send('email=admin@gmail.cl&password=aqweasdd')
-      .expect(403)
+      .expect(404)
       .expect('Content-Type', /json/)
       .expect(/user\snot\sfound/i, done);
   });
@@ -102,8 +102,11 @@ describe('Logout user', function() {
   it('Return a 400 error, No token provided', function(done) {
     agent
       .get('/api/v1/auth/logout')
-      .expect(400)
-      .expect(/no\stoken/i, done);
+      .expect(403)
+      .expect(function(res) {
+        if(res.body.error.code !== 101) throw new Error('No token');
+      })
+      .end(done);
   });
 
   it('Return a 200, Token revoked', function(done) {
@@ -111,15 +114,18 @@ describe('Logout user', function() {
       .get('/api/v1/auth/logout')
       .set('x-access-token', token)
       .expect(200)
-      .expect(/token\sremoved/i, done);
+      .expect(/signed out/i, done);
   });
 
-  it('Denied private with a 403, Token not found', function(done) {
+  it('Denied private with a 404, Token expired', function(done) {
     agent
       .get('/private')
       .set('x-access-token', token)
       .expect(404)
-      .expect(/token\snot\sfound/i, done);
+      .expect(function(res) {
+        if(res.body.error.code !== 100) throw new Error('Token error');
+      })
+      .end(done);
   });
 
   after(function(done) {

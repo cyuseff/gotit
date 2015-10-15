@@ -76,15 +76,18 @@ describe('Signin LocalStrategy', function() {
       .send('email=admin@email.com&password=admin123&confirm_password=admin123')
       .expect(409)
       .expect('Content-Type', /json/)
-      .expect(/user\salready\sexits/i, done);
+      .expect(function(res) {
+        if(res.body.error.code !== 122) throw new Error('Code error don\'t match.');
+      })
+      .end(done);
   });
 
-  it('Return a 200, Token revoked', function(done) {
+  it('Signed out user', function(done) {
     agent
       .get('/api/v1/auth/logout')
       .set('x-access-token', token)
       .expect(200)
-      .expect(/token\sremoved/i, done);
+      .expect(/signed out/i, done);
   });
 
 
