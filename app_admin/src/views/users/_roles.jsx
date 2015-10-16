@@ -61,11 +61,12 @@ module.exports = React.createClass({
     });
   },
   renderRoles: function() {
-    return this.props.userRoles.map(function(rol) {
-      return (<li key={rol.id}>
-        <a onClick={this.handleClick.bind(this, rol.id)}><i className="fa fa-trash pull-right"></i></a>
+    return this.props.userRoles.map(function(rol, idx) {
+      return (<li key={rol.id + '-' + idx}>
+        <a onClick={this.handleClick.bind(this, rol.uuid)}><i className="fa fa-trash pull-right"></i></a>
         {this.getRolName(rol.id)}
-        <span>Scope: {rol.scope}</span>
+        <div>Scope: {rol.scope}</div>
+        <div>UUID: {rol.uuid}</div>
       </li>);
     }, this);
   },

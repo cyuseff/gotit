@@ -4,6 +4,7 @@ var aerospike = require('./aero.js').aero
   , aero = require('./aero.js').client
   , User = require('../app_api/models/user')
   , Rol = require('../app_api/models/rol')
+  , UserRol = require('../app_api/models/user-rol')
   , Mongo = require('./mongoose')
   , PASSWORD = '123456'
   , NAME = 'GotIt'
@@ -71,10 +72,11 @@ function createAdmin(cb) {
         user.admin = true;
 
         // Assign SuperAdmin Rol
-        user.roles.push({
+        var userRol = new UserRol({
           id: rol.id,
           scope: '*'
         });
+        user.roles.push(userRol);
 
         // save user before serialize into his token
         user.save(function(err) {

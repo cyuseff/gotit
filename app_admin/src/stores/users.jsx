@@ -25,8 +25,7 @@ module.exports = Reflux.createStore({
   },
 
   addRolToUser: function(userId, rolId, scope) {
-    Api.post('admin/roles/'+rolId+'/assign', {
-      userId: userId,
+    Api.post('admin/users/'+userId+'/roles/'+rolId, {
       scope: scope
     })
     .then(function(res) {
@@ -37,11 +36,8 @@ module.exports = Reflux.createStore({
     }.bind(this));
   },
 
-  removeRolToUser: function(userId, rolId, scope) {
-    Api.del('admin/roles/'+rolId+'/assign', {
-      userId: userId,
-      scope: scope
-    })
+  removeRolToUser: function(userId, rolUuid, scope) {
+    Api.del('admin/users/'+userId+'/roles/'+rolUuid, {})
     .then(function(res) {
       if(res.user) {
         this.user = res.user;

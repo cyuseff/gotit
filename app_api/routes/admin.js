@@ -13,6 +13,10 @@ router.route('/users')
 router.route('/users/:userId')
   .all(hh.authToken, rh.isAllowed)
   .get(userCtrl.showUsers);
+router.route('/users/:userId/roles/:rolId')
+  .all(hh.authToken, rh.isAllowed)
+  .post(userCtrl.addRol)
+  .delete(userCtrl.removeRol);
 
 // Roles
 router.route('/roles')
@@ -25,11 +29,6 @@ router.route('/roles/:rolId')
   .get(rolCtrl.showRol)
   .put(rolCtrl.updateRol)
   .delete(rolCtrl.removeRol);
-
-router.route('/roles/:rolId/assign')
-  .all(hh.authToken, rh.isAllowed)
-  .post(rolCtrl.assignRol)
-  .delete(rolCtrl.removeUserRol);
 
 
 // Providers
