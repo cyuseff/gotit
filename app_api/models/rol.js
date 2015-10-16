@@ -6,7 +6,8 @@ var aerospike = require('../../config/aero').aero
   , uuid = require('uuid')
   , STATUS = require('../helpers/status-codes')
   , NAMESPACE = 'test'
-  , SET = 'roles';
+  , SET = 'roles'
+  , TTL = -1;
 
 function generateAeroKey(primaryKey) {
   return aerospike.key(NAMESPACE, SET, primaryKey);
@@ -122,7 +123,7 @@ Rol.prototype.save = function(callback) {
   var me = this
     , key = generateAeroKey(me.id);
 
-  aero.put(key, me, {}, function(err, key) {
+  aero.put(key, me, {ttl: TTL}, function(err, key) {
     if(err.code !== aerospike.status.AEROSPIKE_OK) if(callback) return callback(err.message, null);
     if(callback) return callback(null, key);
   });

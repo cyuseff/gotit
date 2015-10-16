@@ -15,7 +15,7 @@ function createRoles(cb) {
   Rol.findAll(function(err, roles) {
     if(!roles || !roles.length) {
       rol = new Rol({
-        name: 'superAdmin',
+        name: 'Super Admin',
         accessLevel: 1,
         routes: [
           {
@@ -29,7 +29,7 @@ function createRoles(cb) {
     } else {
       console.log('Rol Found!');
       for(var i=0, l=roles.length; i<l; i++) {
-        if(roles[i].name === 'superAdmin') {
+        if(roles[i].name === 'Super Admin') {
           rol = roles[i];
           break;
         }

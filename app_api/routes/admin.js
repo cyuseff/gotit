@@ -74,3 +74,21 @@ router.route('/clubs')
 module.exports = function(app) {
   app.use('/api/v1/admin', router);
 };
+
+
+// Write Admin routes in a file
+var fs = require('fs')
+  , routes = []
+  , fsName = 'admin-routes.json';
+
+for(var i=0, l=router.stack.length; i<l; i++) {
+  routes.push({
+    path: router.stack[i].route.path,
+    methods: router.stack[i].route.methods
+  });
+}
+
+fs.writeFile('public/' + fsName, JSON.stringify({routes: routes}), 'utf8', function(err) {
+  if(err) return console.log(err);
+  console.log(fsName + ' writed!');
+});
