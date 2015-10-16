@@ -1,7 +1,9 @@
 var React = require('react')
-  , ReactDom = require('react-dom');
+  , ReactDom = require('react-dom')
+  , Loading = require('../../components/loading')
+  , Api = require('../../utils/api');
 
-function getRoute(refs) {
+function createRoute(refs) {
   var url = ReactDom.findDOMNode(refs.url)
     , methodAll = ReactDom.findDOMNode(refs.methodAll)
     , methodGet = ReactDom.findDOMNode(refs.methodGet)
@@ -22,7 +24,7 @@ function getRoute(refs) {
   if(!url.value.trim() || !methods.length) return null;
 
   route =  {
-    url: url.value.trim(),
+    url: url.value.replace(/:[^\/]+/, ':scope'),
     methods: methods.toString(),
     recursive: recursive.checked? 1 : 0,
     accessLevel: accessLevel.value
@@ -37,6 +39,15 @@ function getRoute(refs) {
 }
 
 module.exports = React.createClass({
+  getInitialState: function() {
+    return {routes: null};
+  },
+  componentDidMount: function() {
+    Api.fetch('get', '//localhost:5000/admin-routes.json')
+      .then(function(res) {
+        this.setState({routes: res.routes});
+      }.bind(this));
+  },
   allChecked: function(e) {
     var methods = [
       ReactDom.findDOMNode(this.refs.methodGet),
@@ -50,18 +61,22 @@ module.exports = React.createClass({
   },
   handleRouteSubmit: function(e) {
     e.preventDefault();
-    var route = getRoute(this.refs);
+    var route = createRoute(this.refs);
 
     if(!route) return;
     this.props.addRoute(route);
   },
   render: function() {
+    if(!this.state.routes) return (<Loading />);
+
     return (<div>
       <h3>Create Route</h3>
       <form onSubmit={this.handleRouteSubmit}>
         <div className="form-group">
-          <input type="text" ref="url" className="form-control" placeholder="Url" />
-          <small className="help-block">Ex: "provider/:scope/some-nested-route"</small>
+          <select className="form-control" ref="url">
+            <option key="admin-route-" value="">Select a route...</option>
+            {this.renderRoutes()}
+          </select>
         </div>
         <div className="form-group">
           <h5>Methods</h5>
@@ -89,6 +104,14 @@ module.exports = React.createClass({
         <button className="btn btn-default">Add Route</button>
       </form>
     </div>);
+  },
+  renderRoutes: function() {
+    return this.state.routes.map(function(route, idx) {
+      var path = route.path;
+      path = path.replace(/^\//, '');
+      path = path.replace(/$\//, '');
+      return (<option key={'admin-route-' + idx} value={path}>{path}</option>);
+    });
   },
   renderAccessLevel: function() {
     var lvls = [];

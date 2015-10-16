@@ -30,8 +30,8 @@ function parseJSON(res) {
   return res.json();
 }
 
-function _fetch(method, url, data) {
-  return fetch(ROOT_URL + url, getOpts(method, data))
+function _fetch(method, url, data, absolutePath) {
+  return fetch((absolutePath? url : ROOT_URL + url), getOpts(method, data))
     .then(function(res) {
       return parseJSON(res);
     })
@@ -46,5 +46,6 @@ module.exports = {
   get:    function(url, data) { return _fetch('get', url, data); },
   post:   function(url, data) { return _fetch('post', url, data); },
   put:    function(url, data) { return _fetch('put', url, data); },
-  del:    function(url, data) { return _fetch('delete', url, data); }
+  del:    function(url, data) { return _fetch('delete', url, data); },
+  fetch:  function(method, url, data) { return _fetch(method, url, data, true) }
 };
