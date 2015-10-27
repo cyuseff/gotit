@@ -18,24 +18,25 @@ module.exports = React.createClass({
   onChange: function() {
     this.setState({providers: ProvidersStore.providers});
   },
+
   render: function() {
+    return (<div>
+      <div className="margin-b">
+        <h2>Providers List</h2>
+      </div>
+      <ul className="list-unstyled">
+        {this.renderList()}
+      </ul>
+    </div>);
+  },
+  renderList: function() {
     if(this.state.providers) {
-      return (<div>
-        <div className="margin-b">
-          <Link to="/providers/new" className="pull-right btn btn-primary">
-            <i className="fa fa-plus-circle"></i> New
-          </Link>
-          <h2>Providers List</h2>
-        </div>
-        <ul className="list-unstyled">
-          {this.state.providers.map(function(provider) {
-            return (<li key={provider.slug}>
-              <Link to={'/providers/' + provider.slug}><h4>{provider.name}</h4></Link>
-              <small>{provider.slug}</small>
-            </li>);
-          })}
-        </ul>
-      </div>);
+      return this.state.providers.map(function(provider) {
+        return (<li key={provider.slug}>
+          <Link to={'/providers/' + provider.slug}><h4>{provider.name}</h4></Link>
+          <small>{provider.slug}</small>
+        </li>);
+      });
     } else {
       return <Loading />;
     }

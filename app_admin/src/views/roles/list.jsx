@@ -19,7 +19,6 @@ module.exports = React.createClass({
     this.setState({roles: RolesStore.roles});
   },
   render: function() {
-    if(this.props.children) return this.props.children;
     return (<div>
       <div className="margin-b">
         <Link to="/roles/new" className="pull-right btn btn-primary">

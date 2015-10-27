@@ -18,19 +18,25 @@ module.exports = React.createClass({
   onChange: function() {
     this.setState({users: UsersStore.users});
   },
+
   render: function() {
-    if(this.state.users) {
-      return (<div>
+    return (<div>
+      <div className="margin-b">
         <h2>Users List</h2>
-        <ul className="list-unstyled">
-          {this.state.users.map(function(user) {
-            return (<li key={user._id}>
-              <Link to={'/users/' + user._id}><h4>{user.fullName}</h4></Link>
-              <small>{user.emails.toString()}</small>
-            </li>);
-          })}
-        </ul>
-      </div>);
+      </div>
+      <ul className="list-unstyled">
+        {this.renderList()}
+      </ul>
+    </div>);
+  },
+  renderList: function() {
+    if(this.state.users) {
+      return this.state.users.map(function(user) {
+        return (<li key={user._id}>
+          <Link to={'/users/' + user._id}><h4>{user.fullName}</h4></Link>
+          <small>{user.emails.toString()}</small>
+        </li>);
+      });
     } else {
       return <Loading />;
     }
