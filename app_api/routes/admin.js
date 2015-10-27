@@ -4,7 +4,8 @@ var router = require('express').Router()
   , hh = require('../helpers')
   , rh = require('../helpers/roles')
   , userCtrl = require('../controllers/admin/users')
-  , rolCtrl = require('../controllers/admin/roles');
+  , rolCtrl = require('../controllers/admin/roles')
+  , providerCtrl = require('../controllers/admin/providers');
 
 // Users
 router.route('/users')
@@ -32,42 +33,11 @@ router.route('/roles/:rolId')
 
 
 // Providers
-var providers = [
-  {id: '1', name: 'Provider001'},
-  {id: '2', name: 'Provider002'},
-  {id: '3', name: 'Provider003'}
-];
-function getProvider(id) {
-  for(var i=0, l=providers.length; i<l; i++) if(id === providers[i].id) return providers[i];
-  return null;
-}
+
 router.route('/providers')
   .all(hh.authToken, rh.isAllowed)
-  .get(function(req, res) {
-    hh.sendJsonResponse(res, 200, {providers: providers});
-  });
-router.route('/providers/:providerId')
-  .all(hh.authToken, rh.isAllowed)
-  .get(function(req, res) {
-    var provider = getProvider(req.params.providerId);
-    if(!provider) return hh.sendJsonResponse(res, 404, {error: 'Not Found.'});
-    return hh.sendJsonResponse(res, 200, {provider: provider, user: req.user, rol: req.rol});
-  });
-router.route('/providers/:providerId/nested')
-  .all(hh.authToken, rh.isAllowed)
-  .get(function(req, res) {
-    var provider = getProvider(req.params.providerId);
-    if(!provider) return hh.sendJsonResponse(res, 404, {error: 'Not Found.'});
-    return hh.sendJsonResponse(res, 200, {provider: provider, user: req.user, rol: req.rol});
-  });
-
-
-// Clubs
-router.route('/clubs')
-  .all(hh.authToken, rh.isAllowed)
-  .get(function(req, res) {
-    return hh.sendJsonResponse(res, 200, {message: 'Welcome to clubs', user: req.user, rol: req.rol});
-  });
+  .get(providerCtrl.listProviders)
+  .post(providerCtrl.newProvider);
 
 
 module.exports = function(app) {

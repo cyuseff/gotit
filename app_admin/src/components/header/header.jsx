@@ -7,7 +7,8 @@ var React = require('react')
 
 var menu = [
   {name: 'Users', slug: 'users'},
-  {name: 'Roles', slug: 'roles'}
+  {name: 'Roles', slug: 'roles'},
+  {name: 'Providers', slug: 'providers'}
 ];
 
 var MenuItem = React.createClass({

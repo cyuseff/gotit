@@ -31,7 +31,7 @@
     "GOTIT_111": {
       "code": 111,
       "status": 400,
-      "msg": "No rol id supplied"
+      "msg": "You can't edit your own rols"
     },
     "GOTIT_112": {
       "code": 112,

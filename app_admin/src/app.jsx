@@ -23,6 +23,10 @@ ReactDom.render((
         <IndexRoute component={require('./views/users/list')}/>
         <Route path=":userId" component={require('./views/users/show')} />
       </Route>
+      <Route path="providers">
+        <IndexRoute component={require('./views/providers/list')}/>
+        <Route path="new" component={require('./views/providers/new')} />
+      </Route>
     </Route>
   </Router>
 ), document.getElementById('react-app'));

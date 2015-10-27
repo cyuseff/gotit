@@ -32,15 +32,13 @@ module.exports.showUsers = function(req, res) {
 };
 
 module.exports.addRol = function(req, res) {
-  var userRol;
-  if(!req.params.userId) {
-    code = STATUS.code(121);
-    return hh.sendJsonResponse(res, code.status, {error: code});
-  }
-  if(!req.params.rolId) {
+  if(req.params.userId === req.user._id) {
     code = STATUS.code(111);
     return hh.sendJsonResponse(res, code.status, {error: code});
   }
+
+  var userRol;
+
   if(!req.body.scope) {
     code = STATUS.code(112);
     return hh.sendJsonResponse(res, code.status, {error: code});
@@ -104,11 +102,7 @@ module.exports.addRol = function(req, res) {
 };
 
 module.exports.removeRol = function(req, res) {
-  if(!req.params.userId) {
-    code = STATUS.code(121);
-    return hh.sendJsonResponse(res, code.status, {error: code});
-  }
-  if(!req.params.rolId) {
+  if(req.params.userId === req.user._id) {
     code = STATUS.code(111);
     return hh.sendJsonResponse(res, code.status, {error: code});
   }

@@ -77,9 +77,9 @@ module.exports = React.createClass({
           <a onClick={me.props.removeRoute} rel={idx} className="pull-right">Borrar</a>
           <h4>{route.url}</h4>
           <ul>
-            <li>Methods: {route.methods}</li>
-            <li>Recursive: {route.recursive}</li>
-            <li>AccessLevel: {route.accessLevel}</li>
+            <li key="route-methods">Methods: {route.methods}</li>
+            <li key="route-recursive">Recursive: {route.recursive}</li>
+            <li key="route-lvl">AccessLevel: {route.accessLevel}</li>
           </ul>
         </li>);
       });
@@ -88,9 +88,7 @@ module.exports = React.createClass({
 
   renderAccessLevel: function() {
     var lvls = [];
-    for(var i=1; i<10; i++) {
-      lvls.push(<option value={i}>{i}</option>);
-    }
+    for(var i=1; i<10; i++) lvls.push(<option key={'opt-' + i} value={i}>{i}</option>);
     return lvls;
   }
 });

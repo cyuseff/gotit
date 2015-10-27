@@ -115,7 +115,7 @@ module.exports = React.createClass({
   },
   renderAccessLevel: function() {
     var lvls = [];
-    for(var i=1; i<10; i++) lvls.push(<option value={i}>{i}</option>);
+    for(var i=1; i<10; i++) lvls.push(<option key={'opt-' + i} value={i}>{i}</option>);
     return lvls;
   }
 });
