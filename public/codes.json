@@ -129,7 +129,11 @@
 
 
 
-
+    "GOTIT_404": {
+      "code": 404,
+      "status": 404,
+      "msg": "Page not found"
+    },
     "GOTIT_500": {
       "code": 500,
       "status": 500,

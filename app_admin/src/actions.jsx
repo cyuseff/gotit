@@ -17,6 +17,7 @@ module.exports = Reflux.createActions([
   'removeRolToUser',
 
   'getProviders',
+  'getProvider',
 
   'setFlashMessage'
 ]);

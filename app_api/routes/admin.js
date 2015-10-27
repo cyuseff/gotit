@@ -33,11 +33,14 @@ router.route('/roles/:rolId')
 
 
 // Providers
-
 router.route('/providers')
   .all(hh.authToken, rh.isAllowed)
   .get(providerCtrl.listProviders)
   .post(providerCtrl.newProvider);
+
+router.route('/providers/:providerId')
+  .all(hh.authToken, rh.isAllowed)
+  .get(providerCtrl.showProvider);
 
 
 module.exports = function(app) {

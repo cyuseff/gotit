@@ -15,6 +15,7 @@ module.exports.listProviders = function(req, res) {
   });
 };
 
+// TODO: check that every require params is present
 module.exports.newProvider = function(req, res) {
   var prov = new Provider({
     name: req.body.name,
@@ -28,5 +29,16 @@ module.exports.newProvider = function(req, res) {
       return hh.sendJsonResponse(res, code.status, {error: code});
     }
     return hh.sendJsonResponse(res, 201, {message: 'Provider created', provider: prov});
+  });
+};
+
+// TODO: check that every require params is present
+module.exports.showProvider = function(req, res) {
+  Provider.findOne({slug: req.params.providerId}, function(err, provider) {
+    if(err) {
+      code = STATUS.code(501, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
+    return hh.sendJsonResponse(res, 200, provider);
   });
 };

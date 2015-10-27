@@ -16,8 +16,8 @@ ReactDom.render((
       <Route path="roles">
         <IndexRoute component={require('./views/roles/list')}/>
         <Route path="new" component={require('./views/roles/new')} />
-        <Route path="edit/:rolId" component={require('./views/roles/edit')} />
         <Route path=":rolId" component={require('./views/roles/show')} />
+        <Route path=":rolId/edit" component={require('./views/roles/edit')} />
       </Route>
       <Route path="users">
         <IndexRoute component={require('./views/users/list')}/>
@@ -26,6 +26,7 @@ ReactDom.render((
       <Route path="providers">
         <IndexRoute component={require('./views/providers/list')}/>
         <Route path="new" component={require('./views/providers/new')} />
+        <Route path=":providerId" component={require('./views/providers/show')} />
       </Route>
     </Route>
   </Router>

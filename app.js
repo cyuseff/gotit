@@ -31,6 +31,10 @@ require('./app_api/routes/site')(app);
 // Api Admin routes
 require('./app_api/routes/admin')(app);
 // Not found
-app.use(function(req, res) { res.status(404).json({error: 'Not found.'}); });
+app.use(function(req, res) { res.status(404).json({error: {
+  code: 404,
+  status: 404,
+  msg: 'Not found'
+}}); });
 
 module.exports = app;

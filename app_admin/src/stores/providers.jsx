@@ -15,6 +15,13 @@ module.exports = Reflux.createStore({
         this.triggerChange();
       }.bind(this));
   },
+  getProvider: function(providerId) {
+    Api.get('admin/providers/' + providerId)
+      .then(function(provider) {
+        this.provider = provider;
+        this.triggerChange();
+      }.bind(this));
+  },
 
   triggerChange: function() {
     this.trigger('change');

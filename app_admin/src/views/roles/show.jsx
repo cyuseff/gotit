@@ -26,7 +26,7 @@ module.exports = React.createClass({
   render: function() {
     return (<div>
       <div className="pull-right">
-        <Link to={'/roles/edit/' +  this.props.params.rolId} className="btn btn-default">
+        <Link to={'/roles/' +  this.props.params.rolId + '/edit'} className="btn btn-default">
           <i className="fa fa-edit"></i> Edit
         </Link>
         <button onClick={this.handleClick} className="btn btn-danger">
