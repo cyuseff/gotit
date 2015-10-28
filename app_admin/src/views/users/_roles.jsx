@@ -1,4 +1,5 @@
 var React = require('react')
+  , ReactDom = require('react-dom')
   , Api = require('../../utils/api');
 
 function _findRolById(id, roles) {
@@ -18,8 +19,8 @@ module.exports = React.createClass({
   },
   handleSubmit: function(e) {
     e.preventDefault();
-    var rolId = React.findDOMNode(this.refs.rolId)
-      , scope = React.findDOMNode(this.refs.scope);
+    var rolId = ReactDom.findDOMNode(this.refs.rolId)
+      , scope = ReactDom.findDOMNode(this.refs.scope);
 
     this.props.addRol(rolId.value, scope.value);
     rolId.value = scope.value = '';

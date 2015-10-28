@@ -22,6 +22,9 @@ module.exports = React.createClass({
   render: function() {
     return (<div>
       <div className="margin-b">
+        <Link to="/providers/new" className="pull-right btn btn-primary">
+          <i className="fa fa-plus-circle"></i> New
+        </Link>
         <h2>Providers List</h2>
       </div>
       <ul className="list-unstyled">

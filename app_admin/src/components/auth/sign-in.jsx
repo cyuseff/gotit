@@ -1,4 +1,5 @@
 var React = require('react')
+  , ReactDom = require('react-dom')
   , Reflux = require('reflux')
   , UserStore = require('../../stores/user')
   , Actions = require('../../actions');
@@ -10,8 +11,8 @@ module.exports = React.createClass({
   handleSubmit: function(e) {
     e.preventDefault();
 
-    var email = React.findDOMNode(this.refs.email).value
-      , password = React.findDOMNode(this.refs.password).value;
+    var email = ReactDom.findDOMNode(this.refs.email).value
+      , password = ReactDom.findDOMNode(this.refs.password).value;
 
     if(!email || !password) return;
     Actions.signIn({email: email, password: password});

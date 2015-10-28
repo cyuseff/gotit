@@ -128,6 +128,18 @@
 
 
 
+    "GOTIT_140": {
+      "code": 140,
+      "status": 404,
+      "msg": "Provider not found"
+    },
+    "GOTIT_141": {
+      "code": 141,
+      "status": 403,
+      "msg": "Provider slug must be unique"
+    },
+
+
 
     "GOTIT_404": {
       "code": 404,

@@ -36,6 +36,12 @@ module.exports.listRoles = function(req, res) {
       code = STATUS.code(500, err);
       return hh.sendJsonResponse(res, code.status, err);
     }
+    roles = roles.map(function(rol) {
+      return {
+        id: rol.id,
+        name: rol.name
+      };
+    });
     return hh.sendJsonResponse(res, 200, {roles: roles});
   });
 };

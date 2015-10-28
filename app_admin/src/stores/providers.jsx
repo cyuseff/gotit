@@ -22,6 +22,12 @@ module.exports = Reflux.createStore({
         this.triggerChange();
       }.bind(this));
   },
+  removeProvider: function(providerId) {
+    Api.del('admin/providers/' + providerId)
+      .then(function(res) {
+        window.location.href = '/#/providers';
+      });
+  },
 
   triggerChange: function() {
     this.trigger('change');

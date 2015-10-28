@@ -59,10 +59,11 @@ module.exports = React.createClass({
     if(!this.state.rol.routes) return;
     return this.state.rol.routes.map(function(route, idx) {
       return (<li key={'route-' + idx}>
-        <div>url: {route.url}</div>
-        <div>methods: {route.methods}</div>
-        <div>recursive: {route.recursive}</div>
-        <div>accessLevel: {route.accessLevel}</div>
+        <div>URL: {route.url}</div>
+        <div>Methods: {route.methods}</div>
+        <div>Recursive: {route.recursive}</div>
+        <div>AccessLevel: {route.accessLevel}</div>
+        <hr />
       </li>);
     });
   }

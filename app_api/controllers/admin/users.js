@@ -7,8 +7,14 @@ var User = require('../../models/user')
   , STATUS = require('../../helpers/status-codes')
   , code;
 
+// TODO: check that every require params is present
 module.exports.listUsers = function(req, res) {
-  User.find({}, function(err, users) {
+  var projection = {
+    fullName: 1,
+    emails: 1
+  };
+
+  User.find({}, projection, function(err, users) {
     if(err) {
       code = STATUS.code(501, err);
       return hh.sendJsonResponse(res, code.status, {error: code});

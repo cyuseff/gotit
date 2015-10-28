@@ -27,6 +27,7 @@ ReactDom.render((
         <IndexRoute component={require('./views/providers/list')}/>
         <Route path="new" component={require('./views/providers/new')} />
         <Route path=":providerId" component={require('./views/providers/show')} />
+        <Route path=":providerId/edit" component={require('./views/providers/edit')} />
       </Route>
     </Route>
   </Router>

@@ -40,7 +40,9 @@ router.route('/providers')
 
 router.route('/providers/:providerId')
   .all(hh.authToken, rh.isAllowed)
-  .get(providerCtrl.showProvider);
+  .get(providerCtrl.showProvider)
+  .put(providerCtrl.updateProvider)
+  .delete(providerCtrl.removeProvider);
 
 
 module.exports = function(app) {

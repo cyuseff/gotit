@@ -1,4 +1,5 @@
 var React = require('react')
+  , ReactDom = require('react-dom')
   , Api = require('../../utils/api');
 
 module.exports = React.createClass({
@@ -11,8 +12,8 @@ module.exports = React.createClass({
 
   handleSubmit: function(e) {
     e.preventDefault();
-    var rolName = React.findDOMNode(this.refs.rolName).value
-      , accessLevel = React.findDOMNode(this.refs.accessLevel).value;
+    var rolName = ReactDom.findDOMNode(this.refs.rolName).value.trim()
+      , accessLevel = ReactDom.findDOMNode(this.refs.accessLevel).value;
 
     if(!rolName || !accessLevel || !this.props.routes.length) return;
     var rol = {
@@ -51,7 +52,9 @@ module.exports = React.createClass({
           type="text"
           ref="rolName"
           className="form-control"
-          placeholder="Nombre" />
+          placeholder="Nombre"
+          required="required"
+        />
       </div>
 
       <div className="form-group">

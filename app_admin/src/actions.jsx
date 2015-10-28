@@ -18,6 +18,7 @@ module.exports = Reflux.createActions([
 
   'getProviders',
   'getProvider',
+  'removeProvider',
 
   'setFlashMessage'
 ]);
