@@ -43,9 +43,9 @@ function _fetch(method, url, data, absolutePath) {
 }
 
 module.exports = {
-  get:    function(url, data) { return _fetch('get', url, data); },
-  post:   function(url, data) { return _fetch('post', url, data); },
-  put:    function(url, data) { return _fetch('put', url, data); },
-  del:    function(url, data) { return _fetch('delete', url, data); },
-  fetch:  function(method, url, data) { return _fetch(method, url, data, true) }
+  get:    function(url, data) { return _fetch('GET', url, data); },
+  post:   function(url, data) { return _fetch('POST', url, data); },
+  patch:    function(url, data) { return _fetch('PATCH', url, data); },
+  del:    function(url, data) { return _fetch('DELETE', url, data); },
+  fetch:  function(method, url, data) { return _fetch(method, url, data, true); }
 };

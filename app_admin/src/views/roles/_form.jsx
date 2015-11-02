@@ -23,16 +23,20 @@ module.exports = React.createClass({
     };
 
     if(this.props.action === 'PUT') {
-      Api.put('admin/roles/' + this.props.id, rol)
+      Api.patch('admin/roles/' + this.props.id, rol)
         .then(function(res) {
-          window.location.href = '/#/roles';
-        });
+          this.handleResponse(res);
+        }.bind(this));
     } else {
       Api.post('admin/roles', rol)
         .then(function(res) {
-          window.location.href = '/#/roles';
-        });
+          this.handleResponse(res);
+        }.bind(this));
     }
+  },
+
+  handleResponse: function(res) {
+    if(!res.error) window.location.href = '/#/roles';
   },
 
   handleTextChange: function(e) {

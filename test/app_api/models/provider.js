@@ -15,9 +15,10 @@ describe('Provider Model', function() {
   });
 
   it('Should create a new Provider', function(done) {
+    var rnd = Math.round(Math.random() * 1000);
     provider = new Provider({
-      name: 'Provider 001',
-      slug: 'provider-001',
+      name: 'Provider ' + rnd,
+      slug: 'provider-' + rnd,
       description:  'My cool test provider',
       category: ',category,test'
     });

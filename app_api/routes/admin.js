@@ -10,10 +10,10 @@ var router = require('express').Router()
 // Users
 router.route('/users')
   .all(hh.authToken, rh.isAllowed)
-  .get(userCtrl.listUsers);
+  .get(userCtrl.list);
 router.route('/users/:userId')
   .all(hh.authToken, rh.isAllowed)
-  .get(userCtrl.showUsers);
+  .get(userCtrl.show);
 router.route('/users/:userId/roles/:rolId')
   .all(hh.authToken, rh.isAllowed)
   .post(userCtrl.addRol)
@@ -22,27 +22,27 @@ router.route('/users/:userId/roles/:rolId')
 // Roles
 router.route('/roles')
   .all(hh.authToken, rh.isAllowed)
-  .get(rolCtrl.listRoles)
-  .post(rolCtrl.newRol);
+  .get(rolCtrl.list)
+  .post(rolCtrl.create);
 
 router.route('/roles/:rolId')
   .all(hh.authToken, rh.isAllowed)
-  .get(rolCtrl.showRol)
-  .put(rolCtrl.updateRol)
-  .delete(rolCtrl.removeRol);
+  .get(rolCtrl.show)
+  .patch(rolCtrl.update)
+  .delete(rolCtrl.remove);
 
 
 // Providers
 router.route('/providers')
   .all(hh.authToken, rh.isAllowed)
-  .get(providerCtrl.listProviders)
-  .post(providerCtrl.newProvider);
+  .get(providerCtrl.list)
+  .post(providerCtrl.create);
 
 router.route('/providers/:providerId')
   .all(hh.authToken, rh.isAllowed)
-  .get(providerCtrl.showProvider)
-  .put(providerCtrl.updateProvider)
-  .delete(providerCtrl.removeProvider);
+  .get(providerCtrl.show)
+  .patch(providerCtrl.update)
+  .delete(providerCtrl.remove);
 
 
 module.exports = function(app) {

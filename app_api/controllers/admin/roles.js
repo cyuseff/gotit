@@ -6,20 +6,28 @@ var Rol = require('../../models/rol')
   , STATUS = require('../../helpers/status-codes')
   , code;
 
-module.exports.newRol = function(req, res) {
-  if(!req.body.name || !req.body.accessLevel || !req.body.routes.length) {
+module.exports.create = function(req, res) {
+  var name = req.body.name.trim()
+    , accessLevel = parseInt(req.body.accessLevel.trim());
+
+  if(!name || !accessLevel || !req.body.routes.length) {
     code = STATUS.code(114);
     return hh.sendJsonResponse(res, code.status, {error: code});
   }
 
   var rol = new Rol({
-    name: req.body.name,
-    accessLevel: req.body.accessLevel
+    name: name,
+    accessLevel: accessLevel
   });
 
-  req.body.routes.map(function(route) {
-    rol.addRoute(route.url, route.methods, route.recursive, route.accessLevel);
-  });
+  for(var i=0, l=req.body.routes.length; i<l; i++) {
+    rol.addRoute(
+      req.body.routes[i].url,
+      req.body.routes[i].methods,
+      parseInt(req.body.routes[i].recursive),
+      parseInt(req.body.routes[i].accessLevel)
+    );
+  }
 
   rol.save(function(err, reply) {
     if(err) {
@@ -30,7 +38,7 @@ module.exports.newRol = function(req, res) {
   });
 };
 
-module.exports.listRoles = function(req, res) {
+module.exports.list = function(req, res) {
   Rol.findAll(function(err, roles) {
     if(err) {
       code = STATUS.code(500, err);
@@ -46,12 +54,7 @@ module.exports.listRoles = function(req, res) {
   });
 };
 
-module.exports.showRol = function(req, res) {
-  if(!req.params.rolId) {
-    code = STATUS.code(111);
-    return hh.sendJsonResponse(res, code.status, {error: code});
-  }
-
+module.exports.show = function(req, res) {
   Rol.findOneById(req.params.rolId, function(err, rol) {
     if(err) {
       code = STATUS.code(500, err);
@@ -67,18 +70,26 @@ module.exports.showRol = function(req, res) {
 };
 
 function updateRol(rol, vars) {
-  rol.name = vars.name;
-  rol.accessLevel = vars.accessLevel;
-  rol.routes = vars.routes;
+  if(vars.name) rol.name = vars.name;
+  if(vars.accessLevel) rol.accessLevel = vars.accessLevel;
+  if(vars.routes && vars.routes.length) {
+    rol.routes = [];
+    for(var i=0, l=vars.routes.length; i<l; i++) {
+      rol.addRoute(
+        vars.routes[i].url,
+        vars.routes[i].methods,
+        parseInt(vars.routes[i].recursive),
+        parseInt(vars.routes[i].accessLevel)
+      );
+    }
+  }
   return rol;
 }
-module.exports.updateRol = function(req, res) {
-  if(!req.params.rolId) {
-    code = STATUS.code(111);
-    return hh.sendJsonResponse(res, code.status, {error: code});
-  }
+module.exports.update = function(req, res) {
+  var name = req.body.name.trim()
+    , accessLevel = parseInt(req.body.accessLevel.trim());
 
-  if(!req.body.name || !req.body.accessLevel || !req.body.routes.length) {
+  if(!name || !accessLevel || !req.body.routes.length) {
     code = STATUS.code(114);
     return hh.sendJsonResponse(res, code.status, {error: code});
   }
@@ -106,13 +117,7 @@ module.exports.updateRol = function(req, res) {
   });
 };
 
-module.exports.removeRol = function(req, res) {
-
-  if(!req.params.rolId) {
-    code = STATUS.code(110);
-    return hh.sendJsonResponse(res, code.status, {error: code});
-  }
-
+module.exports.remove = function(req, res) {
   Rol.remove(req.params.rolId, function(err, reply) {
     if(err) {
       code = STATUS.code(500, err);

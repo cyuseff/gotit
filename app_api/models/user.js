@@ -79,7 +79,7 @@ userSchema.methods.saveAndUpdate = function(callback) {
   me.save(function(err, user) {
     if(err) return callback(err);
     Token.updateAllInSetBySid(SET, me._id, me, function(err, reply) {
-      if(err) return callback({error: 'Tokens not updated', code: 400});
+      if(err) return callback({error: 'Tokens not updated'});
       return callback(null, user);
     });
   });

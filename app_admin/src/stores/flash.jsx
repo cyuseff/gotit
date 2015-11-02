@@ -5,8 +5,8 @@ module.exports = Reflux.createStore({
 
   listenables: [Actions],
 
-  setFlashMessage(err, msg) {
-    this.err = err? err.msg : null;
+  setFlashMessage: function(err, msg) {
+    this.err = err? err.message : null;
     this.msg = msg || null;
     this.triggerChange();
   },

@@ -8,7 +8,7 @@ var User = require('../../models/user')
   , code;
 
 // TODO: check that every require params is present
-module.exports.listUsers = function(req, res) {
+module.exports.list = function(req, res) {
   var projection = {
     fullName: 1,
     emails: 1
@@ -23,7 +23,7 @@ module.exports.listUsers = function(req, res) {
   });
 };
 
-module.exports.showUsers = function(req, res) {
+module.exports.show = function(req, res) {
   User.findOne({_id: req.params.userId}, function(err, user) {
     if(err) {
       code = STATUS.code(501, err);
@@ -43,9 +43,10 @@ module.exports.addRol = function(req, res) {
     return hh.sendJsonResponse(res, code.status, {error: code});
   }
 
-  var userRol;
+  var userRol
+    , scope = req.body.scope.trim();
 
-  if(!req.body.scope) {
+  if(!scope) {
     code = STATUS.code(112);
     return hh.sendJsonResponse(res, code.status, {error: code});
   }
@@ -74,7 +75,7 @@ module.exports.addRol = function(req, res) {
 
         userRol = new UserRol({
           id: req.params.rolId,
-          scope: req.body.scope
+          scope: scope
         });
 
         user.admin = true;

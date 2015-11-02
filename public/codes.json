@@ -3,75 +3,76 @@
     "GOTIT_100": {
       "code": 100,
       "status": 404,
-      "msg": "Token expired"
+      "message": "Token expired"
     },
     "GOTIT_101": {
       "code": 101,
       "status": 403,
-      "msg": "No token provided"
+      "message": "No token provided"
     },
     "GOTIT_102": {
       "code": 102,
       "status": 400,
-      "msg": "Token is not valid"
+      "message": "Token is not valid"
     },
     "GOTIT_103": {
       "code": 103,
       "status": 400,
-      "msg": "Bad token"
+      "message": "Bad token"
     },
+
 
 
 
     "GOTIT_110": {
       "code": 110,
       "status": 404,
-      "msg": "Rol not found"
+      "message": "Rol not found"
     },
     "GOTIT_111": {
       "code": 111,
       "status": 400,
-      "msg": "You can't edit your own rols"
+      "message": "You can't edit your own rols"
     },
     "GOTIT_112": {
       "code": 112,
       "status": 400,
-      "msg": "User id and Scope are both required"
+      "message": "User id and Scope are both required"
     },
     "GOTIT_113": {
       "code": 113,
       "status": 400,
-      "msg": "User already have this rol"
+      "message": "User already have this rol"
     },
     "GOTIT_114": {
       "code": 114,
       "status": 400,
-      "msg": "Rol name is required"
+      "message": "Missing required params"
     },
     "GOTIT_115": {
       "code": 115,
       "status": 403,
-      "msg": "You don't have admin privilege!"
+      "message": "You don't have admin privilege!"
     },
     "GOTIT_116": {
       "code": 116,
       "status": 403,
-      "msg": "You don't have roles"
+      "message": "You don't have roles"
     },
     "GOTIT_117": {
       "code": 117,
       "status": 403,
-      "msg": "Rol not found. You don't have the required privilege!"
+      "message": "Rol not found. You don't have the required privilege!"
     },
     "GOTIT_118": {
       "code": 118,
       "status": 403,
-      "msg": "You don't have the required privilege!"
+      "message": "You don't have the required privilege!"
     },
     "GOTIT_119": {
       "code": 119,
       "status": 404,
-      "msg": "Rol not found on user"
+      "message": "Rol not found on user"
     },
 
 
@@ -79,22 +80,22 @@
     "GOTIT_120": {
       "code": 120,
       "status": 404,
-      "msg": "User not found"
+      "message": "User not found"
     },
     "GOTIT_121": {
       "code": 121,
       "status": 404,
-      "msg": "User id not supplied"
+      "message": "User id not supplied"
     },
     "GOTIT_122": {
       "code": 122,
       "status": 409,
-      "msg": "This email is already in use"
+      "message": "This email is already in use"
     },
     "GOTIT_123": {
       "code": 123,
       "status": 400,
-      "msg": "Passwords don't match"
+      "message": "Passwords don't match"
     },
 
 
@@ -102,27 +103,27 @@
     "GOTIT_130": {
       "code": 130,
       "status": 400,
-      "msg": "Missing credentials"
+      "message": "Missing credentials"
     },
     "GOTIT_131": {
       "code": 131,
       "status": 400,
-      "msg": "Invalid email address"
+      "message": "Invalid email address"
     },
     "GOTIT_132": {
       "code": 132,
       "status": 400,
-      "msg": "Password can only have alpha numerical characters"
+      "message": "Password can only have alpha numerical characters"
     },
     "GOTIT_133": {
       "code": 133,
       "status": 400,
-      "msg": "Password must have at least 6 characthers length"
+      "message": "Password must have at least 6 characthers length"
     },
     "GOTIT_134": {
       "code": 134,
       "status": 403,
-      "msg": "Oops! Wrong password.."
+      "message": "Oops! Wrong password.."
     },
 
 
@@ -131,12 +132,12 @@
     "GOTIT_140": {
       "code": 140,
       "status": 404,
-      "msg": "Provider not found"
+      "message": "Provider not found"
     },
     "GOTIT_141": {
       "code": 141,
       "status": 403,
-      "msg": "Provider slug must be unique"
+      "message": "Provider slug must be unique"
     },
 
 
@@ -144,17 +145,17 @@
     "GOTIT_404": {
       "code": 404,
       "status": 404,
-      "msg": "Page not found"
+      "message": "Page not found"
     },
     "GOTIT_500": {
       "code": 500,
       "status": 500,
-      "msg": "Aerospike error"
+      "message": "Aerospike error"
     },
     "GOTIT_501": {
       "code": 501,
       "status": 500,
-      "msg": "Mongo error"
+      "message": "Mongo error"
     }
   }
 }

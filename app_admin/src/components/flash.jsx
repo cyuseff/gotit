@@ -1,5 +1,4 @@
 var React = require('react')
-  , ReactCSSTransitionGroup = require('react-addons-css-transition-group')
   , Reflux = require('reflux')
   , FlashStore = require('../stores/flash');
 

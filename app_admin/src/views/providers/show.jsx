@@ -38,13 +38,26 @@ module.exports = React.createClass({
         </div>
 
         <div className="margin-b-md">
-          <h3>{this.state.provider.name}</h3>
+          <h2>{this.state.provider.name}</h2>
           <small>{this.state.provider.slug}</small>
           <p>{this.state.provider.description}</p>
         </div>
+
+        <h3>Locations</h3>
+        <ul>{this.renderLocations()}</ul>
       </div>);
     } else {
       return <Loading />;
     }
+  },
+
+  renderLocations: function() {
+    return this.state.provider.locations.map(function(location, idx) {
+      return <li className="margin-b-sm" key={idx}>
+        <div><strong>Name:</strong> {location.name}</div>
+        <div><strong>Address:</strong> {location.address}</div>
+        <div><strong>Coords:</strong> {location.coords[0]}:{location.coords[1]}</div>
+      </li>;
+    });
   }
 });

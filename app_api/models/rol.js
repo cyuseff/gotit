@@ -107,7 +107,7 @@ Rol.remove = function(id, callback) {
 // Instance Methods
 Rol.prototype.addRoute = function(url, methods, recursive, accessLevel) {
   accessLevel = accessLevel || this.accessLevel;
-  recursive = 1; // 0 | 1
+  recursive = recursive || 0;
 
   if(url && methods) {
     this.routes.push({

@@ -121,7 +121,7 @@ describe('Token Model', function() {
     Token.findByJwt(token.jwToken, function(err, reply) {
       should.exist(err);
       should.not.exist(reply);
-      err.should.have.properties('code', 'status', 'msg');
+      err.should.have.properties('code', 'status', 'message');
       done();
     },
     false,

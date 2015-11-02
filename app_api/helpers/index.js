@@ -6,7 +6,9 @@ var User = require('../models/user')
   , STATUS = require('./status-codes');
 
 function sendJsonResponse(res, status, content) {
-  // console.log(content);
+  content.meta = {
+    status: status
+  };
   res.status(status).json(content);
 }
 module.exports.sendJsonResponse = sendJsonResponse;

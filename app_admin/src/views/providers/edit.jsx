@@ -3,6 +3,7 @@ var React = require('react')
   , ProviderStore = require('../../stores/providers')
   , Actions = require('../../actions')
   , Form = require('./_form')
+  , Locations = require('./_locations')
   , Loading = require('../../components/loading');
 
 module.exports = React.createClass({
@@ -19,6 +20,12 @@ module.exports = React.createClass({
     this.setState({provider: ProviderStore.provider});
   },
 
+  addLocation: function(location) {
+    var provider = this.state.provider;
+    provider.locations.push(location);
+    this.setState({provider: provider});
+  },
+
   render: function() {
     return (<div>
       <h2>Edit Provider</h2>
@@ -33,10 +40,12 @@ module.exports = React.createClass({
           <Form
             action="PUT"
             {...this.state.provider}
-            saveTeaxt="Save"/>
+            saveTeaxt="Save"
+          />
         </div>
 
         <div className="col-md-4">
+          <Locations addLocation={this.addLocation} />
         </div>
       </div>);
     } else {

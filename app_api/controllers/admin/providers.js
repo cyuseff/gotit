@@ -5,8 +5,14 @@ var Provider = require('../../models/provider')
   , STATUS = require('../../helpers/status-codes')
   , code;
 
-module.exports.listProviders = function(req, res) {
+// TODO: this function should delete all version
+// and create a version based on every location and saved
+// to location-version collection
+function updateVersions(provider) {
 
+}
+
+module.exports.list = function(req, res) {
   var projection = {
     name: 1,
     slug: 1,
@@ -22,13 +28,21 @@ module.exports.listProviders = function(req, res) {
   });
 };
 
-// TODO: check that every require params is present
-// TODO: handle duplicated slug
-module.exports.newProvider = function(req, res) {
+module.exports.create = function(req, res) {
+  var name = req.body.name.trim()
+    , slug = req.body.slug.trim()
+    , description = req.body.description.trim();
+
+  if(!name || !slug || !description) {
+    code = STATUS.code(114);
+    return hh.sendJsonResponse(res, code.status, {error: code});
+  }
+
   var prov = new Provider({
-    name: req.body.name,
-    slug: req.body.slug,
-    description: req.body.description
+    name: name,
+    slug: slug,
+    description: description,
+    locations: req.body.locations
   });
 
   prov.save(function(err) {
@@ -40,32 +54,45 @@ module.exports.newProvider = function(req, res) {
   });
 };
 
-module.exports.showProvider = function(req, res) {
+module.exports.show = function(req, res) {
   Provider.findOne({slug: req.params.providerId}, function(err, provider) {
     if(err) {
       code = STATUS.code(501, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
+    if(!provider) {
+      code = STATUS.code(140, err);
       return hh.sendJsonResponse(res, code.status, {error: code});
     }
     return hh.sendJsonResponse(res, 200, provider);
   });
 };
 
-module.exports.updateProvider = function(req, res) {
-  var prov = {
-    name: req.body.name,
-    slug: req.body.slug,
-    description: req.body.description
-  };
-  Provider.findOneAndUpdate({_id: req.params.providerId}, prov, function(err, reply) {
+module.exports.update = function(req, res) {
+  var prov = {}
+    , name = req.body.name.trim()
+    , slug = req.body.slug.trim()
+    , description = req.body.description.trim();
+
+  if(name) prov.name = name;
+  if(slug) prov.slug = slug;
+  if(description) prov.description = description;
+  if(req.body.locations && req.body.locations.length) prov.locations = req.body.locations;
+
+  Provider.findOneAndUpdate({slug: req.params.providerId}, prov, {new: true}, function(err, provider) {
     if(err) {
       code = (err.code === 11000)? STATUS.code(141, err) : STATUS.code(501, err);
       return hh.sendJsonResponse(res, code.status, {error: code});
     }
-    return hh.sendJsonResponse(res, 200, {message: 'Provider updated'});
+    if(!provider) {
+      code = STATUS.code(140, err);
+      return hh.sendJsonResponse(res, code.status, {error: code});
+    }
+    return hh.sendJsonResponse(res, 200, {message: 'Provider updated', provider: provider});
   });
 };
 
-module.exports.removeProvider = function(req, res) {
+module.exports.remove = function(req, res) {
   Provider.findOneAndRemove({slug: req.params.providerId}, function(err) {
     if(err) {
       code = STATUS.code(501, err);
