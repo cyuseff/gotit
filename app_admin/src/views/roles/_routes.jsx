@@ -85,7 +85,7 @@ module.exports = React.createClass({
           </div>
           <label className="checkbox-inline"><input ref="methodGet" value="GET" type="checkbox" /> GET</label>
           <label className="checkbox-inline"><input ref="methodPost" value="POST" type="checkbox" /> POST</label>
-          <label className="checkbox-inline"><input ref="methodPut" value="PUT" type="checkbox" /> PUT</label>
+          <label className="checkbox-inline"><input ref="methodPut" value="PATCH" type="checkbox" /> PUT</label>
           <label className="checkbox-inline"><input ref="methodDelete" value="DELETE" type="checkbox" /> DELETE</label>
         </div>
 
