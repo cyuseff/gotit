@@ -181,9 +181,7 @@
     color: #fff;
     background-color: #53cf00; }
 
-a.green:hover,
-a.green:focus,
-a.green:active {
+a.green:hover, a.green:focus, a.green:active {
   color: #46ae00; }
 
 .heavenly {
@@ -194,9 +192,7 @@ a.green:active {
     color: #fff;
     background-color: #68c8f1; }
 
-a.heavenly:hover,
-a.heavenly:focus,
-a.heavenly:active {
+a.heavenly:hover, a.heavenly:focus, a.heavenly:active {
   color: #4f9cbd; }
 
 .blue {
@@ -207,9 +203,7 @@ a.heavenly:active {
     color: #fff;
     background-color: #1c84c6; }
 
-a.blue:hover,
-a.blue:focus,
-a.blue:active {
+a.blue:hover, a.blue:focus, a.blue:active {
   color: #176698; }
 
 .red {
@@ -220,9 +214,7 @@ a.blue:active {
     color: #fff;
     background-color: #ed5565; }
 
-a.red:hover,
-a.red:focus,
-a.red:active {
+a.red:hover, a.red:focus, a.red:active {
   color: #be4552; }
 
 .yellow {
@@ -233,9 +225,7 @@ a.red:active {
     color: #fff;
     background-color: #f8ac59; }
 
-a.yellow:hover,
-a.yellow:focus,
-a.yellow:active {
+a.yellow:hover, a.yellow:focus, a.yellow:active {
   color: #cd8f4b; }
 
 .orange {
@@ -246,9 +236,7 @@ a.yellow:active {
     color: #fff;
     background-color: #f78f38; }
 
-a.orange:hover,
-a.orange:focus,
-a.orange:active {
+a.orange:hover, a.orange:focus, a.orange:active {
   color: #d7690d; }
 
 .gray {
@@ -259,9 +247,7 @@ a.orange:active {
     color: #fff;
     background-color: #999; }
 
-a.gray:hover,
-a.gray:focus,
-a.gray:active {
+a.gray:hover, a.gray:focus, a.gray:active {
   color: #666; }
 
 .light-gray {
@@ -272,9 +258,7 @@ a.gray:active {
     color: #fff;
     background-color: #ccc; }
 
-a.light-gray:hover,
-a.light-gray:focus,
-a.light-gray:active {
+a.light-gray:hover, a.light-gray:focus, a.light-gray:active {
   color: #aaa; }
 
 .black {
@@ -285,9 +269,7 @@ a.light-gray:active {
     color: #fff;
     background-color: #444; }
 
-a.black:hover,
-a.black:focus,
-a.black:active {
+a.black:hover, a.black:focus, a.black:active {
   color: #999; }
 
 .white {
@@ -298,9 +280,7 @@ a.black:active {
     color: #FFFFFF;
     background-color: #fff; }
 
-a.white:hover,
-a.white:focus,
-a.white:active {
+a.white:hover, a.white:focus, a.white:active {
   color: #ccc; }
 
 /* Animation classes */
@@ -526,9 +506,7 @@ body {
     color: #fff;
     background-color: #53cf00; }
 
-a.green:hover,
-a.green:focus,
-a.green:active {
+a.green:hover, a.green:focus, a.green:active {
   color: #46ae00; }
 
 .heavenly {
@@ -539,9 +517,7 @@ a.green:active {
     color: #fff;
     background-color: #68c8f1; }
 
-a.heavenly:hover,
-a.heavenly:focus,
-a.heavenly:active {
+a.heavenly:hover, a.heavenly:focus, a.heavenly:active {
   color: #4f9cbd; }
 
 .blue {
@@ -552,9 +528,7 @@ a.heavenly:active {
     color: #fff;
     background-color: #1c84c6; }
 
-a.blue:hover,
-a.blue:focus,
-a.blue:active {
+a.blue:hover, a.blue:focus, a.blue:active {
   color: #176698; }
 
 .red {
@@ -565,9 +539,7 @@ a.blue:active {
     color: #fff;
     background-color: #ed5565; }
 
-a.red:hover,
-a.red:focus,
-a.red:active {
+a.red:hover, a.red:focus, a.red:active {
   color: #be4552; }
 
 .yellow {
@@ -578,9 +550,7 @@ a.red:active {
     color: #fff;
     background-color: #f8ac59; }
 
-a.yellow:hover,
-a.yellow:focus,
-a.yellow:active {
+a.yellow:hover, a.yellow:focus, a.yellow:active {
   color: #cd8f4b; }
 
 .orange {
@@ -591,9 +561,7 @@ a.yellow:active {
     color: #fff;
     background-color: #f78f38; }
 
-a.orange:hover,
-a.orange:focus,
-a.orange:active {
+a.orange:hover, a.orange:focus, a.orange:active {
   color: #d7690d; }
 
 .gray {
@@ -604,9 +572,7 @@ a.orange:active {
     color: #fff;
     background-color: #999; }
 
-a.gray:hover,
-a.gray:focus,
-a.gray:active {
+a.gray:hover, a.gray:focus, a.gray:active {
   color: #666; }
 
 .light-gray {
@@ -617,9 +583,7 @@ a.gray:active {
     color: #fff;
     background-color: #ccc; }
 
-a.light-gray:hover,
-a.light-gray:focus,
-a.light-gray:active {
+a.light-gray:hover, a.light-gray:focus, a.light-gray:active {
   color: #aaa; }
 
 .black {
@@ -630,9 +594,7 @@ a.light-gray:active {
     color: #fff;
     background-color: #444; }
 
-a.black:hover,
-a.black:focus,
-a.black:active {
+a.black:hover, a.black:focus, a.black:active {
   color: #999; }
 
 .white {
@@ -643,9 +605,7 @@ a.black:active {
     color: #FFFFFF;
     background-color: #fff; }
 
-a.white:hover,
-a.white:focus,
-a.white:active {
+a.white:hover, a.white:focus, a.white:active {
   color: #ccc; }
 
 /* Animation classes */
