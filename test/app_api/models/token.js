@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const Token = require('../../../app_api/models/tokens');
+const Token = require('../../../app_api/models/token');
 const redis = require('../../../config/redis');
 
 const opts = {
