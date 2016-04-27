@@ -1,16 +1,10 @@
 'use strict';
 
-var redis = require('redis')
-  , client = redis.createClient();
-
+const redis = require("redis");
+const client = redis.createClient();
 
 /* Conection Events */
-client.on('error', function(err) {
-  console.log('Error ' + err);
-});
-
-client.on('connect', function() {
-  // console.log('Redis is ready');
-});
+client.on('error', err => console.log('Error ' + err));
+client.on('connect', () => console.log('Redis is ready'));
 
 module.exports = client;

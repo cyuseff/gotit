@@ -1,31 +1,11 @@
 'use strict';
 
-var router = require('express').Router()
-  , localCtrl = require('../controllers/site/auth/local')
-  , facebookCtrl = require('../controllers/site/auth/facebook')
-  , logoutCtrl = require('../controllers/site/auth/logout')
-  , usersCtrl = require('../controllers/site/users')
-  , hh = require('../helpers');
+const router = require('express').Router();
+const localCtrl = require(`${__base}/app_api/controllers/site/auth/local`);
 
 // Auth routes
-router.route('/auth/local').post(localCtrl.localStrategy);
-router.route('/auth/facebook').post(facebookCtrl.facebookStrategy);
-router.route('/auth/logout').get(logoutCtrl.revokeUserToken);
-router.route('/auth/logoutAll').get(hh.authToken, logoutCtrl.revokeAllUserTokens);
-
-
-// Users routes
-router.route('/users').get(hh.authToken, usersCtrl.listUsers);
-router.route('/users/:userid').get(hh.authToken, usersCtrl.showUser);
+router.route('/auth/local').post((req, res) => localCtrl.localStrategy(req, res));
 
 module.exports = function(app) {
   app.use('/api/v1', router);
-
-  // Private test Route
-  app.get('/private', hh.authToken, function(req, res) {
-    hh.sendJsonResponse(res, 200, {message: 'This content is private!', user: {
-      id: req.user._id,
-      name: req.user.fullName
-    }});
-  });
-};
+}

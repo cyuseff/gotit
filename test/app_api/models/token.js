@@ -1,311 +1,264 @@
 'use strict';
-/*jshint expr: true*/
 
-var dirName = __dirname.substr(0, __dirname.indexOf('/test'));
+const expect = require('chai').expect;
+const Token = require('../../../app_api/models/tokens');
+const redis = require('../../../config/redis');
 
-var should = require('should')
-  , app = require(dirName + '/app')
-  , Token = require(dirName + '/app_api/models/token')
-  , redis = require(dirName + '/config/redis')
-  , token
-  , ttlToken
-  , staticSetToken
-  , staticSetToken2;
+const opts = {
+  model: 'Test-Static',
+  owner: 123,
+  data: {foo:'var'}
+};
+let token;
 
-describe('Token Model', function() {
-  before(function(done) {
-    staticSetToken2 = new Token({
-      prefix: 'test',
-      id: 'Static002',
-      data: {dummy: 'Token test with Static Set'},
-      setKey: 'reset-pasword'
-    });
-    staticSetToken2.save(function(err, reply) {
-      done();
-    });
+const ttlOpts = {
+  model: 'Test-Expirable',
+  owner: 456,
+  ttl: 120,
+  data: {exp: true}
+};
+let ttlToken;
+let removeToken;
+
+describe('Token Model', () => {
+  it('Should create a new Token', () => {
+    token = new Token(opts);
+    expect(token).to.exist;
   });
 
-  after('Remove all test Tokens', function(done) {
-    Token.removeAllInSet(token.prefix, token.id, function() {
-      Token.removeAllInSet(ttlToken.prefix, ttlToken.id, function() {
-        done();
-      });
-    });
+  it('Should save Token into the DB', (done) => {
+    token
+      .save()
+      .then((jwt) => {
+        expect(jwt).to.exist;
+        expect(token).to.have.property('jwt', jwt);
+        return done();
+      })
+      .catch((err) => done(err));
   });
 
-  it('Should create a new Token', function(done) {
-    token = new Token({
-      prefix: 'test',
-      id: 'token001',
-      data: {dummy: 'Token test'}
-    });
-
-    should.exist(token);
-    token.should.have.properties({prefix: 'test', id: 'token001', data: {dummy: 'Token test'}});
-    token.should.have.property('createdAt').and.not.be.NaN();
-    token.should.have.property('ttl').and.not.be.NaN();
-    done();
+  it('Token re-save should not generate a new jwToken', (done) => {
+    let old = token.jwt;
+    token
+      .save()
+      .then((jwt) => {
+        expect(jwt).to.equal(old);
+        return done();
+      })
+      .catch(err => done(err));
   });
 
-  it('Should save Token into the DB', function(done) {
-    token.save(function(err, reply) {
-      should.not.exist(err);
-      should.exist(reply);
-      token.should.have.property('jwToken').and.be.exactly(reply);
-      done();
-    });
-  });
-
-  it('Token should belong to a Token Set', function(done) {
-    redis.SISMEMBER(token.setKey, token.key, function(err, reply) {
-      should.not.exist(err);
-      reply.should.be.exactly(1);
-      done();
-    });
-  });
-
-  it('Token should not have a TTL', function(done) {
-    redis.TTL(token.key, function(err, reply) {
-      should.not.exist(err);
-      reply.should.be.exactly(-1);
-      done();
-    });
-  });
-
-  it('Token re-save should not generate a new jwToken', function(done) {
-    token.save(function(err, reply) {
-      token.jwToken.should.be.exactly(reply);
-      done();
-    });
-  });
-
-  it('Should create a Expirable Token', function(done) {
-    ttlToken = new Token({
-      prefix: 'test',
-      id: 'TTL001',
-      data: {dummy: 'Token test with TTL'},
-      expire: true
-    });
-
-    ttlToken.save(function(err, reply) {
-      should.not.exist(err);
-      ttlToken.should.have.property('expire').true();
-
-      redis.TTL(ttlToken.key, function(err, reply) {
-        should.not.exist(err);
-        reply.should.be.above(1);
-        done();
-      });
-    });
-  });
-
-  it('Should create a Static Set Token', function(done) {
-    staticSetToken = new Token({
-      prefix: 'test',
-      id: 'Static001',
-      data: {dummy: 'Token test with Static Set'},
-      setKey: 'reset-pasword'
-    });
-    staticSetToken.save(function(err, reply) {
-      should.not.exist(err);
-      staticSetToken.setKey.should.be.exactly('got-it:test:set:reset-pasword');
-      redis.SMEMBERS(staticSetToken.setKey, function(err, reply) {
-        reply.should.be.Array();
-        reply.length.should.be.above(1);
-        reply.should.containDeep([staticSetToken.key, staticSetToken2.key]);
-        done();
-      });
-    });
-  });
-
-  it('Should find the token and return it', function(done) {
-    Token.findByJwt(token.jwToken, function(err, reply) {
-      should.not.exist(err);
-      should.exist(reply);
-      done();
-    });
-  });
-
-  it('Should return an error with a invalid token', function(done) {
-    Token.findByJwt('dummy', function(err, reply) {
-      should.not.exist(reply);
-      err.should.have.property('status', 400);
-      done();
-    });
-  });
-
-  it('Should find the token and and fail the validation', function(done) {
-    Token.findByJwt(token.jwToken, function(err, reply) {
-      should.exist(err);
-      should.not.exist(reply);
-      err.should.have.properties('error', 'status');
-      done();
-    },
-    false,
-    function(token) { return false; });
-  });
-
-  it('Should find the token and pass the validation', function(done) {
-    Token.findByJwt(token.jwToken, function(err, reply) {
-      should.not.exist(err);
-      should.exist(reply);
-      reply.should.have.property('jwToken').be.exactly(token.jwToken);
-      done();
-    },
-    false,
-    function(token, decoded) {
-      return (token.id === 'token001' && token.id === decoded.id);
-    });
-  });
-
-  it('Should find a expirable token and update his TTL', function(done) {
-    redis.EXPIRE(ttlToken.key, 100, function(err, reply) {
-      Token.findByJwt(ttlToken.jwToken, function(err, reply) {
-        should.not.exist(err);
-        should.exist(reply);
-
-        redis.TTL(reply.key, function(err, ttl) {
-          ttl.should.be.approximately(3600, 10);
+  it('Should create a Expirable Token', (done) => {
+    ttlToken = new Token(ttlOpts);
+    ttlToken
+      .save()
+      .then(() => {
+        expect(ttlToken).to.have.property('ttl', ttlOpts.ttl);
+        redis.TTL(`tokens::${ttlToken.model}::${ttlToken.id}`, (err, reply) => {
+          if(err) return done(err);
+          expect(reply).to.be.closeTo(ttlOpts.ttl, 1);
           done();
         });
-      },
-      true);
-    });
+      })
+      .catch(err => done(err));
   });
 
-  it('Should find a expirable token and not update his TTL', function(done) {
-    redis.EXPIRE(ttlToken.key, 100, function(err, reply) {
-      Token.findByJwt(ttlToken.jwToken, function(err, reply) {
-        should.not.exist(err);
-        should.exist(reply);
-
-        redis.TTL(reply.key, function(err, ttl) {
-          ttl.should.be.approximately(100, 10);
-          done();
-        });
-      },
-      false);
-    });
+  it('Should find the token and return it', (done) => {
+    Token
+      .findByJwt(token.jwt)
+      .then((tk) => {
+        expect(tk).to.exist;
+        expect(tk).to.have.property('id', token.id);
+        return done();
+      })
+      .catch(err => done(err));
   });
 
-  it('Should remove a token by JWT', function(done) {
-    Token.removeByJwt(token.jwToken, function(err, reply) {
-      should.not.exist(err);
-      should.exist(reply);
-      reply.should.have.property('message').match(/removed/i);
-      done();
-    });
+  it('Should return an error with a invalid token', (done) => {
+    Token
+      .findByJwt('dummy')
+      .then(() => done(new Error('Token Should not exist.')))
+      .catch((err) => {
+        expect(err).to.exist;
+        expect(err.toString()).to.contain('JsonWebTokenError');
+        return done();
+      });
   });
 
-  it('Should fail to remove it again', function(done) {
-    Token.removeByJwt(token.jwToken, function(err, reply) {
-      should.not.exist(reply);
-      err.should.have.property('status', 404);
-      done();
-    });
+  it('Should find the token and and fail the validation', (done) => {
+    Token
+      .findByJwt(token.jwt, false, () => false)
+      .then(() => done(new Error('Token Should not exist.')))
+      .catch((err) => {
+        expect(err).to.exist;
+        expect(err.toString()).to.contain('Bad token.');
+        return done();
+      });
   });
 
-  it('Should not found the removed token', function(done) {
-    Token.findByJwt(token.jwToken, function(err, reply) {
-      should.exist(err);
-      should.not.exist(reply);
-      err.should.have.property('status').be.exactly(404);
-      done();
-    });
+  it('Should find the token and pass the validation', (done) => {
+    Token
+      .findByJwt(token.jwt, false, (tt, dd) => {
+        return tt.id === dd.id;
+      })
+      .then((tk) => {
+        expect(tk).to.exist;
+        expect(tk).to.have.property('id', token.id);
+        return done();
+      })
+      .catch(err => done(err));
   });
 
-  it('Token should not exist on his Set', function(done) {
-    redis.SISMEMBER(token.setKey, token.key, function(err, reply) {
-      should.not.exist(err);
-      reply.should.be.exactly(0);
-      done();
-    });
-  });
+  it('Should find a expirable token and update his TTL', (done) => {
+    redis.EXPIRE(`tokens::${ttlToken.model}::${ttlToken.id}`, 30, (err, reply) => {
+      if(err) return done(err);
+      expect(reply).to.equal(1);
 
-  it('When a token dont exist, should be removed from set when findByJwt()', function(done) {
-    // insert the deleted key in set
-    redis.SADD(token.setKey, token.key, function(err, reply) {
-      // check the key in set
-      redis.SMEMBERS(token.setKey, function(err, reply) {
-        reply.should.containDeep([token.key]);
-        // exec the find method
-        Token.findByJwt(token.jwToken, function(err, reply) {
-          should.exist(err);
-          should.not.exist(reply);
-          err.should.have.property('status').be.exactly(404);
+      Token
+        .findByJwt(ttlToken.jwt, true)
+        .then(tk => {
+          expect(tk).to.exist;
 
-          // check set in redis
-          redis.SISMEMBER(token.setKey, token.key, function(err, reply) {
-            should.not.exist(err);
-            reply.should.be.exactly(0);
+          redis.TTL(`tokens::${ttlToken.model}::${ttlToken.id}`, (err, rep) => {
+            if(err) return done(err);
+            expect(rep).to.be.closeTo(ttlOpts.ttl, 1);
             done();
           });
-        });
-      });
+
+        })
+        .catch(err => done(err));
+
     });
   });
 
-  it('Should return a list of Tokens', function(done) {
-    Token.findAllInSet(staticSetToken.prefix, 'reset-pasword', function(err, reply) {
-      should.not.exist(err);
-      should.exist(reply);
-      reply.should.be.Array();
-      reply.length.should.be.above(1);
-      done();
+  it('Should find a expirable token and not update his TTL', (done) => {
+    redis.EXPIRE(`tokens::${ttlToken.model}::${ttlToken.id}`, 30, (err, reply) => {
+      if(err) return done(err);
+      expect(reply).to.equal(1);
+
+      Token
+        .findByJwt(ttlToken.jwt)
+        .then(tk => {
+          expect(tk).to.exist;
+
+          redis.TTL(`tokens::${ttlToken.model}::${ttlToken.id}`, (err, rep) => {
+            if(err) return done(err);
+            expect(rep).to.be.closeTo(30, 1);
+            done();
+          });
+
+        })
+        .catch(err => done(err));
+
     });
   });
 
-  it('Should update all tokens data in Set', function(done) {
-    var data = {timeStamp: Date.now()};
-    Token.updateAllInSet(staticSetToken.prefix, 'reset-pasword', data, function(err, reply) {
-      should.not.exist(err);
-      should.exist(reply);
-      reply.should.be.Array();
-      reply.length.should.be.above(1);
+  it('Should remove a token by JWT', (done) => {
+    removeToken = new Token(opts);
+    removeToken
+      .save()
+      .then((data) => {
+        Token
+          .removeByJwt(removeToken.jwt)
+          .then((reply) => {
+            expect(reply).to.exist;
+            expect(reply).to.eql([1,1]);
+            done();
+          })
+          .catch(err => done(err));
+      })
+      .catch(e => done(e))
+  });
 
-      redis.GET(reply[0], function(err, updated) {
-        updated = JSON.parse(updated);
-        updated.should.containDeepOrdered({data: {timeStamp: data.timeStamp }});
+  it('Should fail to remove it again', (done) => {
+    Token
+      .removeByJwt(removeToken.jwt)
+      .then((reply) => {
+        expect(reply).to.exist;
+        expect(reply).to.eql([0,0]);
+        done();
+      })
+      .catch(err => done(err));
+  });
+
+  it('Should not found the removed token', (done) => {
+    Token
+      .findByJwt(removeToken.jwt)
+      .then(() => done(new Error('Should fail.')))
+      .catch((err) => {
+        expect(err).to.exist;
+        expect(err.toString()).to.contain('Not found');
         done();
       });
-    });
   });
 
-  it('When a token dont exist, should be removed from set when updateAllInSet()', function(done) {
-    // add dummy token to set
-    redis.SADD(staticSetToken.setKey, 'dummy-token', function(err, reply) {
-      // check the dummy inside SET
-      redis.SMEMBERS(staticSetToken.setKey, function(err, reply) {
-        reply.should.containDeep(['dummy-token']);
+  it('Should return a list of Tokens', (done) => {
+    Token.
+      findSet(token.model, token.owner)
+      .then((set) => {
+        expect(set).to.exist;
+        expect(set).to.be.instanceof(Array);
+        expect(set).to.have.length.above(0);
+        done();
+      })
+      .catch(err => done(err));
+  });
 
-        var data = {timeStamp: Date.now()};
-        Token.updateAllInSet(staticSetToken.prefix, 'reset-pasword', data, function(err, reply) {
-          should.not.exist(err);
-          should.exist(reply);
-          reply.should.be.Array();
-          reply.should.not.containDeep(['dummy-token']);
+  it('Should update all tokens data in Set', (done) => {
+    const data = {a: 1, b: 2};
+    let json;
+    Token
+      .updateSet(token.model, token.owner, data)
+      .then(set => {
+        expect(set).to.have.length.above(0);
+        redis.GET(set[set.length - 1], (err, reply) => {
+          if(err) done(err);
+          expect(reply).to.exist;
+          json = JSON.parse(reply);
+          expect(json).to.have.property('data').eql(data);
           done();
         });
-      });
+      })
+      .catch(err => done(err));
+  });
+
+  it('Should update all TTL tokens and don\'t modify their TTL', (done) => {
+    const data = {c: 1, d: 2};
+    const key = `tokens::${ttlToken.model}::${ttlToken.id}`;
+    let ttl;
+    let json;
+
+    redis.TTL(key, (err, reply) => {
+      if(err) done(err);
+      ttl = reply;
+      expect(ttl).to.be.above(0);
+
+      Token
+        .updateSet(ttlToken.model, ttlToken.owner, data)
+        .then(set => {
+          expect(set).to.have.length.above(0);
+          redis.TTL(key, (err, reply) => {
+            if(err) done(err);
+            expect(reply).to.be.above(0);
+            expect(reply).to.be.closeTo(ttl, 1);
+            done();
+          });
+        })
+        .catch(err => done(err));
     });
   });
 
-  it('Should remove all token in Set and delete the Set', function(done) {
-    Token.removeAllInSet(staticSetToken.prefix, 'reset-pasword', function(err, reply) {
-      should.not.exist(err);
-      reply.should.be.above(1);
-      // check token key
-      redis.EXISTS(staticSetToken.key, function(err, reply) {
-        should.not.exist(err);
-        reply.should.be.exactly(0);
-        // check set
-        redis.EXISTS(staticSetToken.setKey, function(err, reply) {
-          should.not.exist(err);
-          reply.should.be.exactly(0);
-          done();
+  it('Should remove all token in Set', (done) => {
+    Token
+      .removeSet(token.model, token.owner)
+      .then(reply => {
+        expect(reply).to.be.above(0);
+        redis.EXISTS(`tokens::${token.model}::${token.owner}`, (err, reply) => {
+          if(err) return done(err);
+          expect(reply).to.equal(0);
         });
-      });
-    });
+        done();
+      })
+      .catch(err => done(err));
   });
-
 });

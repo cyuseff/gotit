@@ -1,29 +1,32 @@
 {
-  "name": "token",
+  "name": "gotit",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "./node_modules/.bin/istanbul test ./node_modules/.bin/_mocha -- -R spec"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyuseff/gotit.git"
+  },
+  "author": "@cyussi",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cyuseff/gotit/issues"
+  },
+  "homepage": "https://github.com/cyuseff/gotit#readme",
   "dependencies": {
-    "bcrypt": "https://registry.npmjs.org/bcrypt/-/bcrypt-0.8.3.tgz",
-    "body-parser": "https://registry.npmjs.org/body-parser/-/body-parser-1.12.4.tgz",
-    "express": "https://registry.npmjs.org/express/-/express-4.12.4.tgz",
-    "hiredis": "https://registry.npmjs.org/hiredis/-/hiredis-0.4.0.tgz",
-    "jsonwebtoken": "https://registry.npmjs.org/jsonwebtoken/-/jsonwebtoken-5.0.1.tgz",
-    "mongoose": "https://registry.npmjs.org/mongoose/-/mongoose-4.0.5.tgz",
-    "redis": "https://registry.npmjs.org/redis/-/redis-0.12.1.tgz",
-    "request": "https://registry.npmjs.org/request/-/request-2.57.0.tgz",
-    "uuid": "https://registry.npmjs.org/uuid/-/uuid-2.0.1.tgz",
-    "validator": "https://registry.npmjs.org/validator/-/validator-3.40.0.tgz"
+    "bcrypt": "^0.8.6",
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4",
+    "jsonwebtoken": "^5.7.0",
+    "mongoose": "^4.4.13",
+    "redis": "^2.6.0-1",
+    "validator": "^5.2.0"
   },
   "devDependencies": {
-    "istanbul": "*",
-    "mocha": "*",
-    "should": "*",
-    "supertest": "*"
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
   }
 }

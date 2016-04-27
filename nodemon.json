@@ -1,0 +1,7 @@
+{
+  "ignore": ["app_admin/", "node_modules/", "coverage/"],
+  "events": {
+    "restar-----t": "osascript -e 'display notification \"App restarted due to:\n'$FILENAME'\" with title \"nodemon\"'"
+  },
+  "watch": ["*.*", "public/codes.json"]
+}
