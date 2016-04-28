@@ -21,6 +21,14 @@ let ttlToken;
 let removeToken;
 
 describe('Token Model', () => {
+
+  after((done) => {
+    Token
+      .removeSet(ttlToken.model, ttlToken.owner)
+      .then(() => done())
+      .catch(err => done(err));
+  });
+
   it('Should create a new Token', () => {
     token = new Token(opts);
     expect(token).to.exist;

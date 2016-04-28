@@ -1,70 +1,48 @@
 'use strict';
 
-const BaseController = require(`${__base}/app_api/controllers/base_controller`);
-const User = require(`${__base}/app_api/models/user`);
+const BaseController = require(`../base_controller`);
+const User = require(`../../..//app_api/models/user`);
 const validator = require('validator');
 const ctrl = new BaseController();
 
 
-ctrl.localSignin = function(req, res, email, password, confirmPassword) {
+ctrl.localSignin = function(req, res) {
+  let user;
 
   // Check password and confirmation
-  if(password !== confirmPassword) {
+  if(req.body.password !== req.body.confirmPassword) {
     return this.answer(res, 400, {message: 'Passwords don\'t match'});
   }
 
   User
     .findOne({'local.email': email })
-    // .findOne({ emails:{ $in: [email] } })
-    .exec((err, usr) => {
-      if(err) return this.answer(res, 500, {message: 'Mongo error'});
+    .then((usr) => {
       if(usr) return this.answer(res, 409, {message: 'This email is already in use'});
 
-      // Create a new User
-      var user = new User();
-      user.generateHash(password, (err, hash) => {
-
-        if(err) return this.answer(res, 500, {message: 'Opps!'});
-
-        // Push to users emails array
-        user.emails.push(email);
-
-        // add general properties
-        user.firstName = req.body.first_name;
-        user.lastName = req.body.last_name;
-        user.fullName = `${req.body.first_name} ${req.body.last_name}`;
-
-        // add strategy properties
-        user.local.email = email;
-        user.local.password = hash;
-
-        // save user before serialize into his token
-        user.save((err) => {
-          if(err) return this.answer(res, 500, {message: 'Mongo error'});
-
-          this.answer(res, 201, {id: user._id, location: `/api/v1/users/${user._id}`});
-
-          // create session token
-          /*var token = new Token({
-            set: SET,
-            sid: user._id,
-            data: user,
-            ttl: TTL
-          });
-          token.save(function(err, jwToken) {
-            // The user was created so send it back anyway even if token creation or aerospike fails
-            if(err) console.log(err);
-            return hh.sendJsonResponse(res, 201, {message: 'User created', user: user.getPublicUser(), token: jwToken});
-          });*/
-
-        });
-
+      user = new User({
+        emails: [req.body.email],
+        firstName: req.body.first_name,
+        lastName: req.body.last_name,
+        fullName: `${req.body.first_name} ${req.body.last_name}`,
+        birthAt: req.body.birth_at,
+        sex: req.body.sex,
+        phone: req.body.phone,
+        address: req.body.address,
+        commune: req.body.commune,
+        city: req.body.city
       });
 
-    });
-
+      user
+        .generateHash(req.body.password)
+        .then(hash => {
+          // add strategy properties
+          user.local.email = req.body.email;
+          user.local.password = hash;
+        })
+        .catch(e => this.answer(res, 500, {message: e.toString()}));
+    })
+    .catch(err => this.answer(res, 500, {message: 'Mongo Error.'}));
 }
-
 
 ctrl.localStrategy = function(req, res) {
   const email = req.body.email;
@@ -96,7 +74,7 @@ ctrl.localStrategy = function(req, res) {
     this.localLogin(req, res, email, password);
   } else {
     // New user, start signin flow
-    this.localSignin(req, res, email, password, confirmPassword);
+    this.localSignin(req, res);
   }
 };
 

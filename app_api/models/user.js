@@ -5,6 +5,7 @@ const Token = require('./token');
 const bcrypt = require('bcrypt');
 
 const MODEL = 'User';
+const TTL = 120;
 const SALT_ROUNDS = (process.env.NODE_ENV == 'production')? 12 : 2;
 
 const userSchema = new mongo.Schema({
@@ -60,6 +61,29 @@ const userSchema = new mongo.Schema({
 // Hooks
 
 // Methods
+
+// TODO: create create() method with Token create as a
+userSchema.methods.create = function() {
+  let token;
+  return new Promise((resolve, reject) => {
+    this
+      .save()
+      .then(usr => {
+        token = new Token({
+          model: MODEL,
+          owner: usr._id,
+          data: usr
+        });
+
+        token
+          .save()
+          .then(jwt => resolve({user: usr, jwt: jwt}))
+          .catch(err => resolve({user: usr, jwt: null}));
+      })
+      .catch(err => reject(err));
+  });
+};
+
 userSchema.methods.saveAndUpdate = function() {
   return new Promise((resolve, reject) => {
     this
