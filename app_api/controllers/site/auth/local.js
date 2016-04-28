@@ -1,23 +1,23 @@
 'use strict';
 
-const BaseController = require(`../base_controller`);
-const User = require(`../../..//app_api/models/user`);
+const BaseController = require('../../base_controller');
+const User = require('../../../../app_api/models/user');
 const validator = require('validator');
 const ctrl = new BaseController();
-
 
 ctrl.localSignin = function(req, res) {
   let user;
 
   // Check password and confirmation
-  if(req.body.password !== req.body.confirmPassword) {
-    return this.answer(res, 400, {message: 'Passwords don\'t match'});
+  if(req.body.password !== req.body.confirm_password) {
+    return this.answer(res, 400, {message: 'Passwords do not match'});
   }
 
   User
-    .findOne({'local.email': email })
-    .then((usr) => {
-      if(usr) return this.answer(res, 409, {message: 'This email is already in use'});
+    .findOne({'local.email': req.body.email })
+    .exec((err, usr) => {
+      if(err) return this.answer(res, 500, {message: 'Mongo Error.'});
+      if(usr) return this.answer(res, 409, {message: 'This email is already in use.'});
 
       user = new User({
         emails: [req.body.email],
@@ -38,10 +38,16 @@ ctrl.localSignin = function(req, res) {
           // add strategy properties
           user.local.email = req.body.email;
           user.local.password = hash;
+
+          user
+            .create()
+            .then(obj => {
+              this.answer(res, 201, {id: obj.user._id, token: obj.jwt});
+            })
+            .catch(err => this.answer(res, 500, {message: 'Mongo Error.'}));
         })
-        .catch(e => this.answer(res, 500, {message: e.toString()}));
-    })
-    .catch(err => this.answer(res, 500, {message: 'Mongo Error.'}));
+        .catch(err => this.answer(res, 500, {message: e.toString()}));
+    });
 }
 
 ctrl.localStrategy = function(req, res) {
