@@ -61,25 +61,35 @@ const userSchema = new mongo.Schema({
 // Hooks
 
 // Methods
-
-// TODO: create create() method with Token create as a
 userSchema.methods.create = function() {
   let token;
   return new Promise((resolve, reject) => {
     this
       .save()
-      .then(usr => {
-        token = new Token({
-          model: MODEL,
-          owner: usr._id,
-          data: usr
-        });
-
-        token
-          .save()
-          .then(jwt => resolve({user: usr, jwt: jwt}))
-          .catch(err => resolve({user: usr, jwt: null}));
+      .then(() => {
+        this
+          .createToken()
+          .then(obj => resolve({user: obj.data, jwt: obj.jwt}))
+          .catch(err => resolve({user: this.getPublicUser(), jwt: null}));
       })
+      .catch(err => {
+        reject(err)
+      });
+  });
+};
+
+userSchema.methods.createToken = function() {
+  let token;
+  return new Promise((resolve, reject) => {
+    token = new Token({
+      model: MODEL,
+      owner: this._id,
+      data: this.getPublicUser()
+    });
+
+    token
+      .save()
+      .then(obj => resolve(obj))
       .catch(err => reject(err));
   });
 };
@@ -88,10 +98,10 @@ userSchema.methods.saveAndUpdate = function() {
   return new Promise((resolve, reject) => {
     this
       .save()
-      .then(usr => {
+      .then(() => {
         Token
-          .updateSet(MODEL, this._id, this)
-          .then(arr => resolve({user: usr, tokens: arr}))
+          .updateSet(MODEL, this._id, this.getPublicUser())
+          .then(arr => resolve({user: this.getPublicUser(), tokens: arr}))
           .catch(err => reject(err));
       })
       .catch(e => reject(err));
@@ -135,19 +145,25 @@ userSchema.methods.comparePassword = function(candidatePassword) {
 
 userSchema.methods.getPublicUser = function() {
   let publicUser = {
-    //
-    _id: this._id,
+    id: this._id,
     emails: this.emails,
-    accounts: this.accounts,
+    fullName: this.fullName,
+    firstName: this.firstName,
+    lastName: this.lastName,
+    birthAt: this.birthAt,
+    sex: this.sex,
 
-    // account properties
-    isAdmin: this.admin,
-    active: this.active,
-    createdAt: this.createdAt,
+    admin: this.admin,
     roles: this.roles,
+    createdAt: this.createdAt,
+    active: this.active,
+    verify: this.verify,
 
-    // user properties
-    fullName: this.fullName
+    // additional info
+    phone: this.phone,
+    address: this.address,
+    commune: this.commune,
+    city: this.city
   };
 
   // Auth mehotds
@@ -155,7 +171,7 @@ userSchema.methods.getPublicUser = function() {
   publicUser.facebook = !!this.facebook.id;
   publicUser.twitter = !!this.twitter.id;
   publicUser.google = !!this.google.id;
-
+  
   return publicUser;
 };
 

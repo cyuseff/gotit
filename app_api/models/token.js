@@ -55,9 +55,8 @@ class Token {
 
       multi.exec((err, reply) => {
         if(err) return reject(err);
-        return resolve(this.jwt);
+        return resolve({jwt: this.jwt, data: JSON.parse(this.data)});
       });
-
     };
 
     return new Promise((resolve, reject) => {

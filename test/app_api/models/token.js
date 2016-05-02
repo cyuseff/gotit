@@ -37,9 +37,10 @@ describe('Token Model', () => {
   it('Should save Token into the DB', (done) => {
     token
       .save()
-      .then((jwt) => {
-        expect(jwt).to.exist;
-        expect(token).to.have.property('jwt', jwt);
+      .then((obj) => {
+        expect(obj.jwt).to.exist;
+        expect(obj.data).to.exist;
+        expect(token).to.have.property('jwt', obj.jwt);
         return done();
       })
       .catch((err) => done(err));
@@ -49,8 +50,8 @@ describe('Token Model', () => {
     let old = token.jwt;
     token
       .save()
-      .then((jwt) => {
-        expect(jwt).to.equal(old);
+      .then((obj) => {
+        expect(obj.jwt).to.equal(old);
         return done();
       })
       .catch(err => done(err));

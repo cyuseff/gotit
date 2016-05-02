@@ -38,7 +38,7 @@ describe('User Model', () => {
       .catch(e => done(e));
   });
 
-  it('Mismatch Passwords', (done) => {
+  it('Should not match Passwords', (done) => {
     user
       .comparePassword('wrong_password')
       .then(isMatch => {
@@ -51,7 +51,7 @@ describe('User Model', () => {
   it('Should return a public version of the User', (done) => {
     pUser = user.getPublicUser();
     expect(pUser).to.exist;
-    expect(pUser).to.have.property('_id');
+    expect(pUser).to.have.property('id');
     done();
   });
 
@@ -59,11 +59,11 @@ describe('User Model', () => {
     user
       .create()
       .then((obj) => {
-        expect(obj).to.have.deep.property('user._id', user._id);
+        expect(obj).to.have.deep.property('user.id', user._id.toString());
         expect(obj.jwt).to.exist;
         JWToken = obj.jwt;
 
-        User.findById(pUser._id, function(err, usr) {
+        User.findById(pUser.id, function(err, usr) {
           if(err) done(err);
           expect(usr).to.exist;
           Token

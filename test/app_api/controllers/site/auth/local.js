@@ -12,7 +12,7 @@ let password = '123abC';
 let id;
 let token;
 
-describe('Auth local controller', () => {
+describe('Auth Local Controller', () => {
   after((done) => {
     User
       .findById(id)
@@ -80,9 +80,9 @@ describe('Auth local controller', () => {
         .expect('Content-Type', /json/)
         .expect((res) => {
           expect(res.body.token).to.exist;
-          expect(res.body.id).to.exist;
+          expect(res.body.user).to.exist;
           token = res.body.token;
-          id = res.body.id;
+          id = res.body.user.id;
         })
         .end(done);
     });
@@ -94,6 +94,40 @@ describe('Auth local controller', () => {
         .expect(409)
         .expect('Content-Type', /json/)
         .expect(/This email is already in use/, done);
+    });
+  });
+
+  describe('Login', () => {
+    it('Return a 404 User not found', (done) => {
+      agent
+        .post(URL)
+        .send(`email=wrong@email.com&password=${password}`)
+        .expect(404)
+        .expect('Content-Type', /json/)
+        .expect(/User not found/, done);
+    });
+
+    it('Return a 403 password error', (done) => {
+      agent
+        .post(URL)
+        .send(`email=${email}&password=wrong`)
+        .expect(403)
+        .expect('Content-Type', /json/)
+        .expect(/Wrong password/, done);
+    });
+
+    it('Return a 200 User with token', (done) => {
+      agent
+        .post(URL)
+        .send(`email=${email}&password=${password}`)
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          expect(res.body.token).to.exist;
+          expect(res.body.user).to.exist;
+          expect(res.body.user).to.have.property('emails').to.include(email);
+        })
+        .end(done);
     });
   });
 });

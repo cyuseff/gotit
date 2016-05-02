@@ -42,13 +42,36 @@ ctrl.localSignin = function(req, res) {
           user
             .create()
             .then(obj => {
-              this.answer(res, 201, {id: obj.user._id, token: obj.jwt});
+              this.answer(res, 201, {user: obj.user, token: obj.jwt});
             })
             .catch(err => this.answer(res, 500, {message: 'Mongo Error.'}));
         })
         .catch(err => this.answer(res, 500, {message: e.toString()}));
     });
 }
+
+ctrl.localLogin = function(req, res) {
+  User
+    .findOne({'local.email': req.body.email })
+    .exec((err, user) => {
+      if(err) return this.answer(res, 500, {message: 'Mongo Error.'});
+      if(!user) return this.answer(res, 404, {message: 'User not found.'});
+
+      user
+        .comparePassword(req.body.password)
+        .then((match) => {
+          if(match) {
+            user
+              .createToken()
+              .then(obj => this.answer(res, 200, {user: obj.data, token: obj.jwt}))
+              .catch(err => this.answer(res, 500, {message: 'Opps.'}));
+          } else {
+            return this.answer(res, 403, 'Wrong password.');
+          }
+        })
+        .catch(err => this.answer(res, 500, {message: 'Opps.'}))
+    });
+};
 
 ctrl.localStrategy = function(req, res) {
   const email = req.body.email;
@@ -77,7 +100,7 @@ ctrl.localStrategy = function(req, res) {
 
   if(!confirmPassword) {
     // Old user, start login flow
-    this.localLogin(req, res, email, password);
+    this.localLogin(req, res);
   } else {
     // New user, start signin flow
     this.localSignin(req, res);

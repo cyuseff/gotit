@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const DB_URI = (process.env.NODE_ENV == 'production')? process.env.MONGO_URI : 'mongodb://localhost/gotit';
 
 mongoose.connection
-  .on('connected', () => console.log(`Mongo connected to: ${DB_URI}`))
+  //.on('connected', () => console.log(`Mongo connected to: ${DB_URI}`))
   .on('error', err => console.log(`Mongo connection error: ${err}`))
   .on('disconected', () => 'Mongo disconected');
 

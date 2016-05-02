@@ -25,8 +25,8 @@ describe('Logout controller', () => {
 
     token
       .save()
-      .then((j) => {
-        jwt = j;
+      .then((obj) => {
+        jwt = obj.jwt;
 
         for(let i=0; i < N; i++) {
           arr.push(`Tokens::User::batch-${i}`);
@@ -62,10 +62,10 @@ describe('Logout controller', () => {
 
     token
       .save()
-      .then((jwt) => {
+      .then((obj) => {
         agent
           .get('/api/v1/auth/logout-all')
-          .set('x-access-token', jwt)
+          .set('x-access-token', obj.jwt)
           .expect(204, done);
       })
       .catch(err => done(err));
