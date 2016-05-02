@@ -62,7 +62,7 @@ describe('Token Model', () => {
       .save()
       .then(() => {
         expect(ttlToken).to.have.property('ttl', ttlOpts.ttl);
-        redis.TTL(`tokens::${ttlToken.model}::${ttlToken.id}`, (err, reply) => {
+        redis.TTL(`Tokens::${ttlToken.model}::${ttlToken.id}`, (err, reply) => {
           if(err) return done(err);
           expect(reply).to.be.closeTo(ttlOpts.ttl, 1);
           done();
@@ -118,7 +118,7 @@ describe('Token Model', () => {
   });
 
   it('Should find a expirable token and update his TTL', (done) => {
-    redis.EXPIRE(`tokens::${ttlToken.model}::${ttlToken.id}`, 30, (err, reply) => {
+    redis.EXPIRE(`Tokens::${ttlToken.model}::${ttlToken.id}`, 30, (err, reply) => {
       if(err) return done(err);
       expect(reply).to.equal(1);
 
@@ -127,7 +127,7 @@ describe('Token Model', () => {
         .then(tk => {
           expect(tk).to.exist;
 
-          redis.TTL(`tokens::${ttlToken.model}::${ttlToken.id}`, (err, rep) => {
+          redis.TTL(`Tokens::${ttlToken.model}::${ttlToken.id}`, (err, rep) => {
             if(err) return done(err);
             expect(rep).to.be.closeTo(ttlOpts.ttl, 1);
             done();
@@ -140,7 +140,7 @@ describe('Token Model', () => {
   });
 
   it('Should find a expirable token and not update his TTL', (done) => {
-    redis.EXPIRE(`tokens::${ttlToken.model}::${ttlToken.id}`, 30, (err, reply) => {
+    redis.EXPIRE(`Tokens::${ttlToken.model}::${ttlToken.id}`, 30, (err, reply) => {
       if(err) return done(err);
       expect(reply).to.equal(1);
 
@@ -149,7 +149,7 @@ describe('Token Model', () => {
         .then(tk => {
           expect(tk).to.exist;
 
-          redis.TTL(`tokens::${ttlToken.model}::${ttlToken.id}`, (err, rep) => {
+          redis.TTL(`Tokens::${ttlToken.model}::${ttlToken.id}`, (err, rep) => {
             if(err) return done(err);
             expect(rep).to.be.closeTo(30, 1);
             done();
@@ -232,7 +232,7 @@ describe('Token Model', () => {
 
   it('Should update all TTL tokens and don\'t modify their TTL', (done) => {
     const data = {c: 1, d: 2};
-    const key = `tokens::${ttlToken.model}::${ttlToken.id}`;
+    const key = `Tokens::${ttlToken.model}::${ttlToken.id}`;
     let ttl;
     let json;
 
@@ -261,7 +261,7 @@ describe('Token Model', () => {
       .removeSet(token.model, token.owner)
       .then(reply => {
         expect(reply).to.be.above(0);
-        redis.EXISTS(`tokens::${token.model}::${token.owner}`, (err, reply) => {
+        redis.EXISTS(`Tokens::${token.model}::${token.owner}`, (err, reply) => {
           if(err) return done(err);
           expect(reply).to.equal(0);
         });

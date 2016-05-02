@@ -1,10 +1,10 @@
 'use strict';
 
-const User = require('../../../../../app_api/models/user')
 const request = require('supertest');
 const app = require('../../../../../app');
 const agent = request.agent(app);
 const expect = require('chai').expect;
+const User = require('../../../../../app_api/models/user')
 const URL = '/api/v1/auth/local';
 
 let email = 'test@email.com';
@@ -96,15 +96,4 @@ describe('Auth local controller', () => {
         .expect(/This email is already in use/, done);
     });
   });
-
-  describe('Logout', () => {
-    it('Logout out user', (done) => {
-      agent
-        .get('/api/v1/auth/logout')
-        .set('x-access-token', token)
-        .expect(204)
-        .expect(/signed out/i, done);
-    });
-  });
-  
 });

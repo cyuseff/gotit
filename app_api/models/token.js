@@ -4,7 +4,7 @@ const redis = require('../../config/redis');
 const crypto = require('crypto');
 const JWT = require('jsonwebtoken');
 
-const NAME_SPACE = 'tokens'
+const NAME_SPACE = 'Tokens'
 const SECRET = 'my-cool-secret';
 const TOKEN_LENGTH = 32;
 const TTL = 0;

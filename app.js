@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const app = express();
 
 // Config app
-global.__base = __dirname;
 
 // Middlewares
 app.use(express.static(__dirname + '/public', {index: false}));
