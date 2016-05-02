@@ -115,7 +115,11 @@ class Token {
 
       redis.EVAL(script, 3, itemKey, setKey, touch, (err, token) => {
         if(err) return reject(err);
-        if(!token) return reject(new Error('Not found.'));
+        if(!token) {
+          err = new Error('Not found.');
+          err.status = 404;
+          return reject(err);
+        }
 
         token = JSON.parse(token);
 
@@ -123,7 +127,9 @@ class Token {
           if(verify(token, decoded)) {
             resolve(token);
           } else {
-            reject(new Error('Bad token.'));
+            err = new Error('Bad token.');
+            err.status = 400;
+            reject(err);
           }
         } else {
           resolve(token);

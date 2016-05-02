@@ -4,7 +4,7 @@ const request = require('supertest');
 const app = require('../../../../../app');
 const agent = request.agent(app);
 const expect = require('chai').expect;
-const User = require('../../../../../app_api/models/user')
+const User = require('../../../../../app_api/models/user');
 const URL = '/api/v1/auth/local';
 
 let email = 'test@email.com';

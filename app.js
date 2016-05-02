@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 // Routes
-// Api Site routes
+require('./app_api/routes/admin')(app);
 require('./app_api/routes/site')(app);
 
 module.exports = app;
