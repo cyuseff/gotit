@@ -16,7 +16,7 @@ ctrl.localSignin = function(req, res) {
   User
     .findOne({'local.email': req.body.email })
     .exec((err, usr) => {
-      if(err) return this.answer(res, 500, {message: 'Mongo Error.'});
+      if(err) return this.answer(res, 500, {message: 'Internal Server Error.'});
       if(usr) return this.answer(res, 409, {message: 'This email is already in use.'});
 
       user = new User({
@@ -44,9 +44,9 @@ ctrl.localSignin = function(req, res) {
             .then(obj => {
               this.answer(res, 201, {user: obj.user, token: obj.jwt});
             })
-            .catch(err => this.answer(res, 500, {message: 'Mongo Error.'}));
+            .catch(err => this.answer(res, 500, {message: 'Internal Server Error.'}));
         })
-        .catch(err => this.answer(res, 500, {message: e.toString()}));
+        .catch(err => this.answer(res, 500, {message: 'Internal Server Error.'}));
     });
 }
 
@@ -54,7 +54,7 @@ ctrl.localLogin = function(req, res) {
   User
     .findOne({'local.email': req.body.email })
     .exec((err, user) => {
-      if(err) return this.answer(res, 500, {message: 'Mongo Error.'});
+      if(err) return this.answer(res, 500, {message: 'Internal Server Error.'});
       if(!user) return this.answer(res, 404, {message: 'User not found.'});
 
       user
@@ -64,12 +64,12 @@ ctrl.localLogin = function(req, res) {
             user
               .createToken()
               .then(obj => this.answer(res, 200, {user: obj.data, token: obj.jwt}))
-              .catch(err => this.answer(res, 500, {message: 'Opps.'}));
+              .catch(err => this.answer(res, 500, {message: 'Internal Server Error.'}));
           } else {
-            return this.answer(res, 403, 'Wrong password.');
+            return this.answer(res, 400, 'Wrong credentials.');
           }
         })
-        .catch(err => this.answer(res, 500, {message: 'Opps.'}))
+        .catch(err => this.answer(res, 500, {message: 'Internal Server Error.'}))
     });
 };
 

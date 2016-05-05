@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node bin/www",
+    "test": "NODE_ENV=test mocha -R spec --recursive test"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
     "express": "^4.13.4",
     "jsonwebtoken": "^5.7.0",
     "mongoose": "^4.4.13",
+    "morgan": "^1.7.0",
     "redis": "^2.6.0-1",
     "validator": "^5.2.0"
   },

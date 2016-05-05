@@ -107,13 +107,13 @@ describe('Auth Local Controller', () => {
         .expect(/User not found/, done);
     });
 
-    it('Return a 403 password error', (done) => {
+    it('Return a 400 password error', (done) => {
       agent
         .post(URL)
         .send(`email=${email}&password=wrong`)
-        .expect(403)
+        .expect(400)
         .expect('Content-Type', /json/)
-        .expect(/Wrong password/, done);
+        .expect(/Wrong credentials/, done);
     });
 
     it('Return a 200 User with token', (done) => {

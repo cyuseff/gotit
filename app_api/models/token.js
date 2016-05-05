@@ -114,7 +114,11 @@ class Token {
       end';
 
       redis.EVAL(script, 3, itemKey, setKey, touch, (err, token) => {
-        if(err) return reject(err);
+        if(err) {
+          err = new Error('Internal Server Error.');
+          err.status = 500;
+          return reject(err);
+        }
         if(!token) {
           err = new Error('Not found.');
           err.status = 404;
@@ -139,7 +143,10 @@ class Token {
 
     return new Promise((resolve, reject) => {
       JWT.verify(jwt, SECRET, (err, decoded) => {
-        if(err) return reject(err);
+        if(err) {
+          err.status = 400;
+          return reject(err);
+        }
         itemKey = generateRedisKey(decoded.model, decoded.id);
         setKey = (decoded.owner)? generateRedisKey(decoded.model, decoded.owner) : '';
 

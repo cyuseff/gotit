@@ -13,7 +13,7 @@ ctrl.list = function(req, res) {
   User
     .find({}, projection)
     .exec((err, users) => {
-      if(err) return this.answer(res, 500, {message: err});
+      if(err) return this.answer(res, 500, {message: 'Internal Server Error.'});
       this.answer(res, 200, {users: users});
     });
 };

@@ -4,10 +4,14 @@ const Token = require('../models/token');
 
 class BaseController {
   answer(res, status, data) {
+    BaseController._answer(res, status, data);
+  }
+
+  static _answer(res, status, data) {
     res.status(status).json(data);
   }
 
-  authToken(req, res, next) {
+  static authToken(req, res, next) {
     const jwt = req.body.token || req.query.token || req.headers['x-access-token'];
     let data;
     if(jwt) {
@@ -25,9 +29,9 @@ class BaseController {
           req.user = data;
           next();
         })
-        .catch(err => this.answer(res, err.status, {message: err.toString()}));
+        .catch(err => BaseController._answer(res, err.status, {message: err.toString()}));
     } else {
-      return this.answer(res, 403, {message: 'No token provided.'});
+      return BaseController._answer(res, 401, {message: 'Authorization required.'});
     }
   }
 }

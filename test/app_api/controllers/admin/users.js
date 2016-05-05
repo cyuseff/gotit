@@ -43,9 +43,7 @@ describe('User Admin Controller', () => {
       .set('x-access-token', jwt)
       .expect(200)
       .expect('Content-Type', /json/)
-      .expect((res) => {
-        expect(res.body.users).to.have.length.above(2);
-      })
+      .expect(res => expect(res.body.users).to.have.length.above(2))
       .end(done);
   });
 });

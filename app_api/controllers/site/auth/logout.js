@@ -11,7 +11,7 @@ ctrl.logout = function(req, res) {
   Token
     .removeByJwt(jwt)
     .then(() => this.answer(res, 204, {}))
-    .catch(err => this.answer(res, 400, {message: err}));
+    .catch(err => this.answer(res, 500, {message: 'Internal Server Error.'}));
 };
 
 ctrl.logoutAll = function(req, res) {
@@ -27,7 +27,7 @@ ctrl.logoutAll = function(req, res) {
         .then(() => this.answer(res, 204, {}))
         .catch(err => this.answer(res, 400, {message: err}));
     })
-    .catch(err => this.answer(res, 400, {message: err}));
+    .catch(err => this.answer(res, 500, {message: 'Internal Server Error.'}));
 };
 
 module.exports = ctrl;
