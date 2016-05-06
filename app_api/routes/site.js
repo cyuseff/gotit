@@ -11,4 +11,4 @@ router.route('/auth/logout-all').get((req, res) => logoutCtrl.logoutAll(req, res
 
 module.exports = function(app) {
   app.use('/api/v1', router);
-}
+};

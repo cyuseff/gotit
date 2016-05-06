@@ -4,7 +4,7 @@ const redis = require('../../config/redis');
 const crypto = require('crypto');
 const JWT = require('jsonwebtoken');
 
-const NAME_SPACE = 'Tokens'
+const NAME_SPACE = 'Tokens';
 const SECRET = 'my-cool-secret';
 const TOKEN_LENGTH = 32;
 const TTL = 0;
@@ -29,7 +29,6 @@ class Token {
     });
 
     this.id = null;
-    //this.model = opts.model;
     this.owner = opts.owner || null;
     this.data = JSON.stringify(opts.data);
 
@@ -41,10 +40,9 @@ class Token {
   save() {
     let itemKey;
     let setKey;
-    let _save
 
-    _save = (resolve, reject) => {
-      let multi = redis.multi();
+    const _save = (resolve, reject) => {
+      const multi = redis.multi();
 
       if(this.ttl) {
         multi.SETEX(itemKey, this.ttl, JSON.stringify(this));
@@ -53,7 +51,7 @@ class Token {
       }
       if(setKey) multi.SADD(setKey, itemKey);
 
-      multi.exec((err, reply) => {
+      multi.exec((err) => {
         if(err) return reject(err);
         return resolve({jwt: this.jwt, data: JSON.parse(this.data)});
       });
@@ -95,23 +93,23 @@ class Token {
     touch = touch || false;
     let itemKey;
     let setKey;
-    let _find;
 
-    _find = (resolve, reject, decoded) => {
-      let script = '\
-      local token = redis.call("GET", KEYS[1]) \
-      if token then \
-        if KEYS[3] == "true" then \
-          local json = cjson.decode(token) \
-          if json.ttl then \
-            redis.call("EXPIRE", KEYS[1], json.ttl) \
-          end \
-        end \
-        return token \
-      else \
-        redis.call("SREM", KEYS[2], KEYS[1]) \
-        return nil \
-      end';
+    const _find = (resolve, reject, decoded) => {
+      const script = `
+        local token = redis.call("GET", KEYS[1])
+        if token then
+          if KEYS[3] == "true" then
+            local json = cjson.decode(token)
+            if json.ttl then
+              redis.call("EXPIRE", KEYS[1], json.ttl)
+            end
+          end
+          return token
+        else
+          redis.call("SREM", KEYS[2], KEYS[1])
+          return nil
+        end
+      `;
 
       redis.EVAL(script, 3, itemKey, setKey, touch, (err, token) => {
         if(err) {
@@ -128,16 +126,14 @@ class Token {
         token = JSON.parse(token);
 
         if(verify) {
-          if(verify(token, decoded)) {
-            resolve(token);
-          } else {
-            err = new Error('Bad token.');
-            err.status = 400;
-            reject(err);
-          }
-        } else {
-          resolve(token);
+          if(verify(token, decoded)) return resolve(token);
+
+          err = new Error('Bad token.');
+          err.status = 400;
+          return reject(err);
         }
+
+        return resolve(token);
       });
     };
 
@@ -148,9 +144,9 @@ class Token {
           return reject(err);
         }
         itemKey = generateRedisKey(decoded.model, decoded.id);
-        setKey = (decoded.owner)? generateRedisKey(decoded.model, decoded.owner) : '';
+        setKey = (decoded.owner) ? generateRedisKey(decoded.model, decoded.owner) : '';
 
-        _find(resolve, reject, decoded);
+        return _find(resolve, reject, decoded);
       });
     });
   }
@@ -158,10 +154,9 @@ class Token {
   static removeByJwt(jwt) {
     let itemKey;
     let setKey;
-    let _remove;
 
-    _remove = (resolve, reject, decoded) => {
-      let multi = redis.multi();
+    const _remove = (resolve, reject) => {
+      const multi = redis.multi();
       multi.DEL(itemKey);
       if(setKey) multi.SREM(setKey, itemKey);
 
@@ -175,16 +170,23 @@ class Token {
       JWT.verify(jwt, SECRET, (err, decoded) => {
         if(err) return reject(err);
         itemKey = generateRedisKey(decoded.model, decoded.id);
-        setKey = (decoded.owner)? generateRedisKey(decoded.model, decoded.owner) : '';
+        setKey = (decoded.owner) ? generateRedisKey(decoded.model, decoded.owner) : '';
 
-        _remove(resolve, reject, decoded);
+        return _remove(resolve, reject);
       });
     });
   }
 
   static findSet(model, owner) {
     const setKey = generateRedisKey(model, owner);
-    const script = 'local keys = redis.call("SMEMBERS", KEYS[1]) if table.getn(keys)==0 then return {} else return redis.call("MGET", unpack(keys)) end';
+    const script = `
+      local keys = redis.call("SMEMBERS", KEYS[1])
+      if table.getn(keys)==0 then
+        return {}
+      else
+        return redis.call("MGET", unpack(keys))
+      end
+    `;
 
     return new Promise((resolve, reject) => {
       redis.EVAL(script, 1, setKey, (err, reply) => {
@@ -222,29 +224,37 @@ class Token {
     return new Promise((resolve, reject) => {
       redis.EVAL(script, 1, setKey, data, (err, reply) => {
         if(err) return reject(err);
-        resolve(reply);
+        return resolve(reply);
       });
     });
   }
 
   static removeSet(model, owner) {
     const setKey = generateRedisKey(model, owner);
-    const script = 'local keys = redis.call("SMEMBERS", KEYS[1]) if table.getn(keys)==0 then return nil else table.insert(keys, KEYS[1]) return redis.call("DEL", unpack(keys)) end';
+    const script = `
+      local keys = redis.call("SMEMBERS", KEYS[1])
+      if table.getn(keys)==0 then
+        return nil
+      else
+        table.insert(keys, KEYS[1])
+        return redis.call("DEL", unpack(keys))
+      end
+    `;
 
     return new Promise((resolve, reject) => {
-      redis.EVAL(script, 1, setKey, function(err, reply) {
+      redis.EVAL(script, 1, setKey, (err, reply) => {
         if(err) return reject(err);
         if(!reply) return reject(new Error('Set not found.'));
-        resolve(reply);
+        return resolve(reply);
       });
     });
   }
 }
 
 function generateBuffer(callback) {
-  crypto.randomBytes(TOKEN_LENGTH, function(err, buf) {
+  crypto.randomBytes(TOKEN_LENGTH, (err, buf) => {
     if(err) return callback(err);
-    callback(null, buf.toString('hex'));
+    return callback(null, buf.toString('hex'));
   });
 }
 

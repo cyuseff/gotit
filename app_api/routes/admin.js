@@ -15,4 +15,4 @@ router.route('/users')
 
 module.exports = function(app) {
   app.use('/api/v1/admin', router);
-}
+};

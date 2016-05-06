@@ -25,7 +25,7 @@ class BaseController {
             && d.owner === data.id
           );
         })
-        .then(obj => {
+        .then(() => {
           req.user = data;
           next();
         })

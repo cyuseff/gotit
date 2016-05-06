@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 
 const MODEL = 'User';
 const TTL = 120;
-const SALT_ROUNDS = (process.env.NODE_ENV == 'production')? 12 : 2;
+const SALT_ROUNDS = (process.env.NODE_ENV === 'production') ? 12 : 2;
 
 const userSchema = new mongo.Schema({
   // user properties
@@ -62,7 +62,6 @@ const userSchema = new mongo.Schema({
 
 // Methods
 userSchema.methods.create = function() {
-  let token;
   return new Promise((resolve, reject) => {
     this
       .save()
@@ -70,11 +69,9 @@ userSchema.methods.create = function() {
         this
           .createToken()
           .then(obj => resolve({user: obj.data, jwt: obj.jwt}))
-          .catch(err => resolve({user: this.getPublicUser(), jwt: null}));
+          .catch(() => resolve({user: this.getPublicUser(), jwt: null}));
       })
-      .catch(err => {
-        reject(err)
-      });
+      .catch(err => reject(err));
   });
 };
 
@@ -84,7 +81,8 @@ userSchema.methods.createToken = function() {
     token = new Token({
       model: MODEL,
       owner: this._id,
-      data: this.getPublicUser()
+      data: this.getPublicUser(),
+      ttl: TTL
     });
 
     token
@@ -104,7 +102,7 @@ userSchema.methods.saveAndUpdate = function() {
           .then(arr => resolve({user: this.getPublicUser(), tokens: arr}))
           .catch(err => reject(err));
       })
-      .catch(e => reject(err));
+      .catch(err => reject(err));
   });
 };
 
@@ -116,7 +114,7 @@ userSchema.methods.removeAndUpdate = function() {
         Token
           .removeSet(MODEL, this._id)
           .then(() => resolve('ok'))
-          .catch(e => reject(err, {model: MODEL, id: this._id}));
+          .catch(err => reject(err, {model: MODEL, id: this._id}));
       })
       .catch(err => reject(err));
   });
@@ -127,7 +125,7 @@ userSchema.methods.generateHash = function(password) {
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, SALT_ROUNDS, (err, hash) => {
       if(err) return reject(err);
-      resolve(hash);
+      return resolve(hash);
     });
   });
 };
@@ -138,13 +136,13 @@ userSchema.methods.comparePassword = function(candidatePassword) {
   return new Promise((resolve, reject) => {
     bcrypt.compare(candidatePassword, this.local.password, (err, isMatch) => {
       if(err) return reject(err);
-      resolve(isMatch);
+      return resolve(isMatch);
     });
   });
 };
 
 userSchema.methods.getPublicUser = function() {
-  let publicUser = {
+  const publicUser = {
     id: this._id,
     emails: this.emails,
     fullName: this.fullName,
@@ -171,7 +169,7 @@ userSchema.methods.getPublicUser = function() {
   publicUser.facebook = !!this.facebook.id;
   publicUser.twitter = !!this.twitter.id;
   publicUser.google = !!this.google.id;
-  
+
   return publicUser;
 };
 

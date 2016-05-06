@@ -70,6 +70,7 @@ describe('User Model', () => {
             .findByJwt(JWToken)
             .then(token => {
               expect(token).to.exist;
+              expect(token).to.have.property('ttl').above(0);
               done();
             })
             .catch(err => done(err))

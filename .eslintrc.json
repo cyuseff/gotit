@@ -1,0 +1,24 @@
+{
+    "extends": "airbnb",
+    "plugins": [
+        "react"
+    ],
+    "env": {
+        "node": true
+    },
+    "rules": {
+      "func-names": 0,
+      "space-before-function-paren": 0,
+      "strict": 0,
+      "object-curly-spacing": ["error", "never"],
+      "comma-dangle": ["error", "never"],
+      "keyword-spacing": ["error", { "overrides": {
+        "if": { "after": false },
+        "for": { "after": false },
+        "while": { "after": false }
+      } }],
+      "no-underscore-dangle": 0,
+      "new-cap": ["error", {"capIsNew": false}],
+      "no-param-reassign": 0
+    }
+}

@@ -1,8 +1,6 @@
 'use strict';
 
 const express = require('express');
-const mongoose = require('./config/mongo');
-const redis = require('./config/redis');
 const path = require('path');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
@@ -10,6 +8,8 @@ const morgan = require('morgan');
 const app = express();
 
 // Config app
+require('./config/mongo');
+require('./config/redis');
 
 // Middlewares
 if(process.env.NODE_ENV !== 'test') app.use(morgan('dev'));
